@@ -1,0 +1,8 @@
+[package]
+name = "wayfinder"
+version = "0.1.0"
+authors = ["Andrew Couch <andrew@cockroachlabs.com>"]
+
+[dependencies]
+lazy_static = "1.0"
+nom = { version = "4.1.1", features = ["verbose-errors"] }
