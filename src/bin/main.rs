@@ -13,7 +13,7 @@ fn main() {
         Ok(config) => print!("{}", config.1.stringify()),
         result => {
             println!("cargo:warning=Template parse error in {:?}:", path);
-            wayfinder::parse::errors::show_errors(
+            wayfinder::errors::show_errors(
                 &mut std::io::stdout(),
                 &contents,
                 result,
