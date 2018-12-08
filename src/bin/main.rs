@@ -1,6 +1,5 @@
 extern crate wayfinder;
 
-use wayfinder::flat::FlattenedRoutes;
 use wayfinder::gen::codegen;
 
 fn main() {

@@ -65,6 +65,7 @@ pub fn codegen(
             writeln!(w)?;
             writeln!(w, "impl {}Params {{", to_caps_case(&resource.name))?;
             writeln!(w, "    pub fn to_path(&self) -> String {{")?;
+            writeln!(w, "      #[allow(unused_mut)]")?;
             write!(w, "        let mut s = String::from(\"/")?;
 
             let mut path = route.path.iter().peekable();
@@ -175,7 +176,7 @@ pub fn codegen_trie(
     let mut wrote_none = false;
     match trie.data {
         Some(ref route) if route.resources.len() != 0 => {
-            write_methods(w, route, indent);
+            write_methods(w, route, indent)?;
             wrote_none = true;
         },
         _ => {},
@@ -190,7 +191,7 @@ pub fn codegen_trie(
                 if !wrote_none {
                     writeln!(w, "{}None => return Ok(Match::NotFound),", indent2)?;
                 }
-                write_dynamic(w, &trie.children[0].1, indent, p);
+                write_dynamic(w, &trie.children[0].1, indent, p)?;
             },
             Charlike::Separator => {
                 if let Some(ref route) = trie.children[0].1.data {
@@ -207,7 +208,7 @@ pub fn codegen_trie(
                 Charlike::Static(c) => {
                     writeln!(w, "{}Some('{}') => {{", indent2, c)?;
 
-                    codegen_trie(w, &child.1, indent+2);
+                    codegen_trie(w, &child.1, indent+2)?;
 
                     writeln!(w, "{}}},", indent2)?;
                 },
@@ -215,7 +216,7 @@ pub fn codegen_trie(
                     if !wrote_none {
                         writeln!(w, "{}None => return Ok(Match::NotFound),", indent2)?;
                     }
-                    write_dynamic(w, &child.1, indent, p);
+                    write_dynamic(w, &child.1, indent, p)?;
                     // No further routes will possibly match.
                     break;
                 },
@@ -315,7 +316,7 @@ fn write_dynamic(
 
     trie = &trie.children[0].1;
 
-    codegen_trie(w, trie, indent);
+    codegen_trie(w, trie, indent)?;
 
     Ok(())
 }
