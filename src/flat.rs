@@ -14,7 +14,7 @@ pub struct FlattenedPath {
 }
 
 impl FlattenedPath {
-    fn iter<'a>(&'a self) -> impl Iterator<Item=Charlike> + 'a {
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item=Charlike> + 'a {
         self.segments.iter()
             .map(|segment| {
                 let res: Box<Iterator<Item=Charlike>> = match segment {

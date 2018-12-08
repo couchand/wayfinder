@@ -62,6 +62,43 @@ pub fn codegen(
             }
 
             writeln!(w, "}}")?;
+            writeln!(w)?;
+            writeln!(w, "impl {}Params {{", to_caps_case(&resource.name))?;
+            writeln!(w, "    pub fn to_path(&self) -> String {{")?;
+            write!(w, "        let mut s = String::from(\"/")?;
+
+            let mut path = route.path.iter().peekable();
+            loop {
+                let ch = match path.next() {
+                    None => break,
+                    Some(c) => c.clone(),
+                };
+                match ch {
+                    Charlike::Static(s) => {
+                        write!(w, "{}", s)?;
+                    },
+                    Charlike::Dynamic(ref p) => {
+                        writeln!(w, "\");")?;
+                        writeln!(w, "        let text = format!(\"{{}}\", self.{});", p)?;
+                        writeln!(w, "        s.push_str(&text);")?;
+                        write!(w, "        s.push_str(\"")?;
+                    },
+                    Charlike::Separator => {
+                        match path.peek() {
+                            None => {},
+                            Some(_) => {
+                                write!(w, "/")?;
+                            },
+                        }
+                    },
+                }
+            }
+
+            writeln!(w, "\");")?;
+            writeln!(w, "        s")?;
+            writeln!(w, "    }}")?;
+            writeln!(w, "}}")?;
+
         }
     }
 
@@ -77,6 +114,24 @@ pub fn codegen(
     }
 
     writeln!(w, "}}")?;
+    writeln!(w)?;
+
+    writeln!(w, "impl Route {{")?;
+    writeln!(w, "    pub fn to_path(&self) -> String {{")?;
+    writeln!(w, "        match self {{")?;
+
+    for route in flattened.iter() {
+        for resource in route.resources.iter() {
+            if resource.is_redirect { continue }
+
+            writeln!(w, "            Route::{}(p) => p.to_path(),", to_caps_case(&resource.name))?;
+        }
+    }
+
+    writeln!(w, "        }}")?;
+    writeln!(w, "    }}")?;
+    writeln!(w, "}}")?;
+    writeln!(w)?;
 
     writeln!(w, "pub fn match_route<P: std::iter::Iterator<Item=char>>(")?;
     writeln!(w, "    path: &mut P,")?;
@@ -84,6 +139,10 @@ pub fn codegen(
     writeln!(w, ") -> Result<wayfinder::Match<Route>, wayfinder::Error> {{")?;
     writeln!(w, "    use wayfinder::{{Error, Method, Match}};")?;
     writeln!(w, "    let mut path = path.fuse().peekable();")?;
+
+    writeln!(w, "    if path.peek() == Some(&'/') {{")?;
+    writeln!(w, "        path.next();")?;
+    writeln!(w, "    }}")?;
 
     codegen_trie(w, &flattened.to_trie(), 1)?;
 
