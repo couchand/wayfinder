@@ -36,6 +36,14 @@ pub fn codegen(
 ) -> io::Result<()> {
     let flattened = FlattenedRoutes::from(&route_config.routes);
 
+    writeln!(w, "//! Static route configuration.")?;
+    writeln!(w, "//!")?;
+    writeln!(w, "//! Notably contains [`match_route`], as well as request structs")?;
+    writeln!(w, "//! for each named resource.")?;
+    writeln!(w, "//!")?;
+    writeln!(w, "//! [`match_route`]: fn.match_route.html")?;
+    writeln!(w)?;
+
     for header in route_config.headers.iter() {
         writeln!(w, "{}", header.text)?;
     }
@@ -48,6 +56,8 @@ pub fn codegen(
         for resource in route.resources.iter() {
             if resource.is_redirect { continue }
 
+
+            writeln!(w, "/// Parameters for a request to {}.", resource.name)?;
             writeln!(w, "#[derive(Debug)]")?;
             writeln!(w, "pub struct {}Params {{", to_caps_case(&resource.name))?;
 
@@ -64,8 +74,9 @@ pub fn codegen(
             writeln!(w, "}}")?;
             writeln!(w)?;
             writeln!(w, "impl {}Params {{", to_caps_case(&resource.name))?;
+            writeln!(w, "    /// Produce a path to this resource with the given parameters.")?;
             writeln!(w, "    pub fn to_path(&self) -> String {{")?;
-            writeln!(w, "      #[allow(unused_mut)]")?;
+            writeln!(w, "        #[allow(unused_mut)]")?;
             write!(w, "        let mut s = String::from(\"/")?;
 
             let mut path = route.path.iter().peekable();
@@ -99,10 +110,12 @@ pub fn codegen(
             writeln!(w, "        s")?;
             writeln!(w, "    }}")?;
             writeln!(w, "}}")?;
+            writeln!(w)?;
 
         }
     }
 
+    writeln!(w, "/// An active route in the application.")?;
     writeln!(w, "#[derive(Debug)]")?;
     writeln!(w, "pub enum Route {{")?;
 
@@ -118,6 +131,7 @@ pub fn codegen(
     writeln!(w)?;
 
     writeln!(w, "impl Route {{")?;
+    writeln!(w, "    /// Produce a path to this route with the given parameters.")?;
     writeln!(w, "    pub fn to_path(&self) -> String {{")?;
     writeln!(w, "        match self {{")?;
 
@@ -134,6 +148,7 @@ pub fn codegen(
     writeln!(w, "}}")?;
     writeln!(w)?;
 
+    writeln!(w, "/// Match an incoming request against this router.")?;
     writeln!(w, "pub fn match_route<P: std::iter::Iterator<Item=char>>(")?;
     writeln!(w, "    path: &mut P,")?;
     writeln!(w, "    method: wayfinder::Method,")?;
