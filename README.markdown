@@ -5,6 +5,8 @@ a little http router generator
 
 - what is it?
 - getting started
+- language reference
+- status
 - more information
 
 what is it?
@@ -62,6 +64,70 @@ runs the routing algorithm as a CLI.  Try out:
 ```
 > cargo run /books/
 ```
+
+language reference
+------------------
+
+A route configuration file is composed of two parts: an optional
+header and the main hierarchical route configuration section.  The
+header can be any Rust code to be passed through to the generated
+module, mainly to `use` any types referred to below.
+
+The route configuration starts with a line containing the single
+character '/'.  The routes form a hierarchy, and the structure is
+recursively defined.  It is whitespace-sensitive, with indentation
+level corresponding to nesting level.  Blank lines can be added
+anywhere.
+
+Each route segment can have three types of children: query parameters,
+resources, and nested routes.  They must be specified in that order.
+
+Query parameters are a name-type pair written inside square brackets,
+like so: `[lang: String]`.  They apply to every resource on that
+route and every nested route.
+
+Resources are particular HTTP verbs that your application will
+respond to.  They consist of two required parts and an optional one.
+The verb itself is listed first, followed by the name of the resource.
+If the route should redirect to that resource rather than directly
+serving it, an arrow can be written between the parts.  So a simple
+resource might look like `GET people`, and a redirect `GET -> people`.
+Resources can also have query parameters, they are written in a block
+nested under the resource.
+
+Nested routes come last.  The consist of a path segment followed by
+a nested block of query parameters, resources, and routes.  The
+path segment can be either a static string (e.g. `people`) or a
+path parameter written between curly braces, like `{id: Uuid}`.
+
+status
+------
+
+`wayfinder` is currently a work-in-progress.  Here is a summary of
+the current status compared to planned work:
+
+- [x] Parse & stringify route files
+- [ ] More robust parsing error reporting
+- [x] Match static routes
+- [x] Match catch-all route parameters
+- [ ] Query string handling
+- [ ] Method parser & HTTP first-line parser
+- [ ] Security review
+- [ ] Micro benchmarking to eke out the most perf
+- [ ] Macro benchmarking against other routers
+
+Here are some other random things that may be considered:
+
+- [ ] More complicated parameter matching (e.g. regex)
+- [ ] Other interface types:
+  - [ ] `Read`
+  - [ ] `&str`
+- [ ] Non-blocking support:
+  - [ ] `AsyncRead`
+- [ ] Config file formats:
+  - [ ] Documentation on using the `config` types directly from `build.rs`
+  - [ ] Other indentation options or a non-whitespace style
+  - [ ] TOML?
 
 more information
 ----------------
