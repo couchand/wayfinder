@@ -1,0 +1,11 @@
+[package]
+name = "ex2"
+version = "0.1.0"
+authors = ["Andrew Couch <andrew@cockroachlabs.com>"]
+
+[dependencies]
+uuid = { version = "0.7", features = ["serde"] }
+wayfinder = { path = "../../" }
+
+[build-dependencies]
+wayfinder = { path = "../../" }
