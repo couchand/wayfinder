@@ -1,0 +1,9 @@
+/
+  foobar
+    GET foobar
+  fomo
+    GET fomo
+  foosh
+    GET foosh
+  {a:b}
+    GET bar

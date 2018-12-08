@@ -3,6 +3,9 @@ use uuid::Uuid;
 /
   [lang: String]
 
+  users
+    GET -> people
+
   people
     GET people
     POST person_create
