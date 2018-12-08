@@ -6,7 +6,9 @@ extern crate nom;
 #[macro_use]
 pub mod errors;
 
-pub mod config;
+mod config;
+pub use config::*;
+
 pub mod parse;
 pub mod flat;
 pub mod trie;
@@ -14,8 +16,6 @@ pub mod gen;
 
 #[cfg(test)]
 mod tests;
-
-pub use config::*;
 
 pub enum Match<T> {
     NotFound,

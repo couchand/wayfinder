@@ -36,14 +36,17 @@ pub fn codegen(
 ) -> io::Result<()> {
     let flattened = FlattenedRoutes::from(&route_config.routes);
 
-    writeln!(w, "//! Static route configuration.")?;
+
+    writeln!(w, "pub mod routes {{")?;
+    writeln!(w)?;
+    writeln!(w, "//! Application route configuration.")?;
     writeln!(w, "//!")?;
-    writeln!(w, "//! Notably contains [`match_route`], as well as request structs")?;
-    writeln!(w, "//! for each named resource.")?;
+    writeln!(w, "//! Of note is the function [`match_route`] as well as request structs")?;
+    writeln!(w, "//! specific to each named resource.")?;
     writeln!(w, "//!")?;
     writeln!(w, "//! Route configuration:")?;
     writeln!(w, "//!")?;
-    writeln!(w, "//!    /")?;
+    writeln!(w, "//!     /")?;
 
     let stringified_config = str::replace(
         &route_config.routes.stringify(1),
@@ -53,6 +56,9 @@ pub fn codegen(
     writeln!(w, "//!     {}", stringified_config);
 
     writeln!(w, "//! [`match_route`]: fn.match_route.html")?;
+    writeln!(w)?;
+    writeln!(w, "#![allow(unused_imports)]")?;
+    writeln!(w, "#![allow(dead_code)]")?;
     writeln!(w)?;
 
     for header in route_config.headers.iter() {
@@ -68,7 +74,7 @@ pub fn codegen(
             if resource.is_redirect { continue }
 
 
-            writeln!(w, "/// Parameters for a request to {}.", resource.name)?;
+            writeln!(w, "/// Parameters for a request to the {} route.", resource.name)?;
             writeln!(w, "#[derive(Debug)]")?;
             writeln!(w, "pub struct {}Params {{", to_caps_case(&resource.name))?;
 
@@ -85,7 +91,7 @@ pub fn codegen(
             writeln!(w, "}}")?;
             writeln!(w)?;
             writeln!(w, "impl {}Params {{", to_caps_case(&resource.name))?;
-            writeln!(w, "    /// Produce a path to this resource with the given parameters.")?;
+            writeln!(w, "    /// Make a path to this resource with the given parameters.")?;
             writeln!(w, "    pub fn to_path(&self) -> String {{")?;
             writeln!(w, "        #[allow(unused_mut)]")?;
             write!(w, "        let mut s = String::from(\"/")?;
@@ -126,7 +132,7 @@ pub fn codegen(
         }
     }
 
-    writeln!(w, "/// An active route in the application.")?;
+    writeln!(w, "/// An active route in the application -- match against this.")?;
     writeln!(w, "#[derive(Debug)]")?;
     writeln!(w, "pub enum Route {{")?;
 
@@ -142,7 +148,7 @@ pub fn codegen(
     writeln!(w)?;
 
     writeln!(w, "impl Route {{")?;
-    writeln!(w, "    /// Produce a path to this route with the given parameters.")?;
+    writeln!(w, "    /// Make a path to this route with the given parameters.")?;
     writeln!(w, "    pub fn to_path(&self) -> String {{")?;
     writeln!(w, "        match self {{")?;
 
@@ -160,6 +166,32 @@ pub fn codegen(
     writeln!(w)?;
 
     writeln!(w, "/// Match an incoming request against this router.")?;
+    writeln!(w, "///")?;
+    writeln!(w, "/// Accepts an iterator for the characters of the request path,")?;
+    writeln!(w, "/// as well as a [`wayfinder::Method`] for the HTTP verb.")?;
+    writeln!(w, "/// Returns a `Result`, usually `Ok` with the result of the")?;
+    writeln!(w, "/// [`wayfinder::Match`].")?;
+    writeln!(w, "///")?;
+    writeln!(w, "/// If the match was successful, it will be a `Match::Route` or")?;
+    writeln!(w, "/// `Match::Redirect` with the parameters enclosed.  You can then")?;
+    writeln!(w, "/// match on the [`Route`] to pass control of the request along to")?;
+    writeln!(w, "/// a specific handler.")?;
+    writeln!(w, "///")?;
+    writeln!(w, "/// If there is no match, this will return `Match::NotFound`")?;
+    writeln!(w, "/// if no path matches (which you could return as `404 Not Found`),")?;
+    writeln!(w, "/// or `Match::NotAllowed` if no method matches (in which case a")?;
+    writeln!(w, "/// `405 Not Allowed` would be appropriate).")?;
+    writeln!(w, "///")?;
+    writeln!(w, "/// If a route parameter fails to parse correctly, this will return")?;
+    writeln!(w, "/// `Err` with the underlying parsing error.  Usually you'll want")?;
+    writeln!(w, "/// to send back a `400 Bad Request` for that.")?;
+    writeln!(w, "///")?;
+    // TODO: these relative paths assume way too much
+    // TODO: make these point to the specific version on docs.rs
+    writeln!(w, "/// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html")?;
+    writeln!(w, "/// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html")?;
+    writeln!(w, "/// [`Route`]: enum.Route.html")?;
+
     writeln!(w, "pub fn match_route<P: std::iter::Iterator<Item=char>>(")?;
     writeln!(w, "    path: &mut P,")?;
     writeln!(w, "    method: wayfinder::Method,")?;
@@ -173,7 +205,11 @@ pub fn codegen(
 
     codegen_trie(w, &flattened.to_trie(), 1)?;
 
-    writeln!(w, "}}")
+    writeln!(w, "}}")?;
+    writeln!(w)?;
+    writeln!(w, "}} // mod routes")?;
+
+    Ok(())
 }
 
 pub fn codegen_trie(
