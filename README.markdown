@@ -24,6 +24,32 @@ We also declare the route parameter types ahead of time, so the
 code to parse them is produced automatically, and our application
 code can focus on the domain level.
 
+```
+use uuid::Uuid;
+
+/
+  [lang: String]
+
+  users
+    GET -> people
+
+  people
+    GET people
+    POST person_create
+
+    new
+      GET person_new
+
+    {id: Uuid}
+      GET person
+      PUT person_update
+        [name: String]
+      DELETE person_destroy
+
+      edit
+        GET person_edit
+```
+
 getting started
 ---------------
 
