@@ -41,6 +41,17 @@ pub fn codegen(
     writeln!(w, "//! Notably contains [`match_route`], as well as request structs")?;
     writeln!(w, "//! for each named resource.")?;
     writeln!(w, "//!")?;
+    writeln!(w, "//! Route configuration:")?;
+    writeln!(w, "//!")?;
+    writeln!(w, "//!    /")?;
+
+    let stringified_config = str::replace(
+        &route_config.routes.stringify(1),
+        "\n",
+        "\n//!     ",
+    );
+    writeln!(w, "//!     {}", stringified_config);
+
     writeln!(w, "//! [`match_route`]: fn.match_route.html")?;
     writeln!(w)?;
 
