@@ -189,11 +189,17 @@ impl FlattenedControllers {
         let mut controllers = vec![];
 
         for (name, mut actions) in actions.drain() {
-            controllers.push(FlattenedController {
+            let mut controller = FlattenedController {
                 name,
                 actions: actions.drain().map(|(_, v)| v).collect(),
-            });
+            };
+
+            controller.actions.sort_unstable_by_key(|a| a.name.clone());
+
+            controllers.push(controller);
         }
+
+        controllers.sort_unstable_by_key(|c| c.name.clone());
 
         controllers
     }
