@@ -113,3 +113,106 @@ impl FlattenedRoutes {
         t
     }
 }
+
+#[derive(Debug)]
+pub struct FlattenedControllers {
+    pub controllers: Vec<FlattenedController>,
+}
+
+impl<'a> From<&'a Routes> for FlattenedControllers {
+    fn from(routes: &Routes) -> FlattenedControllers {
+        let controllers = FlattenedControllers::flatten(routes, vec![], vec![]);
+        FlattenedControllers { controllers }
+    }
+}
+
+impl FlattenedControllers {
+    fn flatten(
+        routes: &Routes,
+        path: Vec<PathSegment>,
+        query_parameters: Vec<Param>,
+    ) -> Vec<FlattenedController> {
+        use std::collections::HashMap;
+
+        let mut actions = HashMap::new();
+
+        let mut routes_to_process = vec![(routes, path, query_parameters)];
+
+    loop {
+        let (routes, path, mut query_parameters) = match routes_to_process.pop() {
+            None => break,
+            Some((r, p, qp)) => (r, p, qp),
+        };
+
+        for param in routes.query_parameters.iter() {
+            query_parameters.push(param.clone());
+        }
+
+        let flat_path = FlattenedPath { segments: path.clone() };
+        for resource in routes.resources.iter() {
+            if resource.is_redirect { continue }
+
+            let mut query_parameters = query_parameters.clone();
+            query_parameters.extend_from_slice(&resource.query_parameters);
+
+            match actions.entry(resource.controller.clone())
+                .or_insert(HashMap::new())
+                .insert(
+                    resource.action.clone(),
+                    FlattenedAction {
+                        name: resource.action.clone(),
+                        path: flat_path.clone(),
+                        route_parameters: flat_path.dynamics()
+                            .cloned()
+                            .collect(),
+                        query_parameters,
+                    }
+                ) {
+                Some(_) => panic!(
+                    "Duplicate controller action `{}::{}`!",
+                    resource.controller,
+                    resource.action,
+                ),
+                None => {},
+            }
+
+        }
+
+        for child in routes.routes.iter() {
+            let mut new_path = path.clone();
+            new_path.push(child.path_segment.clone());
+
+            routes_to_process.push((&child.routes, new_path, query_parameters.clone()));
+        }
+    }
+
+        let mut controllers = vec![];
+
+        for (name, mut actions) in actions.drain() {
+            controllers.push(FlattenedController {
+                name,
+                actions: actions.drain().map(|(_, v)| v).collect(),
+            });
+        }
+
+        controllers
+    }
+
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item=&FlattenedController> + 'a {
+        self.controllers.iter()
+    }
+}
+
+#[derive(Debug)]
+pub struct FlattenedController {
+    pub name: String,
+    pub actions: Vec<FlattenedAction>,
+}
+
+#[derive(Debug)]
+pub struct FlattenedAction {
+    pub name: String,
+    pub path: FlattenedPath,
+    pub route_parameters: Vec<Param>,
+    pub query_parameters: Vec<Param>,
+}

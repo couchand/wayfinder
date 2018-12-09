@@ -85,7 +85,8 @@ impl Routes {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Resource {
     pub method: Method,
-    pub name: String,
+    pub controller: String,
+    pub action: String,
     pub is_redirect: bool,
     pub query_parameters: Vec<Param>,
 }
@@ -97,11 +98,12 @@ impl Resource {
         }).collect::<Vec<_>>().concat();
 
         format!(
-            "{}{}{} {}{}\n",
+            "{}{}{} {}::{}{}\n",
             indent(level),
             self.method,
             if self.is_redirect { " ->" } else { "" },
-            self.name,
+            self.controller,
+            self.action,
             params,
         )
     }

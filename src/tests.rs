@@ -120,31 +120,34 @@ fn get_resource_cases() -> Vec<(Resource, &'static str)> {
         (
             Resource {
                 method: Method::Get,
-                name: "person".to_string(),
+                controller: "person".to_string(),
+                action: "show".to_string(),
                 is_redirect: false,
                 query_parameters: vec![],
             },
-            "GET person\n",
+            "GET person::show\n",
         ),
         (
             Resource {
                 method: Method::Get,
-                name: "person".to_string(),
+                controller: "person".to_string(),
+                action: "show".to_string(),
                 is_redirect: true,
                 query_parameters: vec![],
             },
-            "GET -> person\n",
+            "GET -> person::show\n",
         ),
         (
             Resource {
                 method: Method::Get,
-                name: "person".to_string(),
+                controller: "person".to_string(),
+                action: "show".to_string(),
                 is_redirect: false,
                 query_parameters: vec![
                     Param::new("id", "usize"),
                 ],
             },
-            "GET person\n  [id: usize]\n",
+            "GET person::show\n  [id: usize]\n",
         ),
     ]
 }
@@ -175,13 +178,15 @@ fn get_routes_cases() -> Vec<(Routes, &'static str)> {
                 resources: vec![
                     Resource {
                         method: Method::Get,
-                        name: "people".to_string(),
+                        controller: "People".to_string(),
+                        action: "Index".to_string(),
                         is_redirect: false,
                         query_parameters: vec![],
                     },
                     Resource {
                         method: Method::Post,
-                        name: "people_new".to_string(),
+                        controller: "People".to_string(),
+                        action: "New".to_string(),
                         is_redirect: false,
                         query_parameters: vec![],
                     },
@@ -189,14 +194,15 @@ fn get_routes_cases() -> Vec<(Routes, &'static str)> {
                 routes: vec![],
                 query_parameters: vec![],
             },
-            "GET people\nPOST people_new\n",
+            "GET People::Index\nPOST People::New\n",
         ),
         (
             Routes {
                 resources: vec![
                     Resource {
                         method: Method::Get,
-                        name: "people".to_string(),
+                        controller: "People".to_string(),
+                        action: "Index".to_string(),
                         is_redirect: false,
                         query_parameters: vec![],
                     },
@@ -206,14 +212,15 @@ fn get_routes_cases() -> Vec<(Routes, &'static str)> {
                     Param::new("lang", "String"),
                 ],
             },
-            "[lang: String]\nGET people\n",
+            "[lang: String]\nGET People::Index\n",
         ),
         (
             Routes {
                 resources: vec![
                     Resource {
                         method: Method::Get,
-                        name: "people".to_string(),
+                        controller: "People".to_string(),
+                        action: "Index".to_string(),
                         is_redirect: false,
                         query_parameters: vec![],
                     },
@@ -227,7 +234,8 @@ fn get_routes_cases() -> Vec<(Routes, &'static str)> {
                             resources: vec![
                                 Resource {
                                     method: Method::Get,
-                                    name: "person".to_string(),
+                                    controller: "People".to_string(),
+                                    action: "Show".to_string(),
                                     is_redirect: false,
                                     query_parameters: vec![],
                                 },
@@ -239,7 +247,7 @@ fn get_routes_cases() -> Vec<(Routes, &'static str)> {
                 ],
                 query_parameters: vec![],
             },
-            "GET people\n{id: Uuid}\n  GET person\n",
+            "GET People::Index\n{id: Uuid}\n  GET People::Show\n",
         ),
     ]
 }
@@ -272,7 +280,8 @@ fn get_nested_routes_cases() -> Vec<(NestedRoutes, &'static str)> {
                     resources: vec![
                         Resource {
                             method: Method::Get,
-                            name: "people".to_string(),
+                            controller: "People".to_string(),
+                            action: "Index".to_string(),
                             is_redirect: false,
                             query_parameters: vec![],
                         },
@@ -281,7 +290,7 @@ fn get_nested_routes_cases() -> Vec<(NestedRoutes, &'static str)> {
                     query_parameters: vec![],
                 },
             },
-            "people\n  GET people\n",
+            "people\n  GET People::Index\n",
         ),
         (
             NestedRoutes {
@@ -292,13 +301,15 @@ fn get_nested_routes_cases() -> Vec<(NestedRoutes, &'static str)> {
                     resources: vec![
                         Resource {
                             method: Method::Get,
-                            name: "person".to_string(),
+                            controller: "People".to_string(),
+                            action: "Show".to_string(),
                             is_redirect: false,
                             query_parameters: vec![],
                         },
                         Resource {
                             method: Method::Put,
-                            name: "person_save".to_string(),
+                            controller: "People".to_string(),
+                            action: "Update".to_string(),
                             is_redirect: false,
                             query_parameters: vec![
                                 Param::new("name", "String"),
@@ -309,7 +320,7 @@ fn get_nested_routes_cases() -> Vec<(NestedRoutes, &'static str)> {
                     query_parameters: vec![],
                 },
             },
-            "{id: Uuid}\n  GET person\n  PUT person_save\n    [name: String]\n",
+            "{id: Uuid}\n  GET People::Show\n  PUT People::Update\n    [name: String]\n",
         ),
     ]
 }
@@ -348,7 +359,8 @@ fn get_route_config_cases() -> Vec<(RouteConfig, &'static str)> {
                             resources: vec![
                                 Resource {
                                     method: Method::Get,
-                                    name: "people".to_string(),
+                                    controller: "People".to_string(),
+                                    action: "Index".to_string(),
                                     is_redirect: false,
                                     query_parameters: vec![],
                                 },
@@ -362,13 +374,15 @@ fn get_route_config_cases() -> Vec<(RouteConfig, &'static str)> {
                                         resources: vec![
                                             Resource {
                                                 method: Method::Get,
-                                                name: "person".to_string(),
+                                                controller: "People".to_string(),
+                                                action: "Show".to_string(),
                                                 is_redirect: false,
                                                 query_parameters: vec![],
                                             },
                                             Resource {
                                                 method: Method::Put,
-                                                name: "person_save".to_string(),
+                                                controller: "People".to_string(),
+                                                action: "Update".to_string(),
                                                 is_redirect: false,
                                                 query_parameters: vec![
                                                     Param::new("name", "String"),
@@ -394,10 +408,10 @@ fn get_route_config_cases() -> Vec<(RouteConfig, &'static str)> {
 /
   [lang: String]
   people
-    GET people
+    GET People::Index
     {id: Uuid}
-      GET person
-      PUT person_save
+      GET People::Show
+      PUT People::Update
         [name: String]
 ",
     )]

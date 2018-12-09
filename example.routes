@@ -4,35 +4,35 @@ use uuid::Uuid;
   [lang: String]
 
   users
-    GET -> people
+    GET -> People::Index
 
   people
-    GET people
-    POST person_create
+    GET People::Index
+    POST People::Create
 
     new
-      GET person_new
+      GET People::New
 
     {id: Uuid}
-      GET person
-      PUT person_update
+      GET People::Show
+      PUT People::Update
         [name: String]
-      DELETE person_destroy
+      DELETE People::Destroy
 
       edit
-        GET person_edit
+        GET People::Edit
 
   books
-    GET books
-    POST book_create
+    GET Books::Index
+    POST Books:Create
 
     new
-      GET book_new
+      GET Books::New
 
     {id: Uuid}
-      GET book
-      PUT book_update
-      DELETE book_destroy
+      GET Books::Show
+      PUT Books::update
+      DELETE Books::Destroy
 
       edit
-        GET book_edit
+        GET Books::Edit

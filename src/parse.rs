@@ -79,17 +79,20 @@ indented!(query_parameter<Param>,
     )
 );
 
-named!(target<CompleteStr, (bool, String)>,
+named!(target<CompleteStr, (bool, String, String)>,
     alt_complete!(
         do_parse!(
-            tag!("->") >>
-            char!(' ') >>
-            name: take_while1!(is_identifier_char) >>
-            ((true, name.to_string()))
+            ws!(tag!("->")) >>
+            controller: take_while1!(is_identifier_char) >>
+            ws!(tag!("::")) >>
+            action: take_while1!(is_identifier_char) >>
+            ((true, controller.to_string(), action.to_string()))
         ) |
         do_parse!(
-            name: take_while1!(is_identifier_char) >>
-            ((false, name.to_string()))
+            controller: take_while1!(is_identifier_char) >>
+            ws!(tag!("::")) >>
+            action: take_while1!(is_identifier_char) >>
+            ((false, controller.to_string(), action.to_string()))
         )
     )
 );
@@ -120,7 +123,8 @@ pub fn resource(
             ) >>
             (Resource {
                 method,
-                name: target.1,
+                controller: target.1,
+                action: target.2,
                 is_redirect: target.0,
                 query_parameters,
             })

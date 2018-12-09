@@ -112,6 +112,9 @@ the current status compared to planned work:
 - [x] Match catch-all route parameters
 - [ ] Query string handling
 - [ ] Method parser & HTTP first-line parser
+- [x] Two level (controller-action) route types
+- [ ] Some simple static checks (uniqueness of params, existence of redirect)
+- [ ] Better test coverage
 - [ ] Security review
 - [ ] Micro benchmarking to eke out the most perf
 - [ ] Macro benchmarking against other routers

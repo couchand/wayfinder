@@ -1,9 +1,9 @@
 /
   foobar
-    GET foobar
+    GET Foo::Bar
   fomo
-    GET fomo
+    GET Fomo::AsUsual
   foosh
-    GET foosh
+    GET Foosh::Ball
   {a:b}
-    GET bar
+    GET Bar::Dyn

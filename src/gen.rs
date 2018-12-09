@@ -2,7 +2,7 @@ use std::io;
 
 use crate::config::RouteConfig;
 use crate::trie::Trie;
-use crate::flat::{Charlike, FlattenedRoute, FlattenedRoutes};
+use crate::flat::{Charlike, FlattenedControllers, FlattenedRoute, FlattenedRoutes};
 
 pub fn to_caps_case(s: &str) -> String {
     let mut chars = s.chars();
@@ -35,7 +35,9 @@ pub fn codegen(
     route_config: &RouteConfig,
 ) -> io::Result<()> {
     let flattened = FlattenedRoutes::from(&route_config.routes);
+    let controllers = FlattenedControllers::from(&route_config.routes);
 
+    println!("{:?}", controllers);
 
     writeln!(w, "pub mod routes {{")?;
     writeln!(w)?;
@@ -57,8 +59,9 @@ pub fn codegen(
 
     writeln!(w, "//! [`match_route`]: fn.match_route.html")?;
     writeln!(w)?;
-    writeln!(w, "#![allow(unused_imports)]")?;
     writeln!(w, "#![allow(dead_code)]")?;
+    writeln!(w, "#![allow(unused_imports)]")?;
+    writeln!(w, "#![allow(unused_mut)]")?;
     writeln!(w)?;
 
     for header in route_config.headers.iter() {
@@ -69,34 +72,75 @@ pub fn codegen(
         writeln!(w)?;
     }
 
-    for route in flattened.iter() {
-        for resource in route.resources.iter() {
-            if resource.is_redirect { continue }
+    for controller in controllers.iter() {
+        writeln!(w, "/// Parameters for requests to the {} controller.", controller.name)?;
+        writeln!(w, "#[derive(Debug)]")?;
+        writeln!(w, "pub enum {} {{", to_caps_case(&controller.name))?;
 
+        for action in controller.actions.iter() {
+            write!(w, "    /// Renders at `/")?;
 
-            writeln!(w, "/// Parameters for a request to the {} route.", resource.name)?;
-            writeln!(w, "#[derive(Debug)]")?;
-            writeln!(w, "pub struct {}Params {{", to_caps_case(&resource.name))?;
-
-            for param in route.path.dynamics() {
-                writeln!(w, "    {}: {},", param.name, param.typ)?;
+            let mut path = action.path.iter().peekable();
+            loop {
+                let ch = match path.next() {
+                    None => break,
+                    Some(c) => c.clone(),
+                };
+                match ch {
+                    Charlike::Static(s) => {
+                        write!(w, "{}", s)?;
+                    },
+                    Charlike::Dynamic(ref p) => {
+                        write!(w, "{{{}}}", p)?;
+                    },
+                    Charlike::Separator => {
+                        match path.peek() {
+                            None => {},
+                            Some(_) => {
+                                write!(w, "/")?;
+                            },
+                        }
+                    },
+                }
             }
-            for param in route.query_parameters.iter() {
-                writeln!(w, "    {}: Option<{}>,", param.name, param.typ)?;
+
+            writeln!(w, "`.");
+
+            writeln!(w, "    {} {{", to_caps_case(&action.name))?;
+
+            for param in action.route_parameters.iter() {
+                writeln!(w, "        {}: {},", param.name, param.typ)?;
             }
-            for param in resource.query_parameters.iter() {
-                writeln!(w, "    {}: Option<{}>,", param.name, param.typ)?;
+            for param in action.query_parameters.iter() {
+                writeln!(w, "        {}: Option<{}>,", param.name, param.typ)?;
             }
 
-            writeln!(w, "}}")?;
-            writeln!(w)?;
-            writeln!(w, "impl {}Params {{", to_caps_case(&resource.name))?;
-            writeln!(w, "    /// Make a path to this resource with the given parameters.")?;
-            writeln!(w, "    pub fn to_path(&self) -> String {{")?;
-            writeln!(w, "        #[allow(unused_mut)]")?;
-            write!(w, "        let mut s = String::from(\"/")?;
+            writeln!(w, "    }},")?;
+        }
 
-            let mut path = route.path.iter().peekable();
+        writeln!(w, "}}")?;
+        writeln!(w)?;
+        writeln!(w, "impl {} {{", to_caps_case(&controller.name))?;
+        writeln!(w, "    /// Make a path to this controller for the given action and parameters.")?;
+        writeln!(w, "    pub fn to_path(&self) -> String {{")?;
+        writeln!(w, "        match self {{")?;
+
+        for action in controller.actions.iter() {
+            write!(w, "            {}::{} {{", controller.name, action.name)?;
+
+            for param in action.route_parameters.iter() {
+                write!(w, "{}, ", param.name)?;
+            }
+
+            for param in action.query_parameters.iter() {
+                write!(w, "{}, ", param.name)?;
+            }
+
+            writeln!(w, "}} => {{")?;
+
+            write!(w, "                let mut s = String::from(\"/")?;
+
+            let mut path = action.path.iter().peekable();
             loop {
                 let ch = match path.next() {
                     None => break,
@@ -108,9 +152,9 @@ pub fn codegen(
                     },
                     Charlike::Dynamic(ref p) => {
                         writeln!(w, "\");")?;
-                        writeln!(w, "        let text = format!(\"{{}}\", self.{});", p)?;
-                        writeln!(w, "        s.push_str(&text);")?;
-                        write!(w, "        s.push_str(\"")?;
+                        writeln!(w, "                let text = format!(\"{{}}\", {});", p)?;
+                        writeln!(w, "                s.push_str(&text);")?;
+                        write!(w, "                s.push_str(\"")?;
                     },
                     Charlike::Separator => {
                         match path.peek() {
@@ -124,24 +168,22 @@ pub fn codegen(
             }
 
             writeln!(w, "\");")?;
-            writeln!(w, "        s")?;
-            writeln!(w, "    }}")?;
-            writeln!(w, "}}")?;
-            writeln!(w)?;
-
+            writeln!(w, "                s")?;
+            writeln!(w, "            }},")?;
         }
+
+        writeln!(w, "        }}")?;
+        writeln!(w, "    }}")?;
+        writeln!(w, "}}")?;
+        writeln!(w)?;
     }
 
     writeln!(w, "/// An active route in the application -- match against this.")?;
     writeln!(w, "#[derive(Debug)]")?;
     writeln!(w, "pub enum Route {{")?;
 
-    for route in flattened.iter() {
-        for resource in route.resources.iter() {
-            if resource.is_redirect { continue }
-
-            writeln!(w, "    {0}({0}Params),", to_caps_case(&resource.name))?;
-        }
+    for controller in controllers.iter() {
+        writeln!(w, "    {0}({0}),", to_caps_case(&controller.name))?;
     }
 
     writeln!(w, "}}")?;
@@ -152,12 +194,8 @@ pub fn codegen(
     writeln!(w, "    pub fn to_path(&self) -> String {{")?;
     writeln!(w, "        match self {{")?;
 
-    for route in flattened.iter() {
-        for resource in route.resources.iter() {
-            if resource.is_redirect { continue }
-
-            writeln!(w, "            Route::{}(p) => p.to_path(),", to_caps_case(&resource.name))?;
-        }
+    for controller in controllers.iter() {
+        writeln!(w, "            Route::{}(p) => p.to_path(),", to_caps_case(&controller.name))?;
     }
 
     writeln!(w, "        }}")?;
@@ -311,11 +349,12 @@ fn write_methods(
     writeln!(w, "{}None => match method {{", indent1)?;
 
     for resource in route.resources.iter() {
-        writeln!(w, "{}    Method::{:?} => return Ok(Match::{}(Route::{3}({3}Params {{",
+        writeln!(w, "{}    Method::{:?} => return Ok(Match::{}(Route::{3}({3}::{4} {{",
             indent1,
             resource.method,
             if resource.is_redirect { "Redirect" } else { "Route" },
-            to_caps_case(&resource.name),
+            to_caps_case(&resource.controller),
+            to_caps_case(&resource.action),
         )?;
 
             for param in route.path.dynamics() {
