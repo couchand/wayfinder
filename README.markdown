@@ -115,6 +115,7 @@ the current status compared to planned work:
 - [ ] `http` lib support instead of or in addition to the above
 - [x] Two level (controller-action) route types
 - [ ] Get rid of any runtime dep on this lib
+- [ ] Route file comments
 - [ ] Some simple static checks (uniqueness of params, existence of redirect)
 - [ ] Better test coverage
 - [ ] Security review
