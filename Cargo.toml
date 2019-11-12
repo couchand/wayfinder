@@ -2,6 +2,7 @@
 members = [
   "wayfinder",
   "wayfinder-build",
+  "wayfinder-cmd",
   "wayfinder-core",
   "wayfinder-gen",
   "wayfinder-parse",
