@@ -1,3 +1,4 @@
+extern crate itertools;
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
@@ -38,7 +39,7 @@ impl<T: fmt::Debug> fmt::Debug for Match<T> {
 
 pub struct Error {
     param: String,
-    what: Box<fmt::Debug>,
+    what: Box<dyn fmt::Debug>,
 }
 
 impl fmt::Debug for Error {

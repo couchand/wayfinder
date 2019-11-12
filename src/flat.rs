@@ -1,3 +1,5 @@
+use itertools::Either;
+
 use crate::config::*;
 use crate::trie::*;
 
@@ -17,22 +19,21 @@ impl FlattenedPath {
     pub fn iter<'a>(&'a self) -> impl Iterator<Item=Charlike> + 'a {
         self.segments.iter()
             .map(|segment| {
-                let res: Box<Iterator<Item=Charlike>> = match segment {
+                match segment {
                     PathSegment::Static(s) => {
-                        Box::new(
+                        Either::Left(
                             s.chars()
                                 .map(Charlike::Static)
                                 .chain(std::iter::once(Charlike::Separator))
                         )
                     },
                     PathSegment::Dynamic(d) => {
-                        Box::new(vec![
+                        Either::Right(vec![
                             Charlike::Dynamic(d.name.clone()),
                             Charlike::Separator,
                         ].into_iter())
                     },
-                };
-                res
+                }
             })
             .flatten()
     }
