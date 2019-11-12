@@ -64,6 +64,7 @@ pub fn codegen<W>(
     writeln!(w, "#![allow(dead_code)]")?;
     writeln!(w, "#![allow(unused_imports)]")?;
     writeln!(w, "#![allow(unused_mut)]")?;
+    writeln!(w, "#![allow(unused_variables)]")?;
     writeln!(w)?;
 
     for header in route_config.headers.iter() {
@@ -497,6 +498,7 @@ mod tests {
 #![allow(dead_code)]
 #![allow(unused_imports)]
 #![allow(unused_mut)]
+#![allow(unused_variables)]
 
 use uuid::Uuid;
 
