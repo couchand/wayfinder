@@ -113,6 +113,7 @@ the current status compared to planned work:
 - [ ] Query string handling
 - [ ] Method parser & HTTP first-line parser
 - [x] Two level (controller-action) route types
+- [ ] Get rid of any runtime dep on this lib
 - [ ] Some simple static checks (uniqueness of params, existence of redirect)
 - [ ] Better test coverage
 - [ ] Security review
