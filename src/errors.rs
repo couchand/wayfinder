@@ -38,13 +38,14 @@ use std::io::Write;
 use nom::{Context, Err};
 use nom::types::CompleteStr;
 
-pub fn show_errors<E>(
-    out: &mut Write,
+pub fn show_errors<E, W>(
+    out: &mut W,
     buf: &str,
     result: nom::IResult<CompleteStr, E>,
     prefix: &str,
 ) where
     E: Debug,
+    W: Write,
 {
     match result {
         Ok(_) => (),
@@ -82,13 +83,15 @@ fn get_message(err: &ErrorKind) -> String {
     }
 }
 
-fn show_error(
-    out: &mut Write,
+fn show_error<W>(
+    out: &mut W,
     buf: &str,
     pos: usize,
     msg: &str,
     prefix: &str,
-) {
+) where
+    W: Write,
+{
     let mut line_start = buf[0..pos].rsplitn(2, '\n');
     let _ = line_start.next();
     let line_start =

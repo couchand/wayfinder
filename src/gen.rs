@@ -1,4 +1,5 @@
 use std::io;
+use std::io::Write;
 
 use crate::config::RouteConfig;
 use crate::trie::Trie;
@@ -30,10 +31,12 @@ pub fn to_caps_case(s: &str) -> String {
     res
 }
 
-pub fn codegen(
-    w: &mut io::Write,
+pub fn codegen<W>(
+    w: &mut W,
     route_config: &RouteConfig,
-) -> io::Result<()> {
+) -> io::Result<()> where
+    W: Write,
+{
     let flattened = FlattenedRoutes::from(&route_config.routes);
     let controllers = FlattenedControllers::from(&route_config.routes);
 
@@ -249,11 +252,13 @@ pub fn codegen(
     Ok(())
 }
 
-pub fn codegen_trie(
-    w: &mut io::Write,
+pub fn codegen_trie<W>(
+    w: &mut W,
     trie: &Trie<Charlike, FlattenedRoute>,
     indent: usize,
-) -> io::Result<()> {
+) -> io::Result<()> where
+    W: Write,
+{
     let mut indent1 = String::new();
     for _ in 0..indent { indent1.push_str("    "); }
     let mut indent2 = indent1.clone();
@@ -337,11 +342,13 @@ pub fn codegen_trie(
     Ok(())
 }
 
-fn write_methods(
-    w: &mut io::Write,
+fn write_methods<W>(
+    w: &mut W,
     route: &FlattenedRoute,
     indent: usize,
-) -> io::Result<()> {
+) -> io::Result<()> where
+    W: Write,
+{
     let mut indent1 = String::from("    ");
     for _ in 0..indent { indent1.push_str("    "); }
 
@@ -376,12 +383,14 @@ fn write_methods(
 }
 
 // assumes that a None case has already been written
-fn write_dynamic(
-    w: &mut io::Write,
+fn write_dynamic<W>(
+    w: &mut W,
     mut trie: &Trie<Charlike, FlattenedRoute>,
     indent: usize,
     name: &str,
-) -> io::Result<()> {
+) -> io::Result<()> where
+    W: Write,
+{
     let mut indent1 = String::new();
     for _ in 0..indent { indent1.push_str("    "); }
     let mut indent2 = indent1.clone();
