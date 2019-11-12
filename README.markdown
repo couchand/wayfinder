@@ -112,7 +112,7 @@ the current status compared to planned work:
 - [x] Match catch-all route parameters
 - [ ] Query string handling
 - [ ] Method parser & HTTP first-line parser
-- [ ] `http` lib support instead of or in addition to the above
+- [x] `http` lib support instead of or in addition to the above
 - [x] Two level (controller-action) route types
 - [ ] Get rid of any runtime dep on this lib
 - [ ] Route file comments

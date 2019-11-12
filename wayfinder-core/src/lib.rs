@@ -208,3 +208,16 @@ impl fmt::Display for Method {
         })
     }
 }
+
+#[cfg(feature = "http")]
+impl std::convert::From<&http::Method> for Method {
+    fn from(method: &http::Method) -> Method {
+        match method {
+            &http::Method::GET => Method::Get,
+            &http::Method::POST => Method::Post,
+            &http::Method::PUT => Method::Put,
+            &http::Method::DELETE => Method::Delete,
+            _ => unimplemented!("Method unimplemented: {}", method.as_str()),
+        }
+    }
+}

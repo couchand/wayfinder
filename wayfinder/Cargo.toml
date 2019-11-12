@@ -6,5 +6,9 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+
+http = ["wayfinder-core/http"]
+
 [dependencies]
 wayfinder-core = { path = "../wayfinder-core" }
