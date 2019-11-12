@@ -1,9 +1,10 @@
 [workspace]
 members = [
+  "wayfinder",
   "wayfinder-build",
   "wayfinder-core",
   "wayfinder-gen",
   "wayfinder-parse",
-  "wayfinder-run",
   "wayfinder-tests",
+  "examples/cli",
 ]

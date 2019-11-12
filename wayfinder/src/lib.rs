@@ -1,3 +1,5 @@
+pub use wayfinder_core::Method;
+
 pub enum Match<T> {
     NotFound,
     NotAllowed,

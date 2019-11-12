@@ -5,7 +5,7 @@ authors = ["Andrew Dona-Couch <hi@andrewcou.ch>"]
 
 [dependencies]
 uuid = { version = "0.7", features = ["serde"] }
-wayfinder = { path = "../../" }
+wayfinder = { path = "../../wayfinder" }
 
 [build-dependencies]
-wayfinder = { path = "../../" }
+wayfinder-build = { path = "../../wayfinder-build" }
