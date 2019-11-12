@@ -28,19 +28,19 @@ impl<K: Ord + Clone, V> Trie<K, V> {
         }
     }
 
-/*
-    /// Build a new trie initialized with the given data.
-    pub fn with_data(data: V) -> Trie<K, V> {
-        Trie {
-            data: Some(data),
-            children: vec![],
+    /*
+        /// Build a new trie initialized with the given data.
+        pub fn with_data(data: V) -> Trie<K, V> {
+            Trie {
+                data: Some(data),
+                children: vec![],
+            }
         }
-    }
-*/
+    */
 
     /// Adds the given element to the trie.  If an element already exists
     /// at that position, fails, returning the old trie and the element.
-    pub fn add<P: IntoIterator<Item=K>>(
+    pub fn add<P: IntoIterator<Item = K>>(
         mut self,
         path: P,
         data: V,
@@ -68,7 +68,7 @@ impl<K: Ord + Clone, V> Trie<K, V> {
                     self.children.insert(i, (c, tr));
                     self
                 })
-            },
+            }
             // We found a link.
             Ok(i) => {
                 let (_, tr) = self.children.remove(i);

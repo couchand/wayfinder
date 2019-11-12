@@ -36,15 +36,11 @@ lazy_static! {
 use std::fmt::Debug;
 use std::io::Write;
 
-use nom::{Context, Err};
 use nom::types::CompleteStr;
+use nom::{Context, Err};
 
-pub fn show_errors<E, W>(
-    out: &mut W,
-    buf: &str,
-    result: nom::IResult<CompleteStr, E>,
-    prefix: &str,
-) where
+pub fn show_errors<E, W>(out: &mut W, buf: &str, result: nom::IResult<CompleteStr, E>, prefix: &str)
+where
     E: Debug,
     W: Write,
 {
@@ -84,23 +80,14 @@ fn get_message(err: &ErrorKind) -> String {
     }
 }
 
-fn show_error<W>(
-    out: &mut W,
-    buf: &str,
-    pos: usize,
-    msg: &str,
-    prefix: &str,
-) where
+fn show_error<W>(out: &mut W, buf: &str, pos: usize, msg: &str, prefix: &str)
+where
     W: Write,
 {
     let mut line_start = buf[0..pos].rsplitn(2, '\n');
     let _ = line_start.next();
-    let line_start =
-        line_start.next().map(|bytes| bytes.len() + 1).unwrap_or(0);
-    let line = buf[line_start..]
-        .splitn(2, '\n')
-        .next()
-        .unwrap();
+    let line_start = line_start.next().map(|bytes| bytes.len() + 1).unwrap_or(0);
+    let line = buf[line_start..].splitn(2, '\n').next().unwrap();
     let line_no = what_line(buf, line_start);
     let pos_in_line = buf[line_start..pos].chars().count() + 1;
     writeln!(

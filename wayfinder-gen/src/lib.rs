@@ -1,5 +1,5 @@
 mod flat;
-mod trie;
 mod gen;
+mod trie;
 
 pub use gen::codegen;

@@ -35,17 +35,18 @@ impl fmt::Debug for Error {
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Error parsing '{}' parameter {:?}", self.param, self.what)
+        write!(
+            f,
+            "Error parsing '{}' parameter {:?}",
+            self.param, self.what
+        )
     }
 }
 
 impl std::error::Error for Error {}
 
 impl Error {
-    pub fn fail<
-        S: AsRef<str>,
-        T: fmt::Debug + 'static,
-    >(param: S, what: T) -> Error {
+    pub fn fail<S: AsRef<str>, T: fmt::Debug + 'static>(param: S, what: T) -> Error {
         Error {
             param: param.as_ref().to_string(),
             what: Box::new(what),

@@ -13,7 +13,7 @@ fn main() {
         return;
     }
 
-    let result = routes::match_route(&mut {args[1].chars()}, wayfinder::Method::Get);
+    let result = routes::match_route(&mut { args[1].chars() }, wayfinder::Method::Get);
     println!("Parsed: {:?}", result);
 
     match result {

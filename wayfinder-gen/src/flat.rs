@@ -1,7 +1,7 @@
 use itertools::Either;
 
-use wayfinder_core::*;
 use crate::trie::*;
+use wayfinder_core::*;
 
 #[derive(Debug, Clone, PartialOrd, Ord, PartialEq, Eq)]
 pub enum Charlike {
@@ -16,38 +16,31 @@ pub struct FlattenedPath {
 }
 
 impl FlattenedPath {
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item=Charlike> + 'a {
-        self.segments.iter()
-            .map(|segment| {
-                match segment {
-                    PathSegment::Static(s) => {
-                        Either::Left(
-                            s.chars()
-                                .map(Charlike::Static)
-                                .chain(std::iter::once(Charlike::Separator))
-                        )
-                    },
-                    PathSegment::Dynamic(d) => {
-                        Either::Right(vec![
-                            Charlike::Dynamic(d.name.clone()),
-                            Charlike::Separator,
-                        ].into_iter())
-                    },
-                }
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item = Charlike> + 'a {
+        self.segments
+            .iter()
+            .map(|segment| match segment {
+                PathSegment::Static(s) => Either::Left(
+                    s.chars()
+                        .map(Charlike::Static)
+                        .chain(std::iter::once(Charlike::Separator)),
+                ),
+                PathSegment::Dynamic(d) => Either::Right(
+                    vec![Charlike::Dynamic(d.name.clone()), Charlike::Separator].into_iter(),
+                ),
             })
             .flatten()
     }
 
-    pub fn dynamics<'a>(&'a self) -> impl Iterator<Item=&'a Param> + 'a {
-        self.segments.iter()
-            .filter_map(|segment| match segment {
-                PathSegment::Dynamic(s) => Some(s),
-                _ => None,
-            })
+    pub fn dynamics<'a>(&'a self) -> impl Iterator<Item = &'a Param> + 'a {
+        self.segments.iter().filter_map(|segment| match segment {
+            PathSegment::Dynamic(s) => Some(s),
+            _ => None,
+        })
     }
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct FlattenedRoute {
     pub path: FlattenedPath,
     pub resources: Vec<Resource>,
@@ -78,7 +71,9 @@ impl FlattenedRoutes {
         }
 
         flattened.push(FlattenedRoute {
-            path: FlattenedPath { segments: path.clone() },
+            path: FlattenedPath {
+                segments: path.clone(),
+            },
             resources: routes.resources.clone(),
             query_parameters: query_parameters.clone(),
         });
@@ -86,29 +81,28 @@ impl FlattenedRoutes {
         for child in routes.routes.iter() {
             let mut new_path = path.clone();
             new_path.push(child.path_segment.clone());
-            flattened.extend_from_slice(
-                &FlattenedRoutes::flatten(
-                    &child.routes,
-                    new_path,
-                    query_parameters.clone(),
-                )
-            );
+            flattened.extend_from_slice(&FlattenedRoutes::flatten(
+                &child.routes,
+                new_path,
+                query_parameters.clone(),
+            ));
         }
 
         flattened
     }
 
-/*
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item=&FlattenedRoute> + 'a {
-        self.routes.iter()
-    }
-*/
+    /*
+        pub fn iter<'a>(&'a self) -> impl Iterator<Item=&FlattenedRoute> + 'a {
+            self.routes.iter()
+        }
+    */
 
     pub fn to_trie(&self) -> Trie<Charlike, FlattenedRoute> {
         let mut t = Trie::new();
 
         for route in self.routes.iter() {
-            t = t.add(route.path.iter(), route.clone())
+            t = t
+                .add(route.path.iter(), route.clone())
                 .map_err(|_| "all paths should be unique!")
                 .unwrap();
         }
@@ -141,54 +135,55 @@ impl FlattenedControllers {
 
         let mut routes_to_process = vec![(routes, path, query_parameters)];
 
-    loop {
-        let (routes, path, mut query_parameters) = match routes_to_process.pop() {
-            None => break,
-            Some((r, p, qp)) => (r, p, qp),
-        };
+        loop {
+            let (routes, path, mut query_parameters) = match routes_to_process.pop() {
+                None => break,
+                Some((r, p, qp)) => (r, p, qp),
+            };
 
-        for param in routes.query_parameters.iter() {
-            query_parameters.push(param.clone());
-        }
-
-        let flat_path = FlattenedPath { segments: path.clone() };
-        for resource in routes.resources.iter() {
-            if resource.is_redirect { continue }
-
-            let mut query_parameters = query_parameters.clone();
-            query_parameters.extend_from_slice(&resource.query_parameters);
-
-            match actions.entry(resource.controller.clone())
-                .or_insert(HashMap::new())
-                .insert(
-                    resource.action.clone(),
-                    FlattenedAction {
-                        name: resource.action.clone(),
-                        method: resource.method.clone(),
-                        path: flat_path.clone(),
-                        route_parameters: flat_path.dynamics()
-                            .cloned()
-                            .collect(),
-                        query_parameters,
-                    }
-                ) {
-                Some(_) => panic!(
-                    "Duplicate controller action `{}::{}`!",
-                    resource.controller,
-                    resource.action,
-                ),
-                None => {},
+            for param in routes.query_parameters.iter() {
+                query_parameters.push(param.clone());
             }
 
-        }
+            let flat_path = FlattenedPath {
+                segments: path.clone(),
+            };
+            for resource in routes.resources.iter() {
+                if resource.is_redirect {
+                    continue;
+                }
 
-        for child in routes.routes.iter() {
-            let mut new_path = path.clone();
-            new_path.push(child.path_segment.clone());
+                let mut query_parameters = query_parameters.clone();
+                query_parameters.extend_from_slice(&resource.query_parameters);
 
-            routes_to_process.push((&child.routes, new_path, query_parameters.clone()));
+                match actions
+                    .entry(resource.controller.clone())
+                    .or_insert(HashMap::new())
+                    .insert(
+                        resource.action.clone(),
+                        FlattenedAction {
+                            name: resource.action.clone(),
+                            method: resource.method.clone(),
+                            path: flat_path.clone(),
+                            route_parameters: flat_path.dynamics().cloned().collect(),
+                            query_parameters,
+                        },
+                    ) {
+                    Some(_) => panic!(
+                        "Duplicate controller action `{}::{}`!",
+                        resource.controller, resource.action,
+                    ),
+                    None => {}
+                }
+            }
+
+            for child in routes.routes.iter() {
+                let mut new_path = path.clone();
+                new_path.push(child.path_segment.clone());
+
+                routes_to_process.push((&child.routes, new_path, query_parameters.clone()));
+            }
         }
-    }
 
         let mut controllers = vec![];
 
@@ -208,7 +203,7 @@ impl FlattenedControllers {
         controllers
     }
 
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item=&FlattenedController> + 'a {
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item = &FlattenedController> + 'a {
         self.controllers.iter()
     }
 }

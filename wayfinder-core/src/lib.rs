@@ -9,7 +9,9 @@ pub struct RouteConfig {
 
 impl RouteConfig {
     pub fn stringify(&self) -> String {
-        let headers = self.headers.iter()
+        let headers = self
+            .headers
+            .iter()
             .map(|h| format!("{}\n", h.text))
             .collect::<Vec<_>>()
             .concat();
@@ -60,24 +62,26 @@ fn indent(level: usize) -> &'static str {
 
 impl Routes {
     pub fn stringify(&self, level: usize) -> String {
-        let params = self.query_parameters.iter().map(|param| {
-            format!("{}[{}]\n", indent(level), param)
-        }).collect::<Vec<_>>().concat();
-        let resources = self.resources.iter()
+        let params = self
+            .query_parameters
+            .iter()
+            .map(|param| format!("{}[{}]\n", indent(level), param))
+            .collect::<Vec<_>>()
+            .concat();
+        let resources = self
+            .resources
+            .iter()
             .map(|r| r.stringify(level))
             .collect::<Vec<_>>()
             .concat();
-        let nested_routes = self.routes.iter()
+        let nested_routes = self
+            .routes
+            .iter()
             .map(|r| r.stringify(level))
             .collect::<Vec<_>>()
             .concat();
 
-        format!(
-            "{}{}{}",
-            params,
-            resources,
-            nested_routes,
-        )
+        format!("{}{}{}", params, resources, nested_routes,)
     }
 }
 
@@ -93,9 +97,12 @@ pub struct Resource {
 
 impl Resource {
     pub fn stringify(&self, level: usize) -> String {
-        let params = self.query_parameters.iter().map(|param| {
-            format!("\n{}[{}]", indent(level+1), param)
-        }).collect::<Vec<_>>().concat();
+        let params = self
+            .query_parameters
+            .iter()
+            .map(|param| format!("\n{}[{}]", indent(level + 1), param))
+            .collect::<Vec<_>>()
+            .concat();
 
         format!(
             "{}{}{} {}::{}{}\n",
@@ -125,7 +132,7 @@ impl NestedRoutes {
                 PathSegment::Static(ref p) => format!("{}", p),
                 PathSegment::Dynamic(ref p) => format!("{{{}}}", p),
             },
-            self.routes.stringify(level+1),
+            self.routes.stringify(level + 1),
         )
     }
 }
