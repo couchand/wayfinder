@@ -57,7 +57,7 @@ pub fn codegen<W>(
         "\n//!     ",
     );
     let stringified_config = &stringified_config[..stringified_config.len()-5];
-    writeln!(w, "//!     {}", stringified_config);
+    writeln!(w, "//!     {}", stringified_config)?;
 
     writeln!(w, "//! [`match_route`]: fn.match_route.html")?;
     writeln!(w)?;
@@ -106,7 +106,7 @@ pub fn codegen<W>(
                 }
             }
 
-            writeln!(w, "`.");
+            writeln!(w, "`.")?;
 
             writeln!(w, "    {} {{", to_caps_case(&action.name))?;
 
@@ -270,9 +270,9 @@ pub fn codegen_trie<W>(
     });
 
     if has_dynamic {
-        writeln!(w);
+        writeln!(w)?;
         writeln!(w, "{}let mut text = String::new();", indent1)?;
-        writeln!(w);
+        writeln!(w)?;
     }
 
     writeln!(w, "{}match path.next() {{", indent1)?;
@@ -398,7 +398,7 @@ fn write_dynamic<W>(
 
     writeln!(w, "{}Some(c) => text.push(c),", indent2)?;
     writeln!(w, "{}}}", indent1)?;
-    writeln!(w);
+    writeln!(w)?;
     writeln!(w, "{}loop {{", indent1)?;
 
     writeln!(w, "{}match path.peek().cloned() {{", indent2)?;
@@ -414,10 +414,10 @@ fn write_dynamic<W>(
     writeln!(w, "{}}}", indent2)?;
 
     writeln!(w, "{}}};", indent1)?;
-    writeln!(w);
+    writeln!(w)?;
     writeln!(w, "{}let {} = text.parse()", indent1, name)?;
     writeln!(w, "{}    .map_err(|e| Error::fail(\"{}\", e))?;", indent1, name)?;
-    writeln!(w);
+    writeln!(w)?;
 
     // must be followed by a separator
     if trie.children.len() != 1 {
