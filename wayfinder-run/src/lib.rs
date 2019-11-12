@@ -1,23 +1,3 @@
-extern crate itertools;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate nom;
-
-#[macro_use]
-pub mod errors;
-
-mod config;
-pub use config::*;
-
-pub mod parse;
-pub mod flat;
-pub mod trie;
-pub mod gen;
-
-#[cfg(test)]
-mod tests;
-
 pub enum Match<T> {
     NotFound,
     NotAllowed,

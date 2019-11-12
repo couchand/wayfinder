@@ -1,5 +1,6 @@
 // This mod cribbed from ructe.
 
+use lazy_static::lazy_static;
 use nom::ErrorKind;
 use std::sync::Mutex;
 

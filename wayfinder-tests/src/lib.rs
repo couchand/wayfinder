@@ -1,7 +1,10 @@
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
 use nom::types::CompleteStr;
 
-use crate::config::*;
-use crate::parse;
+use wayfinder_core::*;
+use wayfinder_parse as parse;
 
 fn get_method_cases() -> Vec<(Method, &'static str)> {
     vec![

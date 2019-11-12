@@ -1,6 +1,6 @@
 use itertools::Either;
 
-use crate::config::*;
+use wayfinder_core::*;
 use crate::trie::*;
 
 #[derive(Debug, Clone, PartialOrd, Ord, PartialEq, Eq)]
@@ -98,9 +98,11 @@ impl FlattenedRoutes {
         flattened
     }
 
+/*
     pub fn iter<'a>(&'a self) -> impl Iterator<Item=&FlattenedRoute> + 'a {
         self.routes.iter()
     }
+*/
 
     pub fn to_trie(&self) -> Trie<Charlike, FlattenedRoute> {
         let mut t = Trie::new();

@@ -1,7 +1,7 @@
 use std::io;
 use std::io::Write;
 
-use crate::config::RouteConfig;
+use wayfinder_core::RouteConfig;
 use crate::trie::Trie;
 use crate::flat::{Charlike, FlattenedControllers, FlattenedRoute, FlattenedRoutes};
 
@@ -438,7 +438,7 @@ fn write_dynamic<W>(
 
 #[cfg(test)]
 mod tests {
-    use crate::config::*;
+    use wayfinder_core::*;
     use super::*;
 
     #[test]

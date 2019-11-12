@@ -1,9 +1,9 @@
-[package]
-name = "wayfinder"
-version = "0.1.0"
-authors = ["Andrew Dona-Couch <hi@andrewcou.ch>"]
-
-[dependencies]
-itertools = "0.8"
-lazy_static = "1.0"
-nom = { version = "4.1.1", features = ["verbose-errors"] }
+[workspace]
+members = [
+  "wayfinder-build",
+  "wayfinder-core",
+  "wayfinder-gen",
+  "wayfinder-parse",
+  "wayfinder-run",
+  "wayfinder-tests",
+]

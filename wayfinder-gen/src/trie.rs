@@ -28,6 +28,7 @@ impl<K: Ord + Clone, V> Trie<K, V> {
         }
     }
 
+/*
     /// Build a new trie initialized with the given data.
     pub fn with_data(data: V) -> Trie<K, V> {
         Trie {
@@ -35,6 +36,7 @@ impl<K: Ord + Clone, V> Trie<K, V> {
             children: vec![],
         }
     }
+*/
 
     /// Adds the given element to the trie.  If an element already exists
     /// at that position, fails, returning the old trie and the element.

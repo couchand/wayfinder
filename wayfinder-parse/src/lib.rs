@@ -1,10 +1,20 @@
 // TODO: this parser is functional, but there's a lot more that can
 // be done to improve robustness and error reporting.
 
-use nom::{IResult, line_ending, not_line_ending};
+use lazy_static::lazy_static;
+use nom::{
+    IResult, line_ending, not_line_ending, pair,
+    apply, complete, do_parse, many0, many1, named, tag, tag_no_case,
+    preceded, return_error, terminated, alt_complete, char,
+    value, not, take_while1, ws, count, recognize,
+    delimited,
+};
 use nom::types::CompleteStr;
 
-use crate::config::*;
+use wayfinder_core::*;
+
+#[macro_use]
+pub mod errors;
 
 macro_rules! indented {
     (
