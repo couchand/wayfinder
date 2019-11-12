@@ -161,6 +161,7 @@ impl FlattenedControllers {
                     resource.action.clone(),
                     FlattenedAction {
                         name: resource.action.clone(),
+                        method: resource.method.clone(),
                         path: flat_path.clone(),
                         route_parameters: flat_path.dynamics()
                             .cloned()
@@ -218,6 +219,7 @@ pub struct FlattenedController {
 #[derive(Debug)]
 pub struct FlattenedAction {
     pub name: String,
+    pub method: Method,
     pub path: FlattenedPath,
     pub route_parameters: Vec<Param>,
     pub query_parameters: Vec<Param>,

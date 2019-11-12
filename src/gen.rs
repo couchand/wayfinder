@@ -77,7 +77,7 @@ pub fn codegen(
         writeln!(w, "pub enum {} {{", to_caps_case(&controller.name))?;
 
         for action in controller.actions.iter() {
-            write!(w, "    /// Renders at `/")?;
+            write!(w, "    /// Renders for `{} /", action.method)?;
 
             let mut path = action.path.iter().peekable();
             loop {
@@ -494,10 +494,10 @@ use uuid::Uuid;
 /// Parameters for requests to the People controller.
 #[derive(Debug)]
 pub enum People {
-    /// Renders at `/`.
+    /// Renders for `GET /`.
     Index {
     },
-    /// Renders at `/{id}`.
+    /// Renders for `GET /{id}`.
     Show {
         id: Uuid,
     },
