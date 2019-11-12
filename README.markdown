@@ -33,23 +33,23 @@ use uuid::Uuid;
   [lang: String]
 
   users
-    GET -> people
+    GET -> People::Index
 
   people
-    GET people
-    POST person_create
+    GET People::Index
+    POST People::Create
 
     new
-      GET person_new
+      GET People::New
 
     {id: Uuid}
-      GET person
-      PUT person_update
+      GET People::Show
+      PUT People::Update
         [name: String]
-      DELETE person_destroy
+      DELETE People::Destroy
 
       edit
-        GET person_edit
+        GET People::Edit
 ```
 
 getting started
