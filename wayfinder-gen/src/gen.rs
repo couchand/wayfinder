@@ -141,7 +141,7 @@ where
 
             writeln!(w, "}} => {{")?;
 
-            write!(w, "                let mut s = String::from(\"/")?;
+            write!(w, "                format!(\"/")?;
 
             let mut path = action.path.iter().peekable();
             loop {
@@ -153,11 +153,8 @@ where
                     Charlike::Static(s) => {
                         write!(w, "{}", s)?;
                     }
-                    Charlike::Dynamic(ref p) => {
-                        writeln!(w, "\");")?;
-                        writeln!(w, "                let text = format!(\"{{}}\", {});", p)?;
-                        writeln!(w, "                s.push_str(&text);")?;
-                        write!(w, "                s.push_str(\"")?;
+                    Charlike::Dynamic(_) => {
+                        write!(w, "{{}}")?;
                     }
                     Charlike::Separator => match path.peek() {
                         None => {}
@@ -168,8 +165,13 @@ where
                 }
             }
 
-            writeln!(w, "\");")?;
-            writeln!(w, "                s")?;
+            write!(w, "\"")?;
+
+            for param in action.route_parameters.iter() {
+                write!(w, ", {}", param.name)?;
+            }
+
+            writeln!(w, ")")?;
             writeln!(w, "            }},")?;
         }
 
@@ -591,15 +593,10 @@ impl People {
     pub fn to_path(&self) -> String {
         match self {
             People::Index {} => {
-                let mut s = String::from(\"/\");
-                s
+                format!(\"/\")
             },
             People::Show {id, } => {
-                let mut s = String::from(\"/\");
-                let text = format!(\"{}\", id);
-                s.push_str(&text);
-                s.push_str(\"\");
-                s
+                format!(\"/{}\", id)
             },
         }
     }
