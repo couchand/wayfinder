@@ -620,7 +620,7 @@ impl Route {
     }
 }
 
-/// Match an incoming request against this router.
+/// Match a path and method against this router.
 ///
 /// Accepts an iterator for the characters of the request path,
 /// as well as a [`wayfinder::Method`] for the HTTP verb.
