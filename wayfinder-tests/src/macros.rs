@@ -20,8 +20,8 @@ fn test_get_macro_basic() {
 
     assert_eq!(g, Resource {
         method: Method::Get,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: false,
         query_parameters: vec![],
     });
@@ -33,8 +33,8 @@ fn test_get_macro_redirect() {
 
     assert_eq!(g, Resource {
         method: Method::Get,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: true,
         query_parameters: vec![],
     });
@@ -46,8 +46,8 @@ fn test_get_macro_params() {
 
     assert_eq!(g, Resource {
         method: Method::Get,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: false,
         query_parameters: vec![param!(name: String)],
     });
@@ -59,8 +59,8 @@ fn test_post_macro_basic() {
 
     assert_eq!(g, Resource {
         method: Method::Post,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: false,
         query_parameters: vec![],
     });
@@ -72,8 +72,8 @@ fn test_post_macro_redirect() {
 
     assert_eq!(g, Resource {
         method: Method::Post,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: true,
         query_parameters: vec![],
     });
@@ -85,8 +85,8 @@ fn test_post_macro_params() {
 
     assert_eq!(g, Resource {
         method: Method::Post,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: false,
         query_parameters: vec![param!(name: String)],
     });
@@ -98,8 +98,8 @@ fn test_put_macro_basic() {
 
     assert_eq!(g, Resource {
         method: Method::Put,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: false,
         query_parameters: vec![],
     });
@@ -111,8 +111,8 @@ fn test_put_macro_redirect() {
 
     assert_eq!(g, Resource {
         method: Method::Put,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: true,
         query_parameters: vec![],
     });
@@ -124,8 +124,8 @@ fn test_put_macro_params() {
 
     assert_eq!(g, Resource {
         method: Method::Put,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: false,
         query_parameters: vec![param!(name: String)],
     });
@@ -137,8 +137,8 @@ fn test_delete_macro_basic() {
 
     assert_eq!(g, Resource {
         method: Method::Delete,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: false,
         query_parameters: vec![],
     });
@@ -150,8 +150,8 @@ fn test_delete_macro_redirect() {
 
     assert_eq!(g, Resource {
         method: Method::Delete,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: true,
         query_parameters: vec![],
     });
@@ -163,8 +163,8 @@ fn test_delete_macro_params() {
 
     assert_eq!(g, Resource {
         method: Method::Delete,
-        controller: "User".into(),
-        action: "New".into(),
+        modules: vec!["User".into()],
+        name: "New".into(),
         is_redirect: false,
         query_parameters: vec![param!(name: String)],
     });

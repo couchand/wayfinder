@@ -10,100 +10,100 @@ macro_rules! header {
 #[macro_export]
 macro_rules! get {
     (
-        @get $controller:ident $action:ident $is_redirect:expr $(, $param:expr)*
+        @get $modules:ident $name:ident $is_redirect:expr $(, $param:expr)*
     ) => {
         ::wayfinder_core::Resource {
             method: ::wayfinder_core::Method::Get,
-            controller: stringify!($controller).to_string(),
-            action: stringify!($action).to_string(),
+            modules: vec![stringify!($modules).to_string()],
+            name: stringify!($name).to_string(),
             is_redirect: $is_redirect,
             query_parameters: vec![$($param),*],
         }
     };
     (
-        $controller:ident :: $action:ident $(, $param: expr)*
+        $modules:ident :: $name:ident $(, $param: expr)*
     ) => {
-        get!(@get $controller $action false $(, $param)*)
+        get!(@get $modules $name false $(, $param)*)
     };
     (
-        -> $controller:ident :: $action:ident
+        -> $modules:ident :: $name:ident
     ) => {
-        get!(@get $controller $action true)
+        get!(@get $modules $name true)
     };
 }
 
 #[macro_export]
 macro_rules! post {
     (
-        @post $controller:ident $action:ident $is_redirect:expr $(, $param:expr)*
+        @post $modules:ident $name:ident $is_redirect:expr $(, $param:expr)*
     ) => {
         ::wayfinder_core::Resource {
             method: ::wayfinder_core::Method::Post,
-            controller: stringify!($controller).to_string(),
-            action: stringify!($action).to_string(),
+            modules: vec![stringify!($modules).to_string()],
+            name: stringify!($name).to_string(),
             is_redirect: $is_redirect,
             query_parameters: vec![$($param),*],
         }
     };
     (
-        $controller:ident :: $action:ident $(, $param: expr)*
+        $modules:ident :: $name:ident $(, $param: expr)*
     ) => {
-        post!(@post $controller $action false $(, $param)*)
+        post!(@post $modules $name false $(, $param)*)
     };
     (
-        -> $controller:ident :: $action:ident
+        -> $modules:ident :: $name:ident
     ) => {
-        post!(@post $controller $action true)
+        post!(@post $modules $name true)
     };
 }
 
 #[macro_export]
 macro_rules! put {
     (
-        @put $controller:ident $action:ident $is_redirect:expr $(, $param:expr)*
+        @put $modules:ident $name:ident $is_redirect:expr $(, $param:expr)*
     ) => {
         ::wayfinder_core::Resource {
             method: ::wayfinder_core::Method::Put,
-            controller: stringify!($controller).to_string(),
-            action: stringify!($action).to_string(),
+            modules: vec![stringify!($modules).to_string()],
+            name: stringify!($name).to_string(),
             is_redirect: $is_redirect,
             query_parameters: vec![$($param),*],
         }
     };
     (
-        $controller:ident :: $action:ident $(, $param: expr)*
+        $modules:ident :: $name:ident $(, $param: expr)*
     ) => {
-        put!(@put $controller $action false $(, $param)*)
+        put!(@put $modules $name false $(, $param)*)
     };
     (
-        -> $controller:ident :: $action:ident
+        -> $modules:ident :: $name:ident
     ) => {
-        put!(@put $controller $action true)
+        put!(@put $modules $name true)
     };
 }
 
 #[macro_export]
 macro_rules! delete {
     (
-        @delete $controller:ident $action:ident $is_redirect:expr $(, $param:expr)*
+        @delete $modules:ident $name:ident $is_redirect:expr $(, $param:expr)*
     ) => {
         ::wayfinder_core::Resource {
             method: ::wayfinder_core::Method::Delete,
-            controller: stringify!($controller).to_string(),
-            action: stringify!($action).to_string(),
+            modules: vec![stringify!($modules).to_string()],
+            name: stringify!($name).to_string(),
             is_redirect: $is_redirect,
             query_parameters: vec![$($param),*],
         }
     };
     (
-        $controller:ident :: $action:ident $(, $param: expr)*
+        $modules:ident :: $name:ident $(, $param: expr)*
     ) => {
-        delete!(@delete $controller $action false $(, $param)*)
+        delete!(@delete $modules $name false $(, $param)*)
     };
     (
-        -> $controller:ident :: $action:ident
+        -> $modules:ident :: $name:ident
     ) => {
-        delete!(@delete $controller $action true)
+        delete!(@delete $modules $name true)
     };
 }
 

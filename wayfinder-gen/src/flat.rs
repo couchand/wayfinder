@@ -112,23 +112,23 @@ impl FlattenedRoutes {
 }
 
 #[derive(Debug)]
-pub struct FlattenedControllers {
-    pub controllers: Vec<FlattenedController>,
+pub struct FlattenedModules {
+    pub modules: Vec<FlattenedModule>,
 }
 
-impl<'a> From<&'a Routes> for FlattenedControllers {
-    fn from(routes: &Routes) -> FlattenedControllers {
-        let controllers = FlattenedControllers::flatten(routes, vec![], vec![]);
-        FlattenedControllers { controllers }
+impl<'a> From<&'a Routes> for FlattenedModules {
+    fn from(routes: &Routes) -> FlattenedModules {
+        let modules = FlattenedModules::flatten(routes, vec![], vec![]);
+        FlattenedModules { modules }
     }
 }
 
-impl FlattenedControllers {
+impl FlattenedModules {
     fn flatten(
         routes: &Routes,
         path: Vec<PathSegment>,
         query_parameters: Vec<Param>,
-    ) -> Vec<FlattenedController> {
+    ) -> Vec<FlattenedModule> {
         use std::collections::HashMap;
 
         let mut actions = HashMap::new();
@@ -157,12 +157,12 @@ impl FlattenedControllers {
                 query_parameters.extend_from_slice(&resource.query_parameters);
 
                 match actions
-                    .entry(resource.controller.clone())
+                    .entry(resource.modules.clone().into_iter().next().unwrap()) // TODO: multiplicity
                     .or_insert(HashMap::new())
                     .insert(
-                        resource.action.clone(),
+                        resource.name.clone(),
                         FlattenedAction {
-                            name: resource.action.clone(),
+                            name: resource.name.clone(),
                             method: resource.method.clone(),
                             path: flat_path.clone(),
                             route_parameters: flat_path.dynamics().cloned().collect(),
@@ -171,7 +171,7 @@ impl FlattenedControllers {
                     ) {
                     Some(_) => panic!(
                         "Duplicate controller action `{}::{}`!",
-                        resource.controller, resource.action,
+                        resource.modules.iter().next().unwrap(), resource.name,
                     ),
                     None => {}
                 }
@@ -185,33 +185,34 @@ impl FlattenedControllers {
             }
         }
 
-        let mut controllers = vec![];
+        let mut modules = vec![];
 
         for (name, mut actions) in actions.drain() {
-            let mut controller = FlattenedController {
+            let mut module = FlattenedModule {
                 name,
                 actions: actions.drain().map(|(_, v)| v).collect(),
             };
 
-            controller.actions.sort_unstable_by_key(|a| a.name.clone());
+            module.actions.sort_unstable_by_key(|a| a.name.clone());
 
-            controllers.push(controller);
+            modules.push(module);
         }
 
-        controllers.sort_unstable_by_key(|c| c.name.clone());
+        modules.sort_unstable_by_key(|c| c.name.clone());
 
-        controllers
+        modules
     }
 
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item = &FlattenedController> + 'a {
-        self.controllers.iter()
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item = &FlattenedModule> + 'a {
+        self.modules.iter()
     }
 }
 
 #[derive(Debug)]
-pub struct FlattenedController {
+pub struct FlattenedModule {
     pub name: String,
     pub actions: Vec<FlattenedAction>,
+    // pub modules: Vec<FlattenedModule>,
 }
 
 #[derive(Debug)]

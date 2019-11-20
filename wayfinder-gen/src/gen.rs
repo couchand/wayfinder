@@ -1,7 +1,7 @@
 use std::io;
 use std::io::Write;
 
-use crate::flat::{Charlike, FlattenedControllers, FlattenedRoute, FlattenedRoutes};
+use crate::flat::{Charlike, FlattenedModules, FlattenedRoute, FlattenedRoutes};
 use crate::trie::Trie;
 use wayfinder_core::RouteConfig;
 
@@ -34,7 +34,7 @@ where
     W: Write,
 {
     let flattened = FlattenedRoutes::from(&route_config.routes);
-    let controllers = FlattenedControllers::from(&route_config.routes);
+    let modules = FlattenedModules::from(&route_config.routes);
 
     writeln!(w, "pub mod routes {{")?;
     writeln!(w)?;
@@ -70,16 +70,16 @@ where
         writeln!(w)?;
     }
 
-    for controller in controllers.iter() {
+    for module in modules.iter() {
         writeln!(
             w,
             "/// Parameters for requests to the {} controller.",
-            controller.name
+            module.name
         )?;
         writeln!(w, "#[derive(Debug)]")?;
-        writeln!(w, "pub enum {} {{", to_caps_case(&controller.name))?;
+        writeln!(w, "pub enum {} {{", to_caps_case(&module.name))?;
 
-        for action in controller.actions.iter() {
+        for action in module.actions.iter() {
             write!(w, "    /// Renders for `{} /", action.method)?;
 
             let mut path = action.path.iter().peekable();
@@ -120,7 +120,7 @@ where
 
         writeln!(w, "}}")?;
         writeln!(w)?;
-        writeln!(w, "impl {} {{", to_caps_case(&controller.name))?;
+        writeln!(w, "impl {} {{", to_caps_case(&module.name))?;
         writeln!(
             w,
             "    /// Make a path to this controller for the given action and parameters."
@@ -128,8 +128,8 @@ where
         writeln!(w, "    pub fn to_path(&self) -> String {{")?;
         writeln!(w, "        match self {{")?;
 
-        for action in controller.actions.iter() {
-            write!(w, "            {}::{} {{", controller.name, action.name)?;
+        for action in module.actions.iter() {
+            write!(w, "            {}::{} {{", module.name, action.name)?;
 
             for param in action.route_parameters.iter() {
                 write!(w, "{}, ", param.name)?;
@@ -188,8 +188,8 @@ where
     writeln!(w, "#[derive(Debug)]")?;
     writeln!(w, "pub enum Route {{")?;
 
-    for controller in controllers.iter() {
-        writeln!(w, "    {0}({0}),", to_caps_case(&controller.name))?;
+    for module in modules.iter() {
+        writeln!(w, "    {0}({0}),", to_caps_case(&module.name))?;
     }
 
     writeln!(w, "}}")?;
@@ -203,11 +203,11 @@ where
     writeln!(w, "    pub fn to_path(&self) -> String {{")?;
     writeln!(w, "        match self {{")?;
 
-    for controller in controllers.iter() {
+    for module in modules.iter() {
         writeln!(
             w,
             "            Route::{}(p) => p.to_path(),",
-            to_caps_case(&controller.name)
+            to_caps_case(&module.name)
         )?;
     }
 
@@ -438,8 +438,8 @@ where
             } else {
                 "Route"
             },
-            to_caps_case(&resource.controller),
-            to_caps_case(&resource.action),
+            to_caps_case(&resource.modules.iter().next().unwrap()), // TODO: multiplicity
+            to_caps_case(&resource.name),
         )?;
 
         for param in route.path.dynamics() {
@@ -534,8 +534,8 @@ mod tests {
                 resources: vec![Resource {
                     method: Method::Get,
                     is_redirect: false,
-                    controller: "People".to_string(),
-                    action: "Index".to_string(),
+                    modules: vec!["People".to_string()],
+                    name: "Index".to_string(),
                     query_parameters: vec![],
                 }],
                 routes: vec![NestedRoutes {
@@ -544,8 +544,8 @@ mod tests {
                         resources: vec![Resource {
                             method: Method::Get,
                             is_redirect: false,
-                            controller: "People".to_string(),
-                            action: "Show".to_string(),
+                            modules: vec!["People".to_string()],
+                            name: "Show".to_string(),
                             query_parameters: vec![],
                         }],
                         routes: vec![],

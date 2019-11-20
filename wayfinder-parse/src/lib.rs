@@ -80,6 +80,7 @@ indented!(
     )
 );
 
+// TODO: make this parse multi-level routes!
 named!(target<CompleteStr, (bool, String, String)>,
     alt_complete!(
         do_parse!(
@@ -121,8 +122,8 @@ pub fn resource(input: CompleteStr, level: usize) -> IResult<CompleteStr, Resour
                     ))
                 >> (Resource {
                     method,
-                    controller: target.1,
-                    action: target.2,
+                    modules: vec![target.1],
+                    name: target.2,
                     is_redirect: target.0,
                     query_parameters,
                 })
