@@ -1,6 +1,8 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
+mod macros;
+
 use nom::types::CompleteStr;
 
 use wayfinder_core::*;

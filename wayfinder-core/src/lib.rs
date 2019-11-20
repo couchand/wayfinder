@@ -140,82 +140,100 @@ impl Resource {
 #[macro_export]
 macro_rules! get {
     (
-        $controller:ident :: $action:ident
+        @get $controller:ident $action:ident $is_redirect:expr $(, $param:expr)*
     ) => {
         ::wayfinder_core::Resource {
             method: ::wayfinder_core::Method::Get,
             controller: stringify!($controller).to_string(),
             action: stringify!($action).to_string(),
-            is_redirect: false,
-            query_parameters: vec![],
+            is_redirect: $is_redirect,
+            query_parameters: vec![$($param),*],
         }
+    };
+    (
+        $controller:ident :: $action:ident $(, $param: expr)*
+    ) => {
+        get!(@get $controller $action false $(, $param)*)
     };
     (
         -> $controller:ident :: $action:ident
     ) => {
-        ::wayfinder_core::Resource {
-            method: ::wayfinder_core::Method::Get,
-            controller: stringify!($controller).to_string(),
-            action: stringify!($action).to_string(),
-            is_redirect: true,
-            query_parameters: vec![],
-        }
+        get!(@get $controller $action true)
     };
 }
 
 #[macro_export]
 macro_rules! post {
     (
-        $controller:ident :: $action:ident
+        @post $controller:ident $action:ident $is_redirect:expr $(, $param:expr)*
     ) => {
         ::wayfinder_core::Resource {
             method: ::wayfinder_core::Method::Post,
             controller: stringify!($controller).to_string(),
             action: stringify!($action).to_string(),
-            is_redirect: false,
-            query_parameters: vec![],
+            is_redirect: $is_redirect,
+            query_parameters: vec![$($param),*],
         }
+    };
+    (
+        $controller:ident :: $action:ident $(, $param: expr)*
+    ) => {
+        post!(@post $controller $action false $(, $param)*)
+    };
+    (
+        -> $controller:ident :: $action:ident
+    ) => {
+        post!(@post $controller $action true)
     };
 }
 
 #[macro_export]
 macro_rules! put {
     (
-        $controller:ident :: $action:ident
+        @put $controller:ident $action:ident $is_redirect:expr $(, $param:expr)*
     ) => {
         ::wayfinder_core::Resource {
             method: ::wayfinder_core::Method::Put,
             controller: stringify!($controller).to_string(),
             action: stringify!($action).to_string(),
-            is_redirect: false,
-            query_parameters: vec![],
+            is_redirect: $is_redirect,
+            query_parameters: vec![$($param),*],
         }
     };
     (
-        $controller:ident :: $action:ident , $($params:expr),+
+        $controller:ident :: $action:ident $(, $param: expr)*
     ) => {
-        ::wayfinder_core::Resource {
-            method: ::wayfinder_core::Method::Put,
-            controller: stringify!($controller).to_string(),
-            action: stringify!($action).to_string(),
-            is_redirect: false,
-            query_parameters: vec![$($params),+],
-        }
-    }
+        put!(@put $controller $action false $(, $param)*)
+    };
+    (
+        -> $controller:ident :: $action:ident
+    ) => {
+        put!(@put $controller $action true)
+    };
 }
 
 #[macro_export]
 macro_rules! delete {
     (
-        $controller:ident :: $action:ident
+        @delete $controller:ident $action:ident $is_redirect:expr $(, $param:expr)*
     ) => {
         ::wayfinder_core::Resource {
             method: ::wayfinder_core::Method::Delete,
             controller: stringify!($controller).to_string(),
             action: stringify!($action).to_string(),
-            is_redirect: false,
-            query_parameters: vec![],
+            is_redirect: $is_redirect,
+            query_parameters: vec![$($param),*],
         }
+    };
+    (
+        $controller:ident :: $action:ident $(, $param: expr)*
+    ) => {
+        delete!(@delete $controller $action false $(, $param)*)
+    };
+    (
+        -> $controller:ident :: $action:ident
+    ) => {
+        delete!(@delete $controller $action true)
     };
 }
 
