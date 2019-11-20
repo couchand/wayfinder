@@ -220,7 +220,10 @@ where
     {
         writeln!(w, "/// Match an incoming request against this router.")?;
         writeln!(w, "///")?;
-        writeln!(w, "/// For more details, see the documentation for [`match_route`]")?;
+        writeln!(
+            w,
+            "/// For more details, see the documentation for [`match_route`]"
+        )?;
         writeln!(w, "/// [`match_route`]: #match_route")?;
         writeln!(w, "pub fn match_req<B>(req: &http::Request<B>) ->")?;
         writeln!(w, "    Result<wayfinder::Match<Route>, wayfinder::Error>")?;

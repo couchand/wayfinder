@@ -160,7 +160,7 @@ macro_rules! get {
             is_redirect: true,
             query_parameters: vec![],
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -175,7 +175,7 @@ macro_rules! post {
             is_redirect: false,
             query_parameters: vec![],
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -216,7 +216,7 @@ macro_rules! delete {
             is_redirect: false,
             query_parameters: vec![],
         }
-    }
+    };
 }
 
 /// A block of routes nested under a path segment.
@@ -304,7 +304,7 @@ macro_rules! param {
         $name:ident : $type:ty
     ) => {
         ::wayfinder_core::Param::new(stringify!($name), stringify!($type))
-    }
+    };
 }
 
 /// HTTP methods that resources can respond to.
