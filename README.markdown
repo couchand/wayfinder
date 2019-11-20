@@ -114,9 +114,16 @@ the current status compared to planned work:
 - [ ] Method parser & HTTP first-line parser
 - [x] `http` lib support instead of or in addition to the above
 - [x] Two level (controller-action) route types
+- [ ] Any level (module*-route) route types
 - [ ] Get rid of any runtime dep on this lib
 - [ ] Route file comments
 - [x] Merge multiple route config files
+- [ ] `Into` impls flow upward
+- [ ] `link_to` helper leveraging the above
+- [ ] Accept `AsRef<str>` instead of `Iterator<Item=char>`
+- [ ] Match chunk-wise, not char-wise
+- [ ] Only try parsing if route actually matches otherwise
+- [ ] Add more context to parse errors?
 - [ ] Some simple static checks (uniqueness of params, existence of redirect)
 - [ ] Better test coverage
 - [ ] Security review
