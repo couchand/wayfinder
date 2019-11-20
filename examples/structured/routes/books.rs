@@ -6,12 +6,12 @@ pub fn routes() -> RouteConfig {
             use uuid::Uuid;
         )],
         routes: Routes {
-            resources: vec![get! {Books::Index}, post! {Books::Create}],
+            resources: vec![get!(Books::Index), post!(Books::Create)],
             routes: vec![
                 NestedRoutes::new(
                     "new",
                     Routes {
-                        resources: vec![get! {Books::New}],
+                        resources: vec![get!(Books::New)],
                         ..Default::default()
                     },
                 ),
@@ -19,14 +19,14 @@ pub fn routes() -> RouteConfig {
                     param!(id: Uuid),
                     Routes {
                         resources: vec![
-                            get! {Books::Show},
-                            put! {Books::Update},
-                            delete! {Books::Destroy},
+                            get!(Books::Show),
+                            put!(Books::Update),
+                            delete!(Books::Destroy),
                         ],
                         routes: vec![NestedRoutes::new(
                             "edit",
                             Routes {
-                                resources: vec![get! {Books::Edit}],
+                                resources: vec![get!(Books::Edit)],
                                 ..Default::default()
                             },
                         )],
