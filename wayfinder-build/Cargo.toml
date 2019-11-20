@@ -10,5 +10,6 @@ edition = "2018"
 http = ["wayfinder-gen/http"]
 
 [dependencies]
+wayfinder-core = { path = "../wayfinder-core" }
 wayfinder-gen = { path = "../wayfinder-gen" }
 wayfinder-parse = { path = "../wayfinder-parse" }

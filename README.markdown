@@ -116,6 +116,7 @@ the current status compared to planned work:
 - [x] Two level (controller-action) route types
 - [ ] Get rid of any runtime dep on this lib
 - [ ] Route file comments
+- [x] Merge multiple route config files
 - [ ] Some simple static checks (uniqueness of params, existence of redirect)
 - [ ] Better test coverage
 - [ ] Security review
@@ -132,6 +133,7 @@ Here are some other random things that may be considered:
   - [ ] `AsyncRead`
 - [ ] Config file formats:
   - [ ] Documentation on using the `config` types directly from `build.rs`
+  - [x] Macros!
   - [ ] Other indentation options or a non-whitespace style
   - [ ] TOML?
 

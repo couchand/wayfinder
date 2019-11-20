@@ -8,4 +8,5 @@ members = [
   "wayfinder-parse",
   "wayfinder-tests",
   "examples/cli",
+  "examples/structured",
 ]
