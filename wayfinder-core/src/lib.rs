@@ -111,6 +111,26 @@ pub struct Resource {
 }
 
 impl Resource {
+    /// A helper for macros to use.  Generally, you should just use the struct create syntax.
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `handler` is an empty vec.
+    pub fn make(method: Method, handler: Vec<String>, is_redirect: bool, query_parameters: Vec<Param>) -> Resource {
+        let (modules, name) = {
+            let mut ms = handler;
+            let n = ms.remove(ms.len() - 1);
+            (ms, n)
+        };
+        Resource {
+            method,
+            modules,
+            name,
+            is_redirect,
+            query_parameters,
+        }
+    }
+
     pub fn stringify(&self, level: usize) -> String {
         let params = self
             .query_parameters

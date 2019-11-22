@@ -54,6 +54,32 @@ fn test_get_macro_params() {
 }
 
 #[test]
+fn test_get_macro_no_module() {
+    let g = get!(Homepage);
+
+    assert_eq!(g, Resource {
+        method: Method::Get,
+        modules: vec![],
+        name: "Homepage".into(),
+        is_redirect: false,
+        query_parameters: vec![],
+    });
+}
+
+#[test]
+fn test_get_macro_several_modules() {
+    let g = get!(admin::users::Create);
+
+    assert_eq!(g, Resource {
+        method: Method::Get,
+        modules: vec!["admin".into(), "users".into()],
+        name: "Create".into(),
+        is_redirect: false,
+        query_parameters: vec![],
+    });
+}
+
+#[test]
 fn test_post_macro_basic() {
     let g = post!(User::New);
 
@@ -89,6 +115,32 @@ fn test_post_macro_params() {
         name: "New".into(),
         is_redirect: false,
         query_parameters: vec![param!(name: String)],
+    });
+}
+
+#[test]
+fn test_post_macro_no_module() {
+    let g = post!(Homepage);
+
+    assert_eq!(g, Resource {
+        method: Method::Post,
+        modules: vec![],
+        name: "Homepage".into(),
+        is_redirect: false,
+        query_parameters: vec![],
+    });
+}
+
+#[test]
+fn test_post_macro_several_modules() {
+    let g = post!(admin::users::Create);
+
+    assert_eq!(g, Resource {
+        method: Method::Post,
+        modules: vec!["admin".into(), "users".into()],
+        name: "Create".into(),
+        is_redirect: false,
+        query_parameters: vec![],
     });
 }
 
@@ -132,6 +184,32 @@ fn test_put_macro_params() {
 }
 
 #[test]
+fn test_put_macro_no_module() {
+    let g = put!(Homepage);
+
+    assert_eq!(g, Resource {
+        method: Method::Put,
+        modules: vec![],
+        name: "Homepage".into(),
+        is_redirect: false,
+        query_parameters: vec![],
+    });
+}
+
+#[test]
+fn test_put_macro_several_modules() {
+    let g = put!(admin::users::Create);
+
+    assert_eq!(g, Resource {
+        method: Method::Put,
+        modules: vec!["admin".into(), "users".into()],
+        name: "Create".into(),
+        is_redirect: false,
+        query_parameters: vec![],
+    });
+}
+
+#[test]
 fn test_delete_macro_basic() {
     let g = delete!(User::New);
 
@@ -167,5 +245,31 @@ fn test_delete_macro_params() {
         name: "New".into(),
         is_redirect: false,
         query_parameters: vec![param!(name: String)],
+    });
+}
+
+#[test]
+fn test_delete_macro_no_module() {
+    let g = delete!(Homepage);
+
+    assert_eq!(g, Resource {
+        method: Method::Delete,
+        modules: vec![],
+        name: "Homepage".into(),
+        is_redirect: false,
+        query_parameters: vec![],
+    });
+}
+
+#[test]
+fn test_delete_macro_several_modules() {
+    let g = delete!(admin::users::Create);
+
+    assert_eq!(g, Resource {
+        method: Method::Delete,
+        modules: vec!["admin".into(), "users".into()],
+        name: "Create".into(),
+        is_redirect: false,
+        query_parameters: vec![],
     });
 }

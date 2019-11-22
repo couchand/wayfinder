@@ -10,100 +10,96 @@ macro_rules! header {
 #[macro_export]
 macro_rules! get {
     (
-        @get $modules:ident $name:ident $is_redirect:expr $(, $param:expr)*
+        @get ($($modules:ident)+) $is_redirect:expr $(, $param:expr)*
     ) => {
-        ::wayfinder_core::Resource {
-            method: ::wayfinder_core::Method::Get,
-            modules: vec![stringify!($modules).to_string()],
-            name: stringify!($name).to_string(),
-            is_redirect: $is_redirect,
-            query_parameters: vec![$($param),*],
-        }
+        ::wayfinder_core::Resource::make(
+            ::wayfinder_core::Method::Get,
+            vec![$(stringify!($modules).to_string()),*],
+            $is_redirect,
+            vec![$($param),*],
+        )
     };
     (
-        $modules:ident :: $name:ident $(, $param: expr)*
+        $root:ident $(:: $nested:ident)* $(, $param: expr)*
     ) => {
-        get!(@get $modules $name false $(, $param)*)
+        get!(@get ($root $($nested)*) false $(, $param)*)
     };
     (
-        -> $modules:ident :: $name:ident
+        -> $root:ident $(:: $nested:ident)*
     ) => {
-        get!(@get $modules $name true)
+        get!(@get ($root $($nested)*) true)
     };
 }
 
 #[macro_export]
 macro_rules! post {
     (
-        @post $modules:ident $name:ident $is_redirect:expr $(, $param:expr)*
+        @post ($($modules:ident)+) $is_redirect:expr $(, $param:expr)*
     ) => {
-        ::wayfinder_core::Resource {
-            method: ::wayfinder_core::Method::Post,
-            modules: vec![stringify!($modules).to_string()],
-            name: stringify!($name).to_string(),
-            is_redirect: $is_redirect,
-            query_parameters: vec![$($param),*],
-        }
+        ::wayfinder_core::Resource::make(
+            ::wayfinder_core::Method::Post,
+            vec![$(stringify!($modules).to_string()),*],
+            $is_redirect,
+            vec![$($param),*],
+        )
     };
     (
-        $modules:ident :: $name:ident $(, $param: expr)*
+        $root:ident $(:: $nested:ident)* $(, $param: expr)*
     ) => {
-        post!(@post $modules $name false $(, $param)*)
+        post!(@post ($root $($nested)*) false $(, $param)*)
     };
     (
-        -> $modules:ident :: $name:ident
+        -> $root:ident $(:: $nested:ident)*
     ) => {
-        post!(@post $modules $name true)
+        post!(@post ($root $($nested)*) true)
     };
 }
 
 #[macro_export]
 macro_rules! put {
     (
-        @put $modules:ident $name:ident $is_redirect:expr $(, $param:expr)*
+        @put ($($modules:ident)+) $is_redirect:expr $(, $param:expr)*
     ) => {
-        ::wayfinder_core::Resource {
-            method: ::wayfinder_core::Method::Put,
-            modules: vec![stringify!($modules).to_string()],
-            name: stringify!($name).to_string(),
-            is_redirect: $is_redirect,
-            query_parameters: vec![$($param),*],
-        }
+        ::wayfinder_core::Resource::make(
+            ::wayfinder_core::Method::Put,
+            vec![$(stringify!($modules).to_string()),*],
+            $is_redirect,
+            vec![$($param),*],
+        )
     };
     (
-        $modules:ident :: $name:ident $(, $param: expr)*
+        $root:ident $(:: $nested:ident)* $(, $param: expr)*
     ) => {
-        put!(@put $modules $name false $(, $param)*)
+        put!(@put ($root $($nested)*) false $(, $param)*)
     };
     (
-        -> $modules:ident :: $name:ident
+        -> $root:ident $(:: $nested:ident)*
     ) => {
-        put!(@put $modules $name true)
+        put!(@put ($root $($nested)*) true)
     };
 }
 
 #[macro_export]
 macro_rules! delete {
     (
-        @delete $modules:ident $name:ident $is_redirect:expr $(, $param:expr)*
+        @delete ($($modules:ident)+) $is_redirect:expr $(, $param:expr)*
     ) => {
-        ::wayfinder_core::Resource {
-            method: ::wayfinder_core::Method::Delete,
-            modules: vec![stringify!($modules).to_string()],
-            name: stringify!($name).to_string(),
-            is_redirect: $is_redirect,
-            query_parameters: vec![$($param),*],
-        }
+        ::wayfinder_core::Resource::make(
+            ::wayfinder_core::Method::Delete,
+            vec![$(stringify!($modules).to_string()),*],
+            $is_redirect,
+            vec![$($param),*],
+        )
     };
     (
-        $modules:ident :: $name:ident $(, $param: expr)*
+        $root:ident $(:: $nested:ident)* $(, $param: expr)*
     ) => {
-        delete!(@delete $modules $name false $(, $param)*)
+        delete!(@delete ($root $($nested)*) false $(, $param)*)
     };
     (
-        -> $modules:ident :: $name:ident
+        -> $root:ident $(:: $nested:ident)*
     ) => {
-        delete!(@delete $modules $name true)
+        delete!(@delete ($root $($nested)*) true)
     };
 }
 
