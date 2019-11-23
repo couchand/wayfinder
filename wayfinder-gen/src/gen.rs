@@ -29,6 +29,32 @@ pub fn to_caps_case(s: &str) -> String {
     res
 }
 
+pub fn to_snake_case(s: &str) -> String {
+    let mut chars = s.chars();
+    let mut res = String::new();
+
+    let mut ch = match chars.next() {
+        None => return res,
+        Some(c) => Some(c.to_ascii_lowercase()),
+    };
+
+    while ch.is_some() {
+        let c = ch.unwrap();
+
+        if c.is_ascii_uppercase() {
+            res.push('_');
+            res.push(c.to_ascii_lowercase());
+        }
+        else {
+            res.push(c);
+        }
+
+        ch = chars.next()
+    }
+
+    res
+}
+
 pub fn codegen<W>(w: &mut W, route_config: &RouteConfig) -> io::Result<()>
 where
     W: Write,
@@ -71,13 +97,18 @@ where
     }
 
     for module in modules.iter() {
-        writeln!(
-            w,
-            "/// Parameters for requests to the {} controller.",
-            module.name
-        )?;
-        writeln!(w, "#[derive(Debug)]")?;
-        writeln!(w, "pub enum {} {{", to_caps_case(&module.name))?;
+        writeln!(w, "pub mod {} {{", to_snake_case(&module.name))?;
+
+        // TODO: can we do something smarter than repeating these everywhere?
+        for header in route_config.headers.iter() {
+            writeln!(w, "    {}", header.text)?;
+        }
+
+        if route_config.headers.len() > 0 {
+            writeln!(w)?;
+        }
+
+        // TODO: nested modules?
 
         for action in module.actions.iter() {
             write!(w, "    /// Renders for `{} /", action.method)?;
@@ -106,42 +137,46 @@ where
 
             writeln!(w, "`.")?;
 
-            writeln!(w, "    {} {{", to_caps_case(&action.name))?;
+            writeln!(w, "    #[derive(Debug)]")?;
+            write!(w, "    pub struct {}", to_caps_case(&action.name))?;
 
-            for param in action.route_parameters.iter() {
-                writeln!(w, "        {}: {},", param.name, param.typ)?;
+            if action.route_parameters.is_empty() && action.query_parameters.is_empty() {
+                writeln!(w, ";")?;
             }
-            for param in action.query_parameters.iter() {
-                writeln!(w, "        {}: Option<{}>,", param.name, param.typ)?;
-            }
+            else {
+                writeln!(w, " {{")?;
 
-            writeln!(w, "    }},")?;
-        }
+                for param in action.route_parameters.iter() {
+                    writeln!(w, "        pub {}: {},", param.name, param.typ)?;
+                }
+                for param in action.query_parameters.iter() {
+                    writeln!(w, "        pub {}: Option<{}>,", param.name, param.typ)?;
+                }
 
-        writeln!(w, "}}")?;
-        writeln!(w)?;
-        writeln!(w, "impl {} {{", to_caps_case(&module.name))?;
-        writeln!(
-            w,
-            "    /// Make a path to this controller for the given action and parameters."
-        )?;
-        writeln!(w, "    pub fn to_path(&self) -> String {{")?;
-        writeln!(w, "        match self {{")?;
-
-        for action in module.actions.iter() {
-            write!(w, "            {}::{} {{", module.name, action.name)?;
-
-            for param in action.route_parameters.iter() {
-                write!(w, "{}, ", param.name)?;
+                writeln!(w, "    }}")?;
             }
 
-            for param in action.query_parameters.iter() {
-                write!(w, "{}, ", param.name)?;
+            writeln!(w)?;
+
+            writeln!(w, "    impl {} {{", to_caps_case(&action.name))?;
+            writeln!(w, "        /// Make a path to this route with the given parameters.")?;
+            writeln!(w, "        pub fn to_path(&self) -> String {{")?;
+
+            if !action.route_parameters.is_empty() || !action.query_parameters.is_empty() {
+                write!(w, "            let {} {{ ", to_caps_case(&action.name))?;
+
+                for param in action.route_parameters.iter() {
+                    write!(w, "ref {}, ", param.name)?;
+                }
+
+                for param in action.query_parameters.iter() {
+                    write!(w, "ref {}, ", param.name)?;
+                }
+
+                writeln!(w, "}} = self;")?;
             }
 
-            writeln!(w, "}} => {{")?;
-
-            write!(w, "                format!(\"/")?;
+            write!(w, "            format!(\"/")?;
 
             let mut path = action.path.iter().peekable();
             loop {
@@ -172,9 +207,42 @@ where
             }
 
             writeln!(w, ")")?;
-            writeln!(w, "            }},")?;
+            writeln!(w, "        }}")?;
+            writeln!(w, "    }}")?;
+
+            writeln!(w)?;
         }
 
+        writeln!(
+            w,
+            "    /// Parameters for requests to the {} controller.",
+            to_snake_case(&module.name)
+        )?;
+        writeln!(w, "    #[derive(Debug)]")?;
+        writeln!(w, "    pub enum Route {{")?;
+
+        for action in module.actions.iter() {
+
+            writeln!(w, "        {}({}),", to_caps_case(&action.name), to_caps_case(&action.name))?;
+        }
+
+        writeln!(w, "    }}")?;
+
+        writeln!(w)?;
+
+        writeln!(w, "    impl Route {{")?;
+        writeln!(
+            w,
+            "        /// Make a path to this route with the given parameters."
+        )?;
+        writeln!(w, "        pub fn to_path(&self) -> String {{")?;
+        writeln!(w, "            match self {{")?;
+
+        for action in module.actions.iter() {
+            writeln!(w, "                Route::{}(ref route) => route.to_path(),", to_caps_case(&action.name))?;
+        }
+
+        writeln!(w, "            }}")?;
         writeln!(w, "        }}")?;
         writeln!(w, "    }}")?;
         writeln!(w, "}}")?;
@@ -189,7 +257,7 @@ where
     writeln!(w, "pub enum Route {{")?;
 
     for module in modules.iter() {
-        writeln!(w, "    {0}({0}),", to_caps_case(&module.name))?;
+        writeln!(w, "    {}({}::Route),", to_caps_case(&module.name), to_snake_case(&module.name))?;
     }
 
     writeln!(w, "}}")?;
@@ -206,7 +274,7 @@ where
     for module in modules.iter() {
         writeln!(
             w,
-            "            Route::{}(p) => p.to_path(),",
+            "            Route::{}(ref route) => route.to_path(),",
             to_caps_case(&module.name)
         )?;
     }
@@ -430,7 +498,7 @@ where
     for resource in route.resources.iter() {
         writeln!(
             w,
-            "{}    Method::{:?} => return Ok(Match::{}(Route::{3}({3}::{4} {{",
+            "{}    Method::{:?} => return Ok(Match::{}(Route::{3}({4}::Route::{5}({4}::{5} {{",
             indent1,
             resource.method,
             if resource.is_redirect {
@@ -439,6 +507,7 @@ where
                 "Route"
             },
             to_caps_case(&resource.modules.iter().next().unwrap()), // TODO: multiplicity
+            to_snake_case(&resource.modules.iter().next().unwrap()), // TODO: multiplicity
             to_caps_case(&resource.name),
         )?;
 
@@ -452,7 +521,7 @@ where
             writeln!(w, "{}        {}: None,", indent1, param.name)?;
         }
 
-        writeln!(w, "{}    }}))),", indent1)?;
+        writeln!(w, "{}    }})))),", indent1)?;
     }
 
     writeln!(w, "{}    _ => return Ok(Match::NotAllowed),", indent1)?;
@@ -534,7 +603,7 @@ mod tests {
                 resources: vec![Resource {
                     method: Method::Get,
                     is_redirect: false,
-                    modules: vec!["People".to_string()],
+                    modules: vec!["people".to_string()],
                     name: "Index".to_string(),
                     query_parameters: vec![],
                 }],
@@ -544,7 +613,7 @@ mod tests {
                         resources: vec![Resource {
                             method: Method::Get,
                             is_redirect: false,
-                            modules: vec!["People".to_string()],
+                            modules: vec!["people".to_string()],
                             name: "Show".to_string(),
                             query_parameters: vec![],
                         }],
@@ -566,9 +635,9 @@ mod tests {
 //! Route configuration:
 //!
 //!     /
-//!       GET People::Index
+//!       GET people::Index
 //!       {id: Uuid}
-//!         GET People::Show
+//!         GET people::Show
 //!
 //! [`match_route`]: fn.match_route.html
 
@@ -579,28 +648,48 @@ mod tests {
 
 use uuid::Uuid;
 
-/// Parameters for requests to the People controller.
-#[derive(Debug)]
-pub enum People {
-    /// Renders for `GET /`.
-    Index {
-    },
-    /// Renders for `GET /{id}`.
-    Show {
-        id: Uuid,
-    },
-}
+pub mod people {
+    use uuid::Uuid;
 
-impl People {
-    /// Make a path to this controller for the given action and parameters.
-    pub fn to_path(&self) -> String {
-        match self {
-            People::Index {} => {
-                format!(\"/\")
-            },
-            People::Show {id, } => {
-                format!(\"/{}\", id)
-            },
+    /// Renders for `GET /`.
+    #[derive(Debug)]
+    pub struct Index;
+
+    impl Index {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            format!(\"/\")
+        }
+    }
+
+    /// Renders for `GET /{id}`.
+    #[derive(Debug)]
+    pub struct Show {
+        pub id: Uuid,
+    }
+
+    impl Show {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            let Show { ref id, } = self;
+            format!(\"/{}\", id)
+        }
+    }
+
+    /// Parameters for requests to the people controller.
+    #[derive(Debug)]
+    pub enum Route {
+        Index(Index),
+        Show(Show),
+    }
+
+    impl Route {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            match self {
+                Route::Index(ref route) => route.to_path(),
+                Route::Show(ref route) => route.to_path(),
+            }
         }
     }
 }
@@ -608,14 +697,14 @@ impl People {
 /// An active route in the application -- match against this.
 #[derive(Debug)]
 pub enum Route {
-    People(People),
+    People(people::Route),
 }
 
 impl Route {
     /// Make a path to this route with the given parameters.
     pub fn to_path(&self) -> String {
         match self {
-            Route::People(p) => p.to_path(),
+            Route::People(ref route) => route.to_path(),
         }
     }
 }
@@ -658,8 +747,8 @@ pub fn match_route<P: std::iter::Iterator<Item=char>>(
 
     match path.next() {
         None => match method {
-            Method::Get => return Ok(Match::Route(Route::People(People::Index {
-            }))),
+            Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
+            })))),
             _ => return Ok(Match::NotAllowed),
         },
         Some(c) => text.push(c),
@@ -684,9 +773,9 @@ pub fn match_route<P: std::iter::Iterator<Item=char>>(
 
     match path.next() {
         None => match method {
-            Method::Get => return Ok(Match::Route(Route::People(People::Show {
+            Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
                 id,
-            }))),
+            })))),
             _ => return Ok(Match::NotAllowed),
         },
         _ => return Ok(Match::NotFound),
