@@ -113,13 +113,47 @@ impl FlattenedRoutes {
 
 #[derive(Debug)]
 pub struct FlattenedModules {
-    pub modules: Vec<FlattenedModule>,
+    pub root: FlattenedModule,
 }
 
 impl<'a> From<&'a Routes> for FlattenedModules {
     fn from(routes: &Routes) -> FlattenedModules {
-        let modules = FlattenedModules::flatten(routes, vec![], vec![]);
-        FlattenedModules { modules }
+        let root = FlattenedModules::flatten(routes, vec![], vec![]);
+        FlattenedModules { root }
+    }
+}
+
+mod helper {
+    use std::collections::HashMap;
+    use super::*;
+
+    #[derive(Debug, Default)]
+    pub(crate) struct Module(ModuleMap, ActionMap);
+    #[derive(Debug, Default)]
+    pub(crate) struct ModuleMap(HashMap<String, Module>);
+    #[derive(Debug, Default)]
+    pub(crate) struct ActionMap(HashMap<String, FlattenedAction>);
+
+    impl Module {
+        pub fn entry(&mut self, module: &str) -> std::collections::hash_map::Entry<String, Module> {
+            (self.0).0.entry(module.to_string())
+        }
+
+        pub fn insert(&mut self, name: &str, action: FlattenedAction) -> Option<FlattenedAction> {
+            (self.1).0.insert(name.to_string(), action)
+        }
+
+        pub fn finalize(self, name: String) -> FlattenedModule {
+            let Module(ModuleMap(mut module_map), ActionMap(mut action_map)) = self;
+
+            let mut actions = action_map.drain().map(|(_, v)| v).collect::<Vec<_>>();
+            actions.sort_unstable_by_key(|a| a.name.clone());
+
+            let mut modules = module_map.drain().map(|(k, v)| v.finalize(k)).collect::<Vec<_>>();
+            modules.sort_unstable_by_key(|m| m.name.clone());
+
+            FlattenedModule { name, actions, modules }
+        }
     }
 }
 
@@ -128,10 +162,8 @@ impl FlattenedModules {
         routes: &Routes,
         path: Vec<PathSegment>,
         query_parameters: Vec<Param>,
-    ) -> Vec<FlattenedModule> {
-        use std::collections::HashMap;
-
-        let mut actions = HashMap::new();
+    ) -> FlattenedModule {
+        let mut accum = helper::Module::default();
 
         let mut routes_to_process = vec![(routes, path, query_parameters)];
 
@@ -156,11 +188,16 @@ impl FlattenedModules {
                 let mut query_parameters = query_parameters.clone();
                 query_parameters.extend_from_slice(&resource.query_parameters);
 
-                match actions
-                    .entry(resource.modules.clone().into_iter().next().unwrap()) // TODO: multiplicity
-                    .or_insert(HashMap::new())
+                let mut entry = &mut accum;
+                for module_name in resource.modules.iter() {
+                    entry = entry
+                        .entry(module_name)
+                        .or_insert(helper::Module::default());
+                }
+
+                match entry
                     .insert(
-                        resource.name.clone(),
+                        &resource.name,
                         FlattenedAction {
                             name: resource.name.clone(),
                             method: resource.method.clone(),
@@ -185,26 +222,7 @@ impl FlattenedModules {
             }
         }
 
-        let mut modules = vec![];
-
-        for (name, mut actions) in actions.drain() {
-            let mut module = FlattenedModule {
-                name,
-                actions: actions.drain().map(|(_, v)| v).collect(),
-            };
-
-            module.actions.sort_unstable_by_key(|a| a.name.clone());
-
-            modules.push(module);
-        }
-
-        modules.sort_unstable_by_key(|c| c.name.clone());
-
-        modules
-    }
-
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item = &FlattenedModule> + 'a {
-        self.modules.iter()
+        accum.finalize("routes".into())
     }
 }
 
@@ -212,7 +230,7 @@ impl FlattenedModules {
 pub struct FlattenedModule {
     pub name: String,
     pub actions: Vec<FlattenedAction>,
-    // pub modules: Vec<FlattenedModule>,
+    pub modules: Vec<FlattenedModule>,
 }
 
 #[derive(Debug)]
