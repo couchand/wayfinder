@@ -116,14 +116,16 @@ the current status compared to planned work:
 - [x] Two level (controller-action) route types
 - [x] Any level (module*-route) route types
 - [ ] Get rid of any runtime dep on this lib
-- [ ] Route file comments
+- [ ] Comments in route files
 - [x] Merge multiple route config files
 - [ ] `Into` impls flow upward
+- [ ] `ToPath` or something trait
 - [ ] `link_to` helper leveraging the above
 - [ ] Accept `AsRef<str>` instead of `Iterator<Item=char>`
 - [ ] Match chunk-wise, not char-wise
 - [ ] Only try parsing if route actually matches otherwise
 - [ ] Add more context to parse errors?
+- [ ] Error type enum based on `<$TY as FromStr>::Error`
 - [ ] Not allowed error needs allowed method list (per spec)
 - [ ] Some simple static checks (uniqueness of params, existence of redirect)
 - [ ] Better test coverage
@@ -144,6 +146,11 @@ Here are some other random things that may be considered:
   - [x] Macros!
   - [ ] Other indentation options or a non-whitespace style
   - [ ] TOML?
+- [ ] Other outputs:
+  - [ ] JS router for SPA
+  - [ ] API docs
+  - [ ] API clients
+  - [ ] CLI args??
 
 more information
 ----------------
