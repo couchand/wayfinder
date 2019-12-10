@@ -24,3 +24,36 @@ fn main() {
         Ok(Match::Redirect(p)) => println!("Redirect to {}", p.to_path()),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::routes;
+    use wayfinder::Match;
+
+    #[test]
+    fn test_people_index() {
+        let route = "/people";
+        match routes::match_route(&mut route.chars(), wayfinder::Method::Get) {
+            Ok(Match::Route(routes::Route::People(routes::people::Route::Index(_)))) => {},
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_people_delete() {
+        let route = "/people/12345678901234567890123456789012";
+        match routes::match_route(&mut route.chars(), wayfinder::Method::Delete) {
+            Ok(Match::Route(routes::Route::People(routes::people::Route::Destroy(_)))) => {},
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_not_allowed() {
+        let route = "/people/12345678901234567890123456789012";
+        match routes::match_route(&mut route.chars(), wayfinder::Method::Post) {
+            Ok(Match::NotAllowed) => {},
+            _ => assert!(false),
+        }
+    }
+}
