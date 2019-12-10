@@ -3,7 +3,7 @@ use std::io::Write;
 
 use crate::flat::{Charlike, FlattenedModule, FlattenedModules, FlattenedRoute, FlattenedRoutes};
 use crate::trie::Trie;
-use wayfinder_core::{RouteConfig, Header};
+use wayfinder_core::{Header, RouteConfig};
 
 pub fn to_caps_case(s: &str) -> String {
     let mut chars = s.chars();
@@ -44,8 +44,7 @@ pub fn to_snake_case(s: &str) -> String {
         if c.is_ascii_uppercase() {
             res.push('_');
             res.push(c.to_ascii_lowercase());
-        }
-        else {
+        } else {
             res.push(c);
         }
 
@@ -55,7 +54,12 @@ pub fn to_snake_case(s: &str) -> String {
     res
 }
 
-pub fn codegen_module<W>(w: &mut W, module: &FlattenedModule, headers: &[Header], indent: &str) -> io::Result<()>
+pub fn codegen_module<W>(
+    w: &mut W,
+    module: &FlattenedModule,
+    headers: &[Header],
+    indent: &str,
+) -> io::Result<()>
 where
     W: Write,
 {
@@ -102,15 +106,18 @@ where
 
         if action.route_parameters.is_empty() && action.query_parameters.is_empty() {
             writeln!(w, ";")?;
-        }
-        else {
+        } else {
             writeln!(w, " {{")?;
 
             for param in action.route_parameters.iter() {
                 writeln!(w, "{}    pub {}: {},", indent, param.name, param.typ)?;
             }
             for param in action.query_parameters.iter() {
-                writeln!(w, "{}    pub {}: Option<{}>,", indent, param.name, param.typ)?;
+                writeln!(
+                    w,
+                    "{}    pub {}: Option<{}>,",
+                    indent, param.name, param.typ
+                )?;
             }
 
             writeln!(w, "{}}}", indent)?;
@@ -119,11 +126,20 @@ where
         writeln!(w)?;
 
         writeln!(w, "{}impl {} {{", indent, to_caps_case(&action.name))?;
-        writeln!(w, "{}    /// Make a path to this route with the given parameters.", indent)?;
+        writeln!(
+            w,
+            "{}    /// Make a path to this route with the given parameters.",
+            indent
+        )?;
         writeln!(w, "{}    pub fn to_path(&self) -> String {{", indent)?;
 
         if !action.route_parameters.is_empty() || !action.query_parameters.is_empty() {
-            write!(w, "{}        let {} {{ ", indent, to_caps_case(&action.name))?;
+            write!(
+                w,
+                "{}        let {} {{ ",
+                indent,
+                to_caps_case(&action.name)
+            )?;
 
             for param in action.route_parameters.iter() {
                 write!(w, "ref {}, ", param.name)?;
@@ -188,8 +204,7 @@ where
             "{}/// An active route in the application -- match against this.",
             indent
         )?;
-    }
-    else {
+    } else {
         writeln!(
             w,
             "{}/// Parameters for requests to the {} controller.",
@@ -201,11 +216,23 @@ where
     writeln!(w, "{}pub enum Route {{", indent)?;
 
     for action in module.actions.iter() {
-        writeln!(w, "{}    {}({}),", indent, to_caps_case(&action.name), to_caps_case(&action.name))?;
+        writeln!(
+            w,
+            "{}    {}({}),",
+            indent,
+            to_caps_case(&action.name),
+            to_caps_case(&action.name)
+        )?;
     }
 
     for module in module.modules.iter() {
-        writeln!(w, "{}    {}({}::Route),", indent, to_caps_case(&module.name), to_snake_case(&module.name))?;
+        writeln!(
+            w,
+            "{}    {}({}::Route),",
+            indent,
+            to_caps_case(&module.name),
+            to_snake_case(&module.name)
+        )?;
     }
 
     writeln!(w, "{}}}", indent)?;
@@ -222,7 +249,12 @@ where
     writeln!(w, "{}        match self {{", indent)?;
 
     for action in module.actions.iter() {
-        writeln!(w, "{}            Route::{}(ref route) => route.to_path(),", indent, to_caps_case(&action.name))?;
+        writeln!(
+            w,
+            "{}            Route::{}(ref route) => route.to_path(),",
+            indent,
+            to_caps_case(&action.name)
+        )?;
     }
 
     for module in module.modules.iter() {

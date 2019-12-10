@@ -116,7 +116,12 @@ impl Resource {
     /// # Panics
     ///
     /// Will panic if `handler` is an empty vec.
-    pub fn make(method: Method, handler: Vec<String>, is_redirect: bool, query_parameters: Vec<Param>) -> Resource {
+    pub fn make(
+        method: Method,
+        handler: Vec<String>,
+        is_redirect: bool,
+        query_parameters: Vec<Param>,
+    ) -> Resource {
         let (modules, name) = {
             let mut ms = handler;
             let n = ms.remove(ms.len() - 1);

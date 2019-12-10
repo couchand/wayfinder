@@ -34,7 +34,7 @@ mod tests {
     fn test_people_index() {
         let route = "/people";
         match routes::match_route(&mut route.chars(), wayfinder::Method::Get) {
-            Ok(Match::Route(routes::Route::People(routes::people::Route::Index(_)))) => {},
+            Ok(Match::Route(routes::Route::People(routes::people::Route::Index(_)))) => {}
             _ => assert!(false),
         }
     }
@@ -43,7 +43,7 @@ mod tests {
     fn test_people_delete() {
         let route = "/people/12345678901234567890123456789012";
         match routes::match_route(&mut route.chars(), wayfinder::Method::Delete) {
-            Ok(Match::Route(routes::Route::People(routes::people::Route::Destroy(_)))) => {},
+            Ok(Match::Route(routes::Route::People(routes::people::Route::Destroy(_)))) => {}
             _ => assert!(false),
         }
     }
@@ -52,7 +52,7 @@ mod tests {
     fn test_not_allowed() {
         let route = "/people/12345678901234567890123456789012";
         match routes::match_route(&mut route.chars(), wayfinder::Method::Post) {
-            Ok(Match::NotAllowed) => {},
+            Ok(Match::NotAllowed) => {}
             _ => assert!(false),
         }
     }

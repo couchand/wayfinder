@@ -124,8 +124,8 @@ impl<'a> From<&'a Routes> for FlattenedModules {
 }
 
 mod helper {
-    use std::collections::HashMap;
     use super::*;
+    use std::collections::HashMap;
 
     #[derive(Debug, Default)]
     pub(crate) struct Module(ModuleMap, ActionMap);
@@ -149,10 +149,17 @@ mod helper {
             let mut actions = action_map.drain().map(|(_, v)| v).collect::<Vec<_>>();
             actions.sort_unstable_by_key(|a| a.name.clone());
 
-            let mut modules = module_map.drain().map(|(k, v)| v.finalize(k)).collect::<Vec<_>>();
+            let mut modules = module_map
+                .drain()
+                .map(|(k, v)| v.finalize(k))
+                .collect::<Vec<_>>();
             modules.sort_unstable_by_key(|m| m.name.clone());
 
-            FlattenedModule { name, actions, modules }
+            FlattenedModule {
+                name,
+                actions,
+                modules,
+            }
         }
     }
 }
@@ -195,20 +202,20 @@ impl FlattenedModules {
                         .or_insert(helper::Module::default());
                 }
 
-                match entry
-                    .insert(
-                        &resource.name,
-                        FlattenedAction {
-                            name: resource.name.clone(),
-                            method: resource.method.clone(),
-                            path: flat_path.clone(),
-                            route_parameters: flat_path.dynamics().cloned().collect(),
-                            query_parameters,
-                        },
-                    ) {
+                match entry.insert(
+                    &resource.name,
+                    FlattenedAction {
+                        name: resource.name.clone(),
+                        method: resource.method.clone(),
+                        path: flat_path.clone(),
+                        route_parameters: flat_path.dynamics().cloned().collect(),
+                        query_parameters,
+                    },
+                ) {
                     Some(_) => panic!(
                         "Duplicate controller action `{}::{}`!",
-                        resource.modules.iter().next().unwrap(), resource.name,
+                        resource.modules.iter().next().unwrap(),
+                        resource.name,
                     ),
                     None => {}
                 }
