@@ -21,10 +21,9 @@ fn main() {
 }
 
 fn write_cases<W: std::io::Write>(w: &mut W, cases: &[DirEntry]) -> std::io::Result<()> {
-    writeln!(w, "use std::env;")?;
-
     writeln!(w, "#[cfg(test)]")?;
     writeln!(w, "mod test_cases {{")?;
+    writeln!(w, "    use prettydiff::diff_lines;")?;
 
     for case in cases {
         let case_name = case.file_name().into_string().expect("file name");
@@ -40,7 +39,7 @@ fn write_cases<W: std::io::Write>(w: &mut W, cases: &[DirEntry]) -> std::io::Res
 
         writeln!(w, "        match wayfinder_parse::route_config(&routes) {{")?;
 
-        writeln!(w, "            Ok(config) => wayfinder_gen::codegen(&mut dest, &config.1).unwrap(),");
+        writeln!(w, "            Ok(config) => wayfinder_gen::codegen(&mut dest, &config.1).unwrap(),")?;
         writeln!(w, "            result => {{")?;
         writeln!(w, "                wayfinder_parse::errors::show_errors(&mut std::io::stderr(), &routes, result, \"\");")?;
         writeln!(w, "                assert!(false);")?;
@@ -48,7 +47,13 @@ fn write_cases<W: std::io::Write>(w: &mut W, cases: &[DirEntry]) -> std::io::Res
         writeln!(w, "            }}")?;
         writeln!(w, "        }}")?;
 
-        writeln!(w, "        assert_eq!(String::from_utf8(dest).expect(\"result as utf8\"), rs);")?;
+        writeln!(w, "        let actual = String::from_utf8(dest).expect(\"result as utf8\");")?;
+
+        writeln!(w, "        if actual != rs {{")?;
+        writeln!(w, "            let diff = diff_lines(&actual, rs);")?;
+        writeln!(w, "            eprintln!(\"{{}}\", diff);")?;
+        writeln!(w, "            assert!(false);")?;
+        writeln!(w, "        }}")?;
 
         writeln!(w, "    }}")?;
     }

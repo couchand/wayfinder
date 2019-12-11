@@ -12,5 +12,8 @@ wayfinder-core = { path = "../wayfinder-core" }
 wayfinder-gen = { path = "../wayfinder-gen" }
 wayfinder-parse = { path = "../wayfinder-parse" }
 
+[dev-dependencies]
+prettydiff = "0.3"
+
 [build-dependencies]
 itertools = "0.8"

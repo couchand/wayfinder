@@ -1,0 +1,38 @@
+use uuid::Uuid;
+
+/
+  [lang: String]
+
+  users
+    GET -> People::Index
+
+  people
+    GET People::Index
+    POST People::Create
+
+    new
+      GET People::New
+
+    {id: Uuid}
+      GET People::Show
+      PUT People::Update
+        [name: String]
+      DELETE People::Destroy
+
+      edit
+        GET People::Edit
+
+  books
+    GET Books::Index
+    POST Books:Create
+
+    new
+      GET Books::New
+
+    {id: Uuid}
+      GET Books::Show
+      PUT Books::update
+      DELETE Books::Destroy
+
+      edit
+        GET Books::Edit
