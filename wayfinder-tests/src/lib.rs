@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 
 mod macros;
+mod diff;
 
 use nom::types::CompleteStr;
 

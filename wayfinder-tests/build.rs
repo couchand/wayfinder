@@ -23,7 +23,7 @@ fn main() {
 fn write_cases<W: std::io::Write>(w: &mut W, cases: &[DirEntry]) -> std::io::Result<()> {
     writeln!(w, "#[cfg(test)]")?;
     writeln!(w, "mod test_cases {{")?;
-    writeln!(w, "    use prettydiff::diff_lines;")?;
+    writeln!(w, "    use super::diff;")?;
 
     for case in cases {
         let case_name = case.file_name().into_string().expect("file name");
@@ -48,12 +48,7 @@ fn write_cases<W: std::io::Write>(w: &mut W, cases: &[DirEntry]) -> std::io::Res
         writeln!(w, "        }}")?;
 
         writeln!(w, "        let actual = String::from_utf8(dest).expect(\"result as utf8\");")?;
-
-        writeln!(w, "        if actual != rs {{")?;
-        writeln!(w, "            let diff = diff_lines(&actual, rs);")?;
-        writeln!(w, "            eprintln!(\"{{}}\", diff);")?;
-        writeln!(w, "            assert!(false);")?;
-        writeln!(w, "        }}")?;
+        writeln!(w, "        diff::TestResult::new(rs, &actual).assert();")?;
 
         writeln!(w, "    }}")?;
     }

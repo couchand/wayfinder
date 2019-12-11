@@ -8,12 +8,10 @@ edition = "2018"
 
 [dependencies]
 nom = { version = "4.1.1", features = ["verbose-errors"] }
+prettydiff = "0.3"
 wayfinder-core = { path = "../wayfinder-core" }
 wayfinder-gen = { path = "../wayfinder-gen" }
 wayfinder-parse = { path = "../wayfinder-parse" }
-
-[dev-dependencies]
-prettydiff = "0.3"
 
 [build-dependencies]
 itertools = "0.8"
