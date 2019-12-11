@@ -1,3 +1,4 @@
+use ansi_term::{Colour};
 use prettydiff::text::{diff_lines, LineChangeset};
 use prettydiff::basic::DiffOp;
 
@@ -34,20 +35,37 @@ struct DiffChunk<'source, 'changes> {
     diff: Vec<DiffOp<'source, &'changes str>>,
 }
 
+impl<'source, 'changes> DiffChunk<'source, 'changes> {
+    fn header(&self) -> String {
+        Colour::Yellow.bold().paint(format!(
+            "--- {}\n+++ {}\n@@ -{},{} +{},{} @@",
+            self.old_name,
+            self.new_name,
+            self.old_line, self.old_count, self.new_line, self.new_count
+        )).to_string()
+    }
+
+    fn removal(&self, a: &[&str]) -> String {
+        Colour::Red.bold().paint(format!("-{}", a.join("\n-"))).to_string()
+    }
+
+    fn insertion(&self, a: &[&str]) -> String {
+        Colour::Green.bold().paint(format!("+{}", a.join("\n+"))).to_string()
+    }
+}
+
 impl<'source, 'changes> std::fmt::Display for DiffChunk<'source, 'changes> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "--- {}", self.old_name)?;
-        writeln!(f, "+++ {}", self.new_name)?;
-        writeln!(f, "@@ -{},{} +{},{} @@", self.old_line, self.old_count, self.new_line, self.new_count)?;
+        writeln!(f, "{}", self.header())?;
 
         for op in self.diff.iter() {
             match op {
                 DiffOp::Equal(_) => {},
-                DiffOp::Insert(a) => writeln!(f, "+ {}", a.join("\n+ "))?,
-                DiffOp::Remove(a) => writeln!(f, "- {}", a.join("\n- "))?,
+                DiffOp::Insert(a) => writeln!(f, "{}", self.insertion(a))?,
+                DiffOp::Remove(a) => writeln!(f, "{}", self.removal(a))?,
                 DiffOp::Replace(a, b) => {
-                    writeln!(f, "- {}", a.join("\n- "))?;
-                    writeln!(f, "+ {}", b.join("\n+ "))?;
+                    writeln!(f, "{}", self.removal(a))?;
+                    writeln!(f, "{}", self.insertion(b))?;
                 }
             }
         }
