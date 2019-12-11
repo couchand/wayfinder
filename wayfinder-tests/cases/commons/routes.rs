@@ -184,12 +184,12 @@ impl Route {
 /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
 /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
 /// [`Route`]: enum.Route.html
-pub fn match_route<P: std::iter::Iterator<Item=char>>(
-    path: &mut P,
+pub fn match_route<P: AsRef<str>>(
+    path: P,
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = path.fuse().peekable();
+    let mut path = path.as_ref().chars().fuse().peekable();
     if path.peek() == Some(&'/') {
         path.next();
     }

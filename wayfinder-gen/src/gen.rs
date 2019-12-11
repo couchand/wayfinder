@@ -392,15 +392,15 @@ where
     )?;
     writeln!(w, "/// [`Route`]: enum.Route.html")?;
 
-    writeln!(w, "pub fn match_route<P: std::iter::Iterator<Item=char>>(")?;
-    writeln!(w, "    path: &mut P,")?;
+    writeln!(w, "pub fn match_route<P: AsRef<str>>(")?;
+    writeln!(w, "    path: P,")?;
     writeln!(w, "    method: wayfinder::Method,")?;
     writeln!(
         w,
         ") -> Result<wayfinder::Match<Route>, wayfinder::Error> {{"
     )?;
     writeln!(w, "    use wayfinder::{{Error, Method, Match}};")?;
-    writeln!(w, "    let mut path = path.fuse().peekable();")?;
+    writeln!(w, "    let mut path = path.as_ref().chars().fuse().peekable();")?;
 
     writeln!(w, "    if path.peek() == Some(&'/') {{")?;
     writeln!(w, "        path.next();")?;
@@ -770,12 +770,12 @@ impl Route {
 /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
 /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
 /// [`Route`]: enum.Route.html
-pub fn match_route<P: std::iter::Iterator<Item=char>>(
-    path: &mut P,
+pub fn match_route<P: AsRef<str>>(
+    path: P,
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = path.fuse().peekable();
+    let mut path = path.as_ref().chars().fuse().peekable();
     if path.peek() == Some(&'/') {
         path.next();
     }
@@ -985,12 +985,12 @@ impl Route {
 /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
 /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
 /// [`Route`]: enum.Route.html
-pub fn match_route<P: std::iter::Iterator<Item=char>>(
-    path: &mut P,
+pub fn match_route<P: AsRef<str>>(
+    path: P,
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = path.fuse().peekable();
+    let mut path = path.as_ref().chars().fuse().peekable();
     if path.peek() == Some(&'/') {
         path.next();
     }

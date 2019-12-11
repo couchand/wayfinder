@@ -140,7 +140,7 @@ the current status compared to planned/potential updates:
 
 - Refactorings and cleanups
   - [ ] Get rid of any runtime dep on this lib
-  - [ ] Accept `AsRef<str>` instead of `Iterator<Item=char>`
+  - [x] Accept `AsRef<str>` instead of `Iterator<Item=char>`
   - [ ] Accept `Read`?
   - [ ] Accept `AsyncRead`?
   - [ ] Match chunk-wise, not char-wise
