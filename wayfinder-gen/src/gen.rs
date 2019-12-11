@@ -292,11 +292,14 @@ where
     writeln!(w, "//!")?;
     writeln!(w, "//! Route configuration:")?;
     writeln!(w, "//!")?;
-    writeln!(w, "//!     /")?;
+    writeln!(w, "//! ```ignore")?;
+    writeln!(w, "//! /")?;
 
-    let stringified_config = str::replace(&route_config.routes.stringify(1), "\n", "\n//!     ");
-    let stringified_config = &stringified_config[..stringified_config.len() - 5];
-    writeln!(w, "//!     {}", stringified_config)?;
+    let stringified_config = str::replace(&route_config.routes.stringify(1), "\n", "\n//! ");
+    let stringified_config = &stringified_config[..stringified_config.len() - 4];
+    write!(w, "//! {}", stringified_config)?;
+    writeln!(w, "//! ```")?;
+    writeln!(w, "//!")?;
 
     writeln!(w, "//! [`match_route`]: fn.match_route.html")?;
     writeln!(w)?;
@@ -671,10 +674,12 @@ mod tests {
 //!
 //! Route configuration:
 //!
-//!     /
-//!       GET people::Index
-//!       {id: Uuid}
-//!         GET people::Show
+//! ```ignore
+//! /
+//!   GET people::Index
+//!   {id: Uuid}
+//!     GET people::Show
+//! ```
 //!
 //! [`match_route`]: fn.match_route.html
 
@@ -867,10 +872,12 @@ pub fn match_route<P: AsRef<[u8]>>(
 //!
 //! Route configuration:
 //!
-//!     /
-//!       GET Index
-//!       {id: Uuid}
-//!         GET Admin::People::Show
+//! ```ignore
+//! /
+//!   GET Index
+//!   {id: Uuid}
+//!     GET Admin::People::Show
+//! ```
 //!
 //! [`match_route`]: fn.match_route.html
 

@@ -7,24 +7,26 @@ pub mod routes {
 //!
 //! Route configuration:
 //!
-//!     /
-//!       [lang: String]
-//!       users
-//!         GET -> People::Index
-//!       people
-//!         GET People::Index
-//!         POST People::Create
-//!         new
-//!           GET People::New
-//!         {id: Uuid}
-//!           GET People::Show
-//!           PUT People::Update
-//!             [name: String]
-//!           DELETE People::Destroy
-//!           edit
-//!             GET People::Edit
-//!       books
-//!         GET Books::Index
+//! ```ignore
+//! /
+//!   [lang: String]
+//!   users
+//!     GET -> People::Index
+//!   people
+//!     GET People::Index
+//!     POST People::Create
+//!     new
+//!       GET People::New
+//!     {id: Uuid}
+//!       GET People::Show
+//!       PUT People::Update
+//!         [name: String]
+//!       DELETE People::Destroy
+//!       edit
+//!         GET People::Edit
+//!   books
+//!     GET Books::Index
+//! ```
 //!
 //! [`match_route`]: fn.match_route.html
 

@@ -7,15 +7,17 @@ pub mod routes {
 //!
 //! Route configuration:
 //!
-//!     /
-//!       foobar
-//!         GET Foo::Bar
-//!       fomo
-//!         GET Fomo::AsUsual
-//!       foosh
-//!         GET Foosh::Ball
-//!       {a: b}
-//!         GET Bar::Dyn
+//! ```ignore
+//! /
+//!   foobar
+//!     GET Foo::Bar
+//!   fomo
+//!     GET Fomo::AsUsual
+//!   foosh
+//!     GET Foosh::Ball
+//!   {a: b}
+//!     GET Bar::Dyn
+//! ```
 //!
 //! [`match_route`]: fn.match_route.html
 
