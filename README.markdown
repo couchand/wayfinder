@@ -104,53 +104,60 @@ status
 ------
 
 `wayfinder` is currently a work-in-progress.  Here is a summary of
-the current status compared to planned work:
+the current status compared to planned/potential updates:
 
-- [x] Parse & stringify route files
-- [ ] More robust parsing error reporting
-- [x] Match static routes
-- [x] Match catch-all route parameters
-- [ ] Query string handling
-- [ ] Method parser & HTTP first-line parser
-- [x] `http` lib support instead of or in addition to the above
-- [x] Two level (controller-action) route types
-- [x] Any level (module*-route) route types
-- [ ] Get rid of any runtime dep on this lib
-- [ ] Comments in route files
-- [x] Merge multiple route config files
-- [ ] `Into` impls flow upward
-- [ ] `ToPath` or something trait
-- [ ] `link_to` helper leveraging the above
-- [ ] Accept `AsRef<str>` instead of `Iterator<Item=char>`
-- [ ] Match chunk-wise, not char-wise
-- [ ] Only try parsing if route actually matches otherwise
-- [ ] Add more context to parse errors?
-- [ ] Error type enum based on `<$TY as FromStr>::Error`
-- [ ] Not allowed error needs allowed method list (per spec)
-- [ ] Some simple static checks (uniqueness of params, existence of redirect)
-- [ ] Better test coverage
-- [ ] Security review
-- [ ] Micro benchmarking to eke out the most perf
-- [ ] Macro benchmarking against other routers
-
-Here are some other random things that may be considered:
-
-- [ ] More complicated parameter matching (e.g. regex)
-- [ ] Other interface types:
-  - [ ] `Read`
-  - [ ] `&str`
-- [ ] Non-blocking support:
-  - [ ] `AsyncRead`
-- [ ] Config file formats:
-  - [ ] Documentation on using the `config` types directly from `build.rs`
-  - [x] Macros!
+- Route file syntax
+  - [x] Parse & stringify route files
+  - [ ] More robust parsing error reporting
+  - [ ] Comments in route files
+  - [ ] Merge multiple route files
   - [ ] Other indentation options or a non-whitespace style
   - [ ] TOML?
-- [ ] Other outputs:
+  - [ ] Abandon?
+
+- Route config core
+  - [x] Merge multiple route configs
+  - [x] Two level (controller-action) route types
+  - [x] Any level (module*-route) route types
+  - [ ] Documentation on using the `config` types directly from `build.rs`
+  - [ ] Some simple static checks (uniqueness of params, existence of redirect)
+
+- Runtime functionality
+  - [x] Match static routes
+  - [x] Match catch-all route parameters
+  - [ ] More complicated parameter matching (e.g. regex)
+  - [ ] Match const query params and route on them
+  - [ ] Actually handle query string parameters
+  - [ ] Method parser & HTTP first-line parser
+  - [x] `http` lib support instead of or in addition to the above
+  - [ ] `Into` impls flow upward
+  - [ ] `ToPath` or something trait
+  - [ ] `link_to` helper leveraging the above
+  - [ ] Add more context to parse errors?
+  - [ ] Error type enum based on `<$TY as FromStr>::Error`
+  - [ ] Not allowed error needs allowed method list (per spec)
+  - [ ] Redirect should provide the code?
+
+- Refactorings and cleanups
+  - [ ] Get rid of any runtime dep on this lib
+  - [ ] Accept `AsRef<str>` instead of `Iterator<Item=char>`
+  - [ ] Accept `Read`?
+  - [ ] Accept `AsyncRead`?
+  - [ ] Match chunk-wise, not char-wise
+  - [ ] Only try parsing if route actually matches otherwise
+
+- Other use-cases
   - [ ] JS router for SPA
+  - [ ] WASM router for SPA
   - [ ] API docs
   - [ ] API clients
   - [ ] CLI args??
+
+- Meta-concerns
+  - [ ] Better test coverage
+  - [ ] Security review
+  - [ ] Micro benchmarking to eke out the most perf
+  - [ ] Macro benchmarking against other routers
 
 more information
 ----------------
