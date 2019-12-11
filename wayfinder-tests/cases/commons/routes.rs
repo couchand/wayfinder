@@ -184,12 +184,12 @@ impl Route {
 /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
 /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
 /// [`Route`]: enum.Route.html
-pub fn match_route<P: AsRef<str>>(
+pub fn match_route<P: AsRef<[u8]>>(
     path: P,
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = path.as_ref().chars().fuse().peekable();
+    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();
     if path.peek() == Some(&'/') {
         path.next();
     }

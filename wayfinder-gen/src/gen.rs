@@ -392,7 +392,7 @@ where
     )?;
     writeln!(w, "/// [`Route`]: enum.Route.html")?;
 
-    writeln!(w, "pub fn match_route<P: AsRef<str>>(")?;
+    writeln!(w, "pub fn match_route<P: AsRef<[u8]>>(")?;
     writeln!(w, "    path: P,")?;
     writeln!(w, "    method: wayfinder::Method,")?;
     writeln!(
@@ -400,7 +400,7 @@ where
         ") -> Result<wayfinder::Match<Route>, wayfinder::Error> {{"
     )?;
     writeln!(w, "    use wayfinder::{{Error, Method, Match}};")?;
-    writeln!(w, "    let mut path = path.as_ref().chars().fuse().peekable();")?;
+    writeln!(w, "    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();")?;
 
     writeln!(w, "    if path.peek() == Some(&'/') {{")?;
     writeln!(w, "        path.next();")?;
@@ -770,12 +770,12 @@ impl Route {
 /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
 /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
 /// [`Route`]: enum.Route.html
-pub fn match_route<P: AsRef<str>>(
+pub fn match_route<P: AsRef<[u8]>>(
     path: P,
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = path.as_ref().chars().fuse().peekable();
+    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();
     if path.peek() == Some(&'/') {
         path.next();
     }
@@ -985,12 +985,12 @@ impl Route {
 /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
 /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
 /// [`Route`]: enum.Route.html
-pub fn match_route<P: AsRef<str>>(
+pub fn match_route<P: AsRef<[u8]>>(
     path: P,
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = path.as_ref().chars().fuse().peekable();
+    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();
     if path.peek() == Some(&'/') {
         path.next();
     }
