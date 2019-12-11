@@ -5,6 +5,7 @@ members = [
   "wayfinder-cmd",
   "wayfinder-core",
   "wayfinder-gen",
+  "wayfinder-goal",
   "wayfinder-parse",
   "wayfinder-tests",
   "examples/cli",
