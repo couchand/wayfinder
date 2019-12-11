@@ -5,5 +5,5 @@
     GET Fomo::AsUsual
   foosh
     GET Foosh::Ball
-  {a:b}
+  {a: String}
     GET Bar::Dyn

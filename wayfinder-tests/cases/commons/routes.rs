@@ -15,7 +15,7 @@ pub mod routes {
 //!     GET Fomo::AsUsual
 //!   foosh
 //!     GET Foosh::Ball
-//!   {a: b}
+//!   {a: String}
 //!     GET Bar::Dyn
 //! ```
 //!
@@ -30,7 +30,7 @@ pub mod bar {
     /// Renders for `GET /{a}`.
     #[derive(Debug)]
     pub struct Dyn {
-        pub a: b,
+        pub a: String,
     }
 
     impl Dyn {
