@@ -8,6 +8,8 @@ use nom::types::CompleteStr;
 use wayfinder_core::*;
 use wayfinder_parse as parse;
 
+include!(concat!(env!("OUT_DIR"), "/cases.rs"));
+
 fn get_method_cases() -> Vec<(Method, &'static str)> {
     vec![
         (Method::Get, "GET"),
