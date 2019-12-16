@@ -406,7 +406,10 @@ where
     writeln!(w)?;
     writeln!(w, "    let path = path.as_ref();")?;
     writeln!(w, "    let len = path.len();")?;
-    writeln!(w, "    let mut i = if &path[0..1] == b\"/\" {{ 1 }} else {{ 0 }};")?;
+    writeln!(
+        w,
+        "    let mut i = if &path[0..1] == b\"/\" {{ 1 }} else {{ 0 }};"
+    )?;
 
     writeln!(w)?;
 
@@ -472,7 +475,7 @@ where
 
                 // continue with child
                 codegen_trie(w, child, indent)?;
-            },
+            }
             Charlike::Static(ch) => {
                 // find unambiguous match
                 let mut unambiguous = String::new();
@@ -501,7 +504,7 @@ where
 
                 // continue after unambiguous
                 codegen_trie(w, child, indent)?;
-            },
+            }
             Charlike::Dynamic(ref name) => {
                 // collect chars to next separator
                 writeln!(w, "{}let start = i;", indent1)?;
@@ -518,7 +521,7 @@ where
                     indent1, name
                 )?;
                 writeln!(w)?;
-            },
+            }
         }
 
         return Ok(());
@@ -557,11 +560,15 @@ where
 
             l += 1;
 
-            let options = t.children.iter().filter_map(|c| match c.0 {
-                Charlike::Dynamic(_) => None,
-                Charlike::Separator => unreachable!(),
-                Charlike::Static(ch) => Some((ch, &c.1)),
-            }).collect::<Vec<_>>();
+            let options = t
+                .children
+                .iter()
+                .filter_map(|c| match c.0 {
+                    Charlike::Dynamic(_) => None,
+                    Charlike::Separator => unreachable!(),
+                    Charlike::Static(ch) => Some((ch, &c.1)),
+                })
+                .collect::<Vec<_>>();
 
             if options.len() != 1 {
                 break;
@@ -724,7 +731,11 @@ where
 
     writeln!(w, "{}}}", indent1)?;
     writeln!(w)?;
-    writeln!(w, "{}let text = std::str::from_utf8(&path[start..i]).unwrap();", indent1)?;
+    writeln!(
+        w,
+        "{}let text = std::str::from_utf8(&path[start..i]).unwrap();",
+        indent1
+    )?;
     writeln!(w, "{}let {} = text.parse()", indent1, name)?;
     writeln!(
         w,

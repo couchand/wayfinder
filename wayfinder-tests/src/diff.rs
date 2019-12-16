@@ -1,6 +1,6 @@
-use ansi_term::{Colour};
-use prettydiff::text::{diff_lines, LineChangeset};
+use ansi_term::Colour;
 use prettydiff::basic::DiffOp;
+use prettydiff::text::{diff_lines, LineChangeset};
 
 pub struct TestResult<'a> {
     expected: &'a str,
@@ -37,20 +37,32 @@ struct DiffChunk<'source, 'changes> {
 
 impl<'source, 'changes> DiffChunk<'source, 'changes> {
     fn header(&self) -> String {
-        Colour::Yellow.bold().paint(format!(
-            "--- {}\n+++ {}\n@@ -{},{} +{},{} @@",
-            self.old_name,
-            self.new_name,
-            self.old_line, self.old_count, self.new_line, self.new_count
-        )).to_string()
+        Colour::Yellow
+            .bold()
+            .paint(format!(
+                "--- {}\n+++ {}\n@@ -{},{} +{},{} @@",
+                self.old_name,
+                self.new_name,
+                self.old_line,
+                self.old_count,
+                self.new_line,
+                self.new_count
+            ))
+            .to_string()
     }
 
     fn removal(&self, a: &[&str]) -> String {
-        Colour::Red.bold().paint(format!("-{}", a.join("\n-"))).to_string()
+        Colour::Red
+            .bold()
+            .paint(format!("-{}", a.join("\n-")))
+            .to_string()
     }
 
     fn insertion(&self, a: &[&str]) -> String {
-        Colour::Green.bold().paint(format!("+{}", a.join("\n+"))).to_string()
+        Colour::Green
+            .bold()
+            .paint(format!("+{}", a.join("\n+")))
+            .to_string()
     }
 }
 
@@ -60,7 +72,7 @@ impl<'source, 'changes> std::fmt::Display for DiffChunk<'source, 'changes> {
 
         for op in self.diff.iter() {
             match op {
-                DiffOp::Equal(_) => {},
+                DiffOp::Equal(_) => {}
                 DiffOp::Insert(a) => writeln!(f, "{}", self.insertion(a))?,
                 DiffOp::Remove(a) => writeln!(f, "{}", self.removal(a))?,
                 DiffOp::Replace(a, b) => {
@@ -93,7 +105,7 @@ impl<'a> TestDiff<'a> {
                     old_line += count;
                     new_line += count;
                     // TODO: context
-                },
+                }
                 DiffOp::Insert(a) => {
                     let new_count = a.len();
                     chunks.push(DiffChunk {
@@ -106,7 +118,7 @@ impl<'a> TestDiff<'a> {
                         diff: vec![DiffOp::Insert(a)], // TODO: chunk
                     });
                     new_line += new_count;
-                },
+                }
                 DiffOp::Remove(a) => {
                     let old_count = a.len();
                     chunks.push(DiffChunk {
@@ -119,7 +131,7 @@ impl<'a> TestDiff<'a> {
                         diff: vec![DiffOp::Remove(a)], // TODO: chunk
                     });
                     old_line += old_count;
-                },
+                }
                 DiffOp::Replace(a, b) => {
                     let old_count = a.len();
                     let new_count = b.len();
@@ -134,7 +146,7 @@ impl<'a> TestDiff<'a> {
                     });
                     old_line += old_count;
                     new_line += new_count;
-                },
+                }
             }
         }
 

@@ -1,8 +1,8 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
-mod macros;
 mod diff;
+mod macros;
 
 use nom::types::CompleteStr;
 

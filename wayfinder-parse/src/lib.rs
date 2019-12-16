@@ -4,8 +4,8 @@
 use lazy_static::lazy_static;
 use nom::types::CompleteStr;
 use nom::{
-    alt_complete, apply, char, complete, count, delimited, do_parse, eof, line_ending, many0, many1,
-    named, not, not_line_ending, pair, preceded, recognize, return_error, tag, tag_no_case,
+    alt_complete, apply, char, complete, count, delimited, do_parse, eof, line_ending, many0,
+    many1, named, not, not_line_ending, pair, preceded, recognize, return_error, tag, tag_no_case,
     take_while1, terminated, value, ws, IResult,
 };
 

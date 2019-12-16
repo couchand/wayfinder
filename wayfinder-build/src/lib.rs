@@ -14,9 +14,7 @@ pub fn build<P: AsRef<Path>, W: Write>(src: &P, dest: &mut W) {
 
     match wayfinder_parse::route_config(&contents) {
         // TODO: not unwrap
-        Ok(config) => {
-            codegen(dest, &config.1).unwrap()
-        },
+        Ok(config) => codegen(dest, &config.1).unwrap(),
         result => {
             println!("cargo:warning=Route config parse error in {:?}:", path);
             show_errors(&mut std::io::stdout(), &contents, result, "cargo:warning=");
