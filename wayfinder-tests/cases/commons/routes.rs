@@ -28,7 +28,7 @@ pub mod routes {
 
 pub mod bar {
     /// Renders for `GET /{a}`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Dyn {
         pub a: String,
     }
@@ -42,7 +42,7 @@ pub mod bar {
     }
 
     /// Parameters for requests to the bar controller.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         Dyn(Dyn),
     }
@@ -59,7 +59,7 @@ pub mod bar {
 
 pub mod fomo {
     /// Renders for `GET /fomo`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct AsUsual;
 
     impl AsUsual {
@@ -70,7 +70,7 @@ pub mod fomo {
     }
 
     /// Parameters for requests to the fomo controller.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         AsUsual(AsUsual),
     }
@@ -87,7 +87,7 @@ pub mod fomo {
 
 pub mod foo {
     /// Renders for `GET /foobar`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Bar;
 
     impl Bar {
@@ -98,7 +98,7 @@ pub mod foo {
     }
 
     /// Parameters for requests to the foo controller.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         Bar(Bar),
     }
@@ -115,7 +115,7 @@ pub mod foo {
 
 pub mod foosh {
     /// Renders for `GET /foosh`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Ball;
 
     impl Ball {
@@ -126,7 +126,7 @@ pub mod foosh {
     }
 
     /// Parameters for requests to the foosh controller.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         Ball(Ball),
     }
@@ -142,7 +142,7 @@ pub mod foosh {
 }
 
 /// An active route in the application -- match against this.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Route {
     Bar(bar::Route),
     Fomo(fomo::Route),
@@ -191,94 +191,110 @@ pub fn match_route<P: AsRef<[u8]>>(
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();
-    if path.peek() == Some(&'/') {
-        path.next();
-    }
 
-    let mut text = String::new();
+    let path = path.as_ref();
+    let len = path.len();
+    let mut i = if &path[0..1] == b"/" { 1 } else { 0 };
 
-    match path.next() {
-        Some('f') => {
-            match path.next() {
-                Some('o') => {},
-                _ => return Ok(Match::NotFound),
-            }
-            match path.next() {
-                Some('m') => {
-                    match path.next() {
-                        Some('o') => {},
-                        _ => return Ok(Match::NotFound),
-                    }
-                    match path.next() {
-                        None => match method {
-                            Method::Get => return Ok(Match::Route(Route::Fomo(fomo::Route::AsUsual(fomo::AsUsual {
-                            })))),
-                            _ => return Ok(Match::NotAllowed),
-                        },
-                        Some('/') => {}
-                        _ => return Ok(Match::NotFound),
-                    }
-                    match path.next() {
-                        None => match method {
-                            Method::Get => return Ok(Match::Route(Route::Fomo(fomo::Route::AsUsual(fomo::AsUsual {
-                            })))),
-                            _ => return Ok(Match::NotAllowed),
+
+    let start = i;
+
+    match &path[i..i+3] {
+        b"fo" => {
+            i += 3;
+            match &path[i..i+1] {
+                b"m" => {
+                    i += 1;
+                    match &path[i..i+1] {
+                        b"o" => {
+                            i += 1;
                         },
                         _ => return Ok(Match::NotFound),
                     }
+                    if i == len {
+                        match method {
+                            Method::Get => return Ok(Match::Route(Route::Fomo(fomo::Route::AsUsual(fomo::AsUsual {
+                            })))),
+                            _ => return Ok(Match::NotAllowed),
+                        }
+                    }
+                    match &path[i..i+1] {
+                        b"/" => {
+                            i += 1;
+                        },
+                        _ => return Ok(Match::NotFound),
+                    }
+                    if i == len {
+                        match method {
+                            Method::Get => return Ok(Match::Route(Route::Fomo(fomo::Route::AsUsual(fomo::AsUsual {
+                            })))),
+                            _ => return Ok(Match::NotAllowed),
+                        }
+                    }
+                    return Ok(Match::NotFound);
                 },
-                Some('o') => {
-                    match path.next() {
-                        Some('b') => {
-                            match path.next() {
-                                Some('a') => {},
-                                _ => return Ok(Match::NotFound),
-                            }
-                            match path.next() {
-                                Some('r') => {},
-                                _ => return Ok(Match::NotFound),
-                            }
-                            match path.next() {
-                                None => match method {
-                                    Method::Get => return Ok(Match::Route(Route::Foo(foo::Route::Bar(foo::Bar {
-                                    })))),
-                                    _ => return Ok(Match::NotAllowed),
-                                },
-                                Some('/') => {}
-                                _ => return Ok(Match::NotFound),
-                            }
-                            match path.next() {
-                                None => match method {
-                                    Method::Get => return Ok(Match::Route(Route::Foo(foo::Route::Bar(foo::Bar {
-                                    })))),
-                                    _ => return Ok(Match::NotAllowed),
+                b"o" => {
+                    i += 1;
+                    match &path[i..i+1] {
+                        b"b" => {
+                            i += 1;
+                            match &path[i..i+2] {
+                                b"ar" => {
+                                    i += 2;
                                 },
                                 _ => return Ok(Match::NotFound),
                             }
+                            if i == len {
+                                match method {
+                                    Method::Get => return Ok(Match::Route(Route::Foo(foo::Route::Bar(foo::Bar {
+                                    })))),
+                                    _ => return Ok(Match::NotAllowed),
+                                }
+                            }
+                            match &path[i..i+1] {
+                                b"/" => {
+                                    i += 1;
+                                },
+                                _ => return Ok(Match::NotFound),
+                            }
+                            if i == len {
+                                match method {
+                                    Method::Get => return Ok(Match::Route(Route::Foo(foo::Route::Bar(foo::Bar {
+                                    })))),
+                                    _ => return Ok(Match::NotAllowed),
+                                }
+                            }
+                            return Ok(Match::NotFound);
                         },
-                        Some('s') => {
-                            match path.next() {
-                                Some('h') => {},
-                                _ => return Ok(Match::NotFound),
-                            }
-                            match path.next() {
-                                None => match method {
-                                    Method::Get => return Ok(Match::Route(Route::Foosh(foosh::Route::Ball(foosh::Ball {
-                                    })))),
-                                    _ => return Ok(Match::NotAllowed),
-                                },
-                                Some('/') => {}
-                                _ => return Ok(Match::NotFound),
-                            }
-                            match path.next() {
-                                None => match method {
-                                    Method::Get => return Ok(Match::Route(Route::Foosh(foosh::Route::Ball(foosh::Ball {
-                                    })))),
-                                    _ => return Ok(Match::NotAllowed),
+                        b"s" => {
+                            i += 1;
+                            match &path[i..i+1] {
+                                b"h" => {
+                                    i += 1;
                                 },
                                 _ => return Ok(Match::NotFound),
                             }
+                            if i == len {
+                                match method {
+                                    Method::Get => return Ok(Match::Route(Route::Foosh(foosh::Route::Ball(foosh::Ball {
+                                    })))),
+                                    _ => return Ok(Match::NotAllowed),
+                                }
+                            }
+                            match &path[i..i+1] {
+                                b"/" => {
+                                    i += 1;
+                                },
+                                _ => return Ok(Match::NotFound),
+                            }
+                            if i == len {
+                                match method {
+                                    Method::Get => return Ok(Match::Route(Route::Foosh(foosh::Route::Ball(foosh::Ball {
+                                    })))),
+                                    _ => return Ok(Match::NotAllowed),
+                                }
+                            }
+                            return Ok(Match::NotFound);
                         },
                         _ => return Ok(Match::NotFound),
                     }
@@ -286,36 +302,44 @@ pub fn match_route<P: AsRef<[u8]>>(
                 _ => return Ok(Match::NotFound),
             }
         },
-        None => return Ok(Match::NotFound),
-        Some(c) => text.push(c),
+        _ => {},
     }
 
     loop {
-        match path.peek().cloned() {
-            None => break,
-            Some(c) => {
-                path.next();
-                if c == '/' {
-                    break;
-                } else {
-                    text.push(c);
-                }
-            },
+        if i == len { break }
+        match &path[i..i+1] {
+            b"/" => break,
+            _ => i += 1,
         }
-    };
+    }
 
+    let text = std::str::from_utf8(&path[start..i]).unwrap();
     let a = text.parse()
         .map_err(|e| Error::fail("a", e))?;
 
-    match path.next() {
-        None => match method {
+    if i == len {
+        match method {
             Method::Get => return Ok(Match::Route(Route::Bar(bar::Route::Dyn(bar::Dyn {
                 a,
             })))),
             _ => return Ok(Match::NotAllowed),
+        }
+    }
+    match &path[i..i+1] {
+        b"/" => {
+            i += 1;
         },
         _ => return Ok(Match::NotFound),
     }
+    if i == len {
+        match method {
+            Method::Get => return Ok(Match::Route(Route::Bar(bar::Route::Dyn(bar::Dyn {
+                a,
+            })))),
+            _ => return Ok(Match::NotAllowed),
+        }
+    }
+    return Ok(Match::NotFound);
 }
 
 } // mod routes

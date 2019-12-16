@@ -144,7 +144,7 @@ the current status compared to planned/potential updates:
   - [x] Actually `AsRef<[u8]>` since it must be ASCII
   - [ ] Accept `Read`?
   - [ ] Accept `AsyncRead`?
-  - [ ] Match chunk-wise, not char-wise
+  - [x] Match chunk-wise, not char-wise
   - [ ] Only try parsing if route actually matches otherwise
 
 - Other use-cases

@@ -101,7 +101,7 @@ where
 
         writeln!(w, "`.")?;
 
-        writeln!(w, "{}#[derive(Debug)]", indent)?;
+        writeln!(w, "{}#[derive(Debug, PartialEq, Eq)]", indent)?;
         write!(w, "{}pub struct {}", indent, to_caps_case(&action.name))?;
 
         if action.route_parameters.is_empty() && action.query_parameters.is_empty() {
@@ -212,7 +212,7 @@ where
             to_snake_case(&module.name)
         )?;
     }
-    writeln!(w, "{}#[derive(Debug)]", indent)?;
+    writeln!(w, "{}#[derive(Debug, PartialEq, Eq)]", indent)?;
     writeln!(w, "{}pub enum Route {{", indent)?;
 
     for action in module.actions.iter() {
@@ -403,11 +403,12 @@ where
         ") -> Result<wayfinder::Match<Route>, wayfinder::Error> {{"
     )?;
     writeln!(w, "    use wayfinder::{{Error, Method, Match}};")?;
-    writeln!(w, "    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();")?;
+    writeln!(w)?;
+    writeln!(w, "    let path = path.as_ref();")?;
+    writeln!(w, "    let len = path.len();")?;
+    writeln!(w, "    let mut i = if &path[0..1] == b\"/\" {{ 1 }} else {{ 0 }};")?;
 
-    writeln!(w, "    if path.peek() == Some(&'/') {{")?;
-    writeln!(w, "        path.next();")?;
-    writeln!(w, "    }}")?;
+    writeln!(w)?;
 
     codegen_trie(w, &flattened.to_trie(), 1)?;
 
@@ -433,81 +434,217 @@ where
     let mut indent2 = indent1.clone();
     indent2.push_str("    ");
 
-    let has_dynamic = trie.children.iter().any(|c| match c.0 {
-        Charlike::Dynamic(_) => true,
-        _ => false,
-    });
-
-    if has_dynamic {
-        writeln!(w)?;
-        writeln!(w, "{}let mut text = String::new();", indent1)?;
-        writeln!(w)?;
+    if let Some(ref route) = trie.data {
+        if route.resources.len() != 0 {
+            write_methods(w, route, indent)?;
+        }
     }
 
-    writeln!(w, "{}match path.next() {{", indent1)?;
-
-    let mut wrote_none = false;
-    match trie.data {
-        Some(ref route) if route.resources.len() != 0 => {
-            write_methods(w, route, indent)?;
-            wrote_none = true;
-        }
-        _ => {}
+    if trie.children.len() == 0 {
+        writeln!(w, "{}return Ok(Match::NotFound);", indent1)?;
+        return Ok(());
     }
 
     if trie.children.len() == 1 {
-        match trie.children[0].0 {
-            Charlike::Static(ref c) => {
-                writeln!(w, "{}Some('{}') => {{}},", indent2, c)?;
-            }
-            Charlike::Dynamic(ref p) => {
-                if !wrote_none {
-                    writeln!(w, "{}None => return Ok(Match::NotFound),", indent2)?;
-                }
-                write_dynamic(w, &trie.children[0].1, indent, p)?;
-            }
+        let (ref segment, ref child) = trie.children[0];
+        match segment {
             Charlike::Separator => {
-                if let Some(ref route) = trie.children[0].1.data {
-                    if route.resources.len() != 0 {
+                // check for child match
+                // TODO: this seems backwards??
+                match child.data {
+                    Some(ref route) if route.resources.len() != 0 => {
                         write_methods(w, route, indent)?;
                     }
+                    _ => {
+                        writeln!(w, "{}if i == len {{", indent1)?;
+                        writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
+                        writeln!(w, "{}}}", indent1)?;
+                    }
                 }
+
+                // check for separator
+                writeln!(w, "{}match &path[i..i+1] {{", indent1)?;
+                writeln!(w, "{}    b\"/\" => {{", indent1)?;
+                writeln!(w, "{}        i += 1;", indent1)?;
+                writeln!(w, "{}    }},", indent1)?;
+                writeln!(w, "{}    _ => return Ok(Match::NotFound),", indent1)?;
+                writeln!(w, "{}}}", indent1)?;
+
+                // continue with child
+                codegen_trie(w, child, indent)?;
+            },
+            Charlike::Static(ch) => {
+                // find unambiguous match
+                let mut unambiguous = String::new();
+                unambiguous.push(*ch);
+
+                let mut child = child;
+
+                loop {
+                    if child.children.len() == 1 {
+                        if let Charlike::Static(ch) = child.children[0].0 {
+                            unambiguous.push(ch);
+                            child = &child.children[0].1;
+                            continue;
+                        }
+                    }
+                    break;
+                }
+
+                // check it
+                writeln!(w, "{}match &path[i..i+{}] {{", indent1, unambiguous.len())?;
+                writeln!(w, "{}    b\"{}\" => {{", indent1, unambiguous)?; // TODO quotes in paths????
+                writeln!(w, "{}        i += {};", indent1, unambiguous.len())?;
+                writeln!(w, "{}    }},", indent1)?;
+                writeln!(w, "{}    _ => return Ok(Match::NotFound),", indent1)?;
+                writeln!(w, "{}}}", indent1)?;
+
+                // continue after unambiguous
+                codegen_trie(w, child, indent)?;
+            },
+            Charlike::Dynamic(ref name) => {
+                // collect chars to next separator
+                writeln!(w, "{}let start = i;", indent1)?;
+                writeln!(w, "{}while i < len && path[i..i+1] != b\"/\" {{", indent1)?;
+                writeln!(w, "{}    i += 1;", indent1)?;
+                writeln!(w, "{}}}", indent1)?;
+
+                // try parse
+                writeln!(w)?;
+                writeln!(w, "{}let {} = path[start..i].parse()", indent1, name)?;
+                writeln!(
+                    w,
+                    "{}    .map_err(|e| Error::fail(\"{}\", e))?;",
+                    indent1, name
+                )?;
+                writeln!(w)?;
+            },
+        }
+
+        return Ok(());
+    }
+
+    // n.b. if we got here, trie.children.len() > 1
+
+    let dynamic = trie.children.iter().find(|c| match c.0 {
+        Charlike::Dynamic(_) => true,
+        _ => false,
+    });
+    let has_dynamic = match dynamic {
+        Some(_) => true,
+        None => false,
+    };
+
+    if has_dynamic {
+        writeln!(w)?;
+        writeln!(w, "{}let start = i;", indent1)?;
+        writeln!(w)?;
+    }
+
+    let (unambiguous, l, next) = {
+        let mut l = 0;
+        let mut s = String::new();
+        let mut t = trie;
+
+        loop {
+            let has_separator = t.children.iter().any(|c| match c.0 {
+                Charlike::Separator => true,
+                _ => false,
+            });
+            if has_separator {
+                break;
+            }
+
+            l += 1;
+
+            let options = t.children.iter().filter_map(|c| match c.0 {
+                Charlike::Dynamic(_) => None,
+                Charlike::Separator => unreachable!(),
+                Charlike::Static(ch) => Some((ch, &c.1)),
+            }).collect::<Vec<_>>();
+
+            if options.len() != 1 {
+                break;
+            }
+
+            s.push(options[0].0);
+            t = options[0].1;
+        }
+
+        (s, l, t)
+    };
+
+    let match_len = if l == 0 { 1 } else { l };
+
+/*
+    match trie.data {
+        Some(ref route) if route.resources.len() != 0 => {
+            write_methods(w, route, indent + 1)?;
+        }
+        _ => {
+            writeln!(w, "{}if i == len {{", indent1)?;
+            writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
+            writeln!(w, "{}}}", indent1)?;
+        }
+    }
+*/
+
+    if unambiguous != "" {
+        writeln!(w, "{}match &path[i..i+{}] {{", indent1, match_len)?;
+        writeln!(w, "{}    b\"{}\" => {{", indent1, unambiguous)?; // TODO: quotes in paths??
+        writeln!(w, "{}        i += {};", indent1, match_len)?;
+
+        codegen_trie(w, next, indent + 2)?;
+
+        writeln!(w, "{}    }},", indent1)?;
+
+        if !has_dynamic {
+            writeln!(w, "{}    _ => return Ok(Match::NotFound),", indent1)?;
+            writeln!(w, "{}}}", indent1)?;
+        } else {
+            writeln!(w, "{}    _ => {{}},", indent1)?;
+            writeln!(w, "{}}}", indent1)?;
+
+            if let Charlike::Dynamic(ref name) = dynamic.unwrap().0 {
+                write_dynamic(w, &dynamic.unwrap().1, indent, name)?;
+            } else {
+                unreachable!();
+            }
+        }
+
+        return Ok(());
+    }
+
+    // n.b. if we got here, the next character is ambiguous
+
+    writeln!(w, "{}match &path[i..i+1] {{", indent1)?;
+
+    for child in trie.children.iter() {
+        match child.0 {
+            Charlike::Static(c) => {
+                writeln!(w, "{}b\"{}\" => {{", indent2, c)?;
+                writeln!(w, "{}    i += 1;", indent2)?;
+
+                codegen_trie(w, &child.1, indent + 2)?;
+
+                writeln!(w, "{}}},", indent2)?;
+            }
+            Charlike::Dynamic(ref p) => {
+                write_dynamic(w, &child.1, indent, p)?;
+
+                // TODO: is this true still?
+                // No further routes will possibly match.
+                break;
+            }
+            Charlike::Separator => {
                 writeln!(w, "{}Some('/') => {{}}", indent2)?;
             }
         }
-    } else {
-        // trie.children.len() > 1
-        for child in trie.children.iter() {
-            match child.0 {
-                Charlike::Static(c) => {
-                    writeln!(w, "{}Some('{}') => {{", indent2, c)?;
-
-                    codegen_trie(w, &child.1, indent + 2)?;
-
-                    writeln!(w, "{}}},", indent2)?;
-                }
-                Charlike::Dynamic(ref p) => {
-                    if !wrote_none {
-                        writeln!(w, "{}None => return Ok(Match::NotFound),", indent2)?;
-                    }
-                    write_dynamic(w, &child.1, indent, p)?;
-                    // No further routes will possibly match.
-                    break;
-                }
-                Charlike::Separator => {
-                    writeln!(w, "{}Some('/') => {{}}", indent2)?;
-                }
-            }
-        }
     }
-    if !has_dynamic {
-        writeln!(w, "{}_ => return Ok(Match::NotFound),", indent2)?;
-        writeln!(w, "{}}}", indent1)?;
 
-        if trie.children.len() == 1 {
-            codegen_trie(w, &trie.children[0].1, indent)?;
-        }
-    }
+    writeln!(w, "{}    _ => return Ok(Match::NotFound),", indent1)?;
+
+    writeln!(w, "{}}}", indent1)?;
 
     Ok(())
 }
@@ -516,12 +653,13 @@ fn write_methods<W>(w: &mut W, route: &FlattenedRoute, indent: usize) -> io::Res
 where
     W: Write,
 {
-    let mut indent1 = String::from("    ");
+    let mut indent1 = String::from("");
     for _ in 0..indent {
         indent1.push_str("    ");
     }
 
-    writeln!(w, "{}None => match method {{", indent1)?;
+    writeln!(w, "{}if i == len {{", indent1)?;
+    writeln!(w, "{}    match method {{", indent1)?;
 
     for resource in route.resources.iter() {
         let (path, route_nest, close_parens) = {
@@ -538,7 +676,7 @@ where
 
         writeln!(
             w,
-            "{0}    Method::{1:?} => return Ok(Match::{2}({3}{4}Route::{5}({4}{5} {{",
+            "{0}        Method::{1:?} => return Ok(Match::{2}({3}{4}Route::{5}({4}{5} {{",
             indent1,
             resource.method,
             if resource.is_redirect {
@@ -552,20 +690,21 @@ where
         )?;
 
         for param in route.path.dynamics() {
-            writeln!(w, "{}        {},", indent1, param.name)?;
+            writeln!(w, "{}            {},", indent1, param.name)?;
         }
         for param in route.query_parameters.iter() {
-            writeln!(w, "{}        {}: None,", indent1, param.name)?;
+            writeln!(w, "{}            {}: None,", indent1, param.name)?;
         }
         for param in resource.query_parameters.iter() {
-            writeln!(w, "{}        {}: None,", indent1, param.name)?;
+            writeln!(w, "{}            {}: None,", indent1, param.name)?;
         }
 
-        writeln!(w, "{}    }}{}))),", indent1, close_parens)?;
+        writeln!(w, "{}        }}{}))),", indent1, close_parens)?;
     }
 
-    writeln!(w, "{}    _ => return Ok(Match::NotAllowed),", indent1)?;
-    writeln!(w, "{}}},", indent1)?;
+    writeln!(w, "{}        _ => return Ok(Match::NotAllowed),", indent1)?;
+    writeln!(w, "{}    }}", indent1)?;
+    writeln!(w, "{}}}", indent1)?;
 
     Ok(())
 }
@@ -587,25 +726,18 @@ where
     let mut indent2 = indent1.clone();
     indent2.push_str("    ");
 
-    writeln!(w, "{}Some(c) => text.push(c),", indent2)?;
-    writeln!(w, "{}}}", indent1)?;
     writeln!(w)?;
     writeln!(w, "{}loop {{", indent1)?;
 
-    writeln!(w, "{}match path.peek().cloned() {{", indent2)?;
-    writeln!(w, "{}    None => break,", indent2)?;
-    writeln!(w, "{}    Some(c) => {{", indent2)?;
-    writeln!(w, "{}        path.next();", indent2)?;
-    writeln!(w, "{}        if c == '/' {{", indent2)?;
-    writeln!(w, "{}            break;", indent2)?;
-    writeln!(w, "{}        }} else {{", indent2)?;
-    writeln!(w, "{}            text.push(c);", indent2)?;
-    writeln!(w, "{}        }}", indent2)?;
-    writeln!(w, "{}    }},", indent2)?;
+    writeln!(w, "{}if i == len {{ break }}", indent2)?;
+    writeln!(w, "{}match &path[i..i+1] {{", indent2)?;
+    writeln!(w, "{}    b\"/\" => break,", indent2)?;
+    writeln!(w, "{}    _ => i += 1,", indent2)?;
     writeln!(w, "{}}}", indent2)?;
 
-    writeln!(w, "{}}};", indent1)?;
+    writeln!(w, "{}}}", indent1)?;
     writeln!(w)?;
+    writeln!(w, "{}let text = std::str::from_utf8(&path[start..i]).unwrap();", indent1)?;
     writeln!(w, "{}let {} = text.parse()", indent1, name)?;
     writeln!(
         w,
@@ -622,8 +754,21 @@ where
         return Err(io::ErrorKind::InvalidInput.into());
     }
 
+/*
     // we already checked for the separator above
     trie = &trie.children[0].1;
+
+    match trie.data {
+        Some(ref route) if route.resources.len() != 0 => {
+            write_methods(w, route, indent)?;
+        }
+        _ => {
+            writeln!(w, "{}if i == len {{", indent1)?;
+            writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
+            writeln!(w, "{}}}", indent1)?;
+        }
+    }
+*/
 
     codegen_trie(w, trie, indent)?;
 
@@ -694,7 +839,7 @@ pub mod people {
     use uuid::Uuid;
 
     /// Renders for `GET /`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Index;
 
     impl Index {
@@ -705,7 +850,7 @@ pub mod people {
     }
 
     /// Renders for `GET /{id}`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Show {
         pub id: Uuid,
     }
@@ -719,7 +864,7 @@ pub mod people {
     }
 
     /// Parameters for requests to the people controller.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         Index(Index),
         Show(Show),
@@ -737,7 +882,7 @@ pub mod people {
 }
 
 /// An active route in the application -- match against this.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Route {
     People(people::Route),
 }
@@ -780,48 +925,26 @@ pub fn match_route<P: AsRef<[u8]>>(
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();
-    if path.peek() == Some(&'/') {
-        path.next();
-    }
 
-    let mut text = String::new();
+    let path = path.as_ref();
+    let len = path.len();
+    let mut i = if &path[0..1] == b\"/\" { 1 } else { 0 };
 
-    match path.next() {
-        None => match method {
+    if i == len {
+        match method {
             Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
             })))),
             _ => return Ok(Match::NotAllowed),
-        },
-        Some(c) => text.push(c),
+        }
+    }
+    let start = i;
+    while i < len && path[i..i+1] != b\"/\" {
+        i += 1;
     }
 
-    loop {
-        match path.peek().cloned() {
-            None => break,
-            Some(c) => {
-                path.next();
-                if c == '/' {
-                    break;
-                } else {
-                    text.push(c);
-                }
-            },
-        }
-    };
-
-    let id = text.parse()
+    let id = path[start..i].parse()
         .map_err(|e| Error::fail(\"id\", e))?;
 
-    match path.next() {
-        None => match method {
-            Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
-                id,
-            })))),
-            _ => return Ok(Match::NotAllowed),
-        },
-        _ => return Ok(Match::NotFound),
-    }
 }
 
 } // mod routes
@@ -889,7 +1012,7 @@ pub fn match_route<P: AsRef<[u8]>>(
 use uuid::Uuid;
 
 /// Renders for `GET /`.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Index;
 
 impl Index {
@@ -906,7 +1029,7 @@ pub mod admin {
         use uuid::Uuid;
 
         /// Renders for `GET /{id}`.
-        #[derive(Debug)]
+        #[derive(Debug, PartialEq, Eq)]
         pub struct Show {
             pub id: Uuid,
         }
@@ -920,7 +1043,7 @@ pub mod admin {
         }
 
         /// Parameters for requests to the people controller.
-        #[derive(Debug)]
+        #[derive(Debug, PartialEq, Eq)]
         pub enum Route {
             Show(Show),
         }
@@ -936,7 +1059,7 @@ pub mod admin {
     }
 
     /// Parameters for requests to the admin controller.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         People(people::Route),
     }
@@ -952,7 +1075,7 @@ pub mod admin {
 }
 
 /// An active route in the application -- match against this.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Route {
     Index(Index),
     Admin(admin::Route),
@@ -997,48 +1120,26 @@ pub fn match_route<P: AsRef<[u8]>>(
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();
-    if path.peek() == Some(&'/') {
-        path.next();
-    }
 
-    let mut text = String::new();
+    let path = path.as_ref();
+    let len = path.len();
+    let mut i = if &path[0..1] == b\"/\" { 1 } else { 0 };
 
-    match path.next() {
-        None => match method {
+    if i == len {
+        match method {
             Method::Get => return Ok(Match::Route(Route::Index(Index {
             }))),
             _ => return Ok(Match::NotAllowed),
-        },
-        Some(c) => text.push(c),
+        }
+    }
+    let start = i;
+    while i < len && path[i..i+1] != b\"/\" {
+        i += 1;
     }
 
-    loop {
-        match path.peek().cloned() {
-            None => break,
-            Some(c) => {
-                path.next();
-                if c == '/' {
-                    break;
-                } else {
-                    text.push(c);
-                }
-            },
-        }
-    };
-
-    let id = text.parse()
+    let id = path[start..i].parse()
         .map_err(|e| Error::fail(\"id\", e))?;
 
-    match path.next() {
-        None => match method {
-            Method::Get => return Ok(Match::Route(Route::Admin(admin::Route::People(admin::people::Route::Show(admin::people::Show {
-                id,
-            }))))),
-            _ => return Ok(Match::NotAllowed),
-        },
-        _ => return Ok(Match::NotFound),
-    }
 }
 
 } // mod routes

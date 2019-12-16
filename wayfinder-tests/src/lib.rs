@@ -333,53 +333,54 @@ fn test_nested_routes_parse() {
 }
 
 fn get_route_config_cases() -> Vec<(RouteConfig, &'static str)> {
-    vec![(
-        RouteConfig {
-            headers: vec![Header {
-                text: "use uuid::Uuid;".to_string(),
-            }],
-            routes: Routes {
-                resources: vec![],
-                routes: vec![NestedRoutes {
-                    path_segment: PathSegment::from("people"),
-                    routes: Routes {
-                        resources: vec![Resource {
-                            method: Method::Get,
-                            modules: vec!["People".to_string()],
-                            name: "Index".to_string(),
-                            is_redirect: false,
-                            query_parameters: vec![],
-                        }],
-                        routes: vec![NestedRoutes {
-                            path_segment: PathSegment::from(Param::new("id", "Uuid")),
-                            routes: Routes {
-                                resources: vec![
-                                    Resource {
-                                        method: Method::Get,
-                                        modules: vec!["People".to_string()],
-                                        name: "Show".to_string(),
-                                        is_redirect: false,
-                                        query_parameters: vec![],
-                                    },
-                                    Resource {
-                                        method: Method::Put,
-                                        modules: vec!["People".to_string()],
-                                        name: "Update".to_string(),
-                                        is_redirect: false,
-                                        query_parameters: vec![Param::new("name", "String")],
-                                    },
-                                ],
-                                routes: vec![],
-                                query_parameters: vec![],
-                            },
-                        }],
-                        query_parameters: vec![],
-                    },
+    vec![
+        (
+            RouteConfig {
+                headers: vec![Header {
+                    text: "use uuid::Uuid;".to_string(),
                 }],
-                query_parameters: vec![Param::new("lang", "String")],
+                routes: Routes {
+                    resources: vec![],
+                    routes: vec![NestedRoutes {
+                        path_segment: PathSegment::from("people"),
+                        routes: Routes {
+                            resources: vec![Resource {
+                                method: Method::Get,
+                                modules: vec!["People".to_string()],
+                                name: "Index".to_string(),
+                                is_redirect: false,
+                                query_parameters: vec![],
+                            }],
+                            routes: vec![NestedRoutes {
+                                path_segment: PathSegment::from(Param::new("id", "Uuid")),
+                                routes: Routes {
+                                    resources: vec![
+                                        Resource {
+                                            method: Method::Get,
+                                            modules: vec!["People".to_string()],
+                                            name: "Show".to_string(),
+                                            is_redirect: false,
+                                            query_parameters: vec![],
+                                        },
+                                        Resource {
+                                            method: Method::Put,
+                                            modules: vec!["People".to_string()],
+                                            name: "Update".to_string(),
+                                            is_redirect: false,
+                                            query_parameters: vec![Param::new("name", "String")],
+                                        },
+                                    ],
+                                    routes: vec![],
+                                    query_parameters: vec![],
+                                },
+                            }],
+                            query_parameters: vec![],
+                        },
+                    }],
+                    query_parameters: vec![Param::new("lang", "String")],
+                },
             },
-        },
-        "use uuid::Uuid;
+            "use uuid::Uuid;
 
 /
   [lang: String]
@@ -390,7 +391,73 @@ fn get_route_config_cases() -> Vec<(RouteConfig, &'static str)> {
       PUT People::Update
         [name: String]
 ",
-    )]
+        ),
+        (
+            RouteConfig {
+                headers: vec![],
+                routes: Routes {
+                    resources: vec![],
+                    routes: vec![
+                        NestedRoutes {
+                            path_segment: PathSegment::from("one"),
+                            routes: Routes {
+                                resources: vec![
+                                    Resource {
+                                        method: Method::Get,
+                                        modules: vec!["One".to_string()],
+                                        name: "Show".to_string(),
+                                        is_redirect: false,
+                                        query_parameters: vec![],
+                                    },
+                                    Resource {
+                                        method: Method::Post,
+                                        modules: vec!["One".to_string()],
+                                        name: "Make".to_string(),
+                                        is_redirect: false,
+                                        query_parameters: vec![],
+                                    },
+                                ],
+                                routes: vec![],
+                                query_parameters: vec![],
+                            },
+                        },
+                        NestedRoutes {
+                            path_segment: PathSegment::from("two"),
+                            routes: Routes {
+                                resources: vec![
+                                    Resource {
+                                        method: Method::Get,
+                                        modules: vec!["Two".to_string()],
+                                        name: "Show".to_string(),
+                                        is_redirect: false,
+                                        query_parameters: vec![],
+                                    },
+                                    Resource {
+                                        method: Method::Post,
+                                        modules: vec!["Two".to_string()],
+                                        name: "Make".to_string(),
+                                        is_redirect: false,
+                                        query_parameters: vec![],
+                                    },
+                                ],
+                                routes: vec![],
+                                query_parameters: vec![],
+                            },
+                        },
+                    ],
+                    query_parameters: vec![],
+                },
+            },
+            "/
+  one
+    GET One::Show
+    POST One::Make
+  two
+    GET Two::Show
+    POST Two::Make
+",
+        ),
+    ]
 }
 
 #[test]

@@ -1,5 +1,6 @@
 pub use wayfinder_core::Method;
 
+#[derive(PartialEq, Eq)]
 pub enum Match<T> {
     NotFound,
     NotAllowed,

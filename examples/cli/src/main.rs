@@ -28,23 +28,173 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::routes;
+    use uuid::Uuid;
     use wayfinder::Match;
 
-    #[test]
-    fn test_people_index() {
-        let route = "/people";
-        match routes::match_route(&route, wayfinder::Method::Get) {
-            Ok(Match::Route(routes::Route::People(routes::people::Route::Index(_)))) => {}
-            _ => assert!(false),
-        }
+    fn test_cases() -> Vec<(&'static str, wayfinder::Method, Match<routes::Route>)> {
+        let id: Uuid = "12345678901234567890123456789012".parse().unwrap();
+        vec![
+            (
+                "/users",
+                wayfinder::Method::Get,
+                Match::Redirect(routes::Route::People(routes::people::Route::Index(routes::people::Index{lang: None}))),
+            ),
+            (
+                "/users/",
+                wayfinder::Method::Get,
+                Match::Redirect(routes::Route::People(routes::people::Route::Index(routes::people::Index{lang: None}))),
+            ),
+            (
+                "/people",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::People(routes::people::Route::Index(routes::people::Index{lang: None}))),
+            ),
+            (
+                "/people/",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::People(routes::people::Route::Index(routes::people::Index{lang: None}))),
+            ),
+            (
+                "/people",
+                wayfinder::Method::Post,
+                Match::Route(routes::Route::People(routes::people::Route::Create(routes::people::Create{lang: None}))),
+            ),
+            (
+                "/people/",
+                wayfinder::Method::Post,
+                Match::Route(routes::Route::People(routes::people::Route::Create(routes::people::Create{lang: None}))),
+            ),
+            (
+                "/people/new",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::People(routes::people::Route::New(routes::people::New{lang: None}))),
+            ),
+            (
+                "/people/new/",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::People(routes::people::Route::New(routes::people::New{lang: None}))),
+            ),
+            (
+                "/people/12345678901234567890123456789012",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::People(routes::people::Route::Show(routes::people::Show{id, lang: None}))),
+            ),
+            (
+                "/people/12345678901234567890123456789012/",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::People(routes::people::Route::Show(routes::people::Show{id, lang: None}))),
+            ),
+            (
+                "/people/12345678901234567890123456789012",
+                wayfinder::Method::Put,
+                Match::Route(routes::Route::People(routes::people::Route::Update(routes::people::Update{id, lang: None, name: None}))),
+            ),
+            (
+                "/people/12345678901234567890123456789012/",
+                wayfinder::Method::Put,
+                Match::Route(routes::Route::People(routes::people::Route::Update(routes::people::Update{id, lang: None, name: None}))),
+            ),
+            (
+                "/people/12345678901234567890123456789012",
+                wayfinder::Method::Delete,
+                Match::Route(routes::Route::People(routes::people::Route::Destroy(routes::people::Destroy{id, lang: None}))),
+            ),
+            (
+                "/people/12345678901234567890123456789012/",
+                wayfinder::Method::Delete,
+                Match::Route(routes::Route::People(routes::people::Route::Destroy(routes::people::Destroy{id, lang: None}))),
+            ),
+            (
+                "/people/12345678901234567890123456789012/edit",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::People(routes::people::Route::Edit(routes::people::Edit{id, lang: None}))),
+            ),
+            (
+                "/people/12345678901234567890123456789012/edit/",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::People(routes::people::Route::Edit(routes::people::Edit{id, lang: None}))),
+            ),
+            (
+                "/books",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::Books(routes::books::Route::Index(routes::books::Index{lang: None}))),
+            ),
+            (
+                "/books/",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::Books(routes::books::Route::Index(routes::books::Index{lang: None}))),
+            ),
+            (
+                "/books",
+                wayfinder::Method::Post,
+                Match::Route(routes::Route::Books(routes::books::Route::Create(routes::books::Create{lang: None}))),
+            ),
+            (
+                "/books/",
+                wayfinder::Method::Post,
+                Match::Route(routes::Route::Books(routes::books::Route::Create(routes::books::Create{lang: None}))),
+            ),
+            (
+                "/books/new",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::Books(routes::books::Route::New(routes::books::New{lang: None}))),
+            ),
+            (
+                "/books/new/",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::Books(routes::books::Route::New(routes::books::New{lang: None}))),
+            ),
+            (
+                "/books/12345678901234567890123456789012",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::Books(routes::books::Route::Show(routes::books::Show{id, lang: None}))),
+            ),
+            (
+                "/books/12345678901234567890123456789012/",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::Books(routes::books::Route::Show(routes::books::Show{id, lang: None}))),
+            ),
+            (
+                "/books/12345678901234567890123456789012",
+                wayfinder::Method::Put,
+                Match::Route(routes::Route::Books(routes::books::Route::Update(routes::books::Update{id, lang: None}))),
+            ),
+            (
+                "/books/12345678901234567890123456789012/",
+                wayfinder::Method::Put,
+                Match::Route(routes::Route::Books(routes::books::Route::Update(routes::books::Update{id, lang: None}))),
+            ),
+            (
+                "/books/12345678901234567890123456789012",
+                wayfinder::Method::Delete,
+                Match::Route(routes::Route::Books(routes::books::Route::Destroy(routes::books::Destroy{id, lang: None}))),
+            ),
+            (
+                "/books/12345678901234567890123456789012/",
+                wayfinder::Method::Delete,
+                Match::Route(routes::Route::Books(routes::books::Route::Destroy(routes::books::Destroy{id, lang: None}))),
+            ),
+            (
+                "/books/12345678901234567890123456789012/edit",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::Books(routes::books::Route::Edit(routes::books::Edit{id, lang: None}))),
+            ),
+            (
+                "/books/12345678901234567890123456789012/edit/",
+                wayfinder::Method::Get,
+                Match::Route(routes::Route::Books(routes::books::Route::Edit(routes::books::Edit{id, lang: None}))),
+            ),
+        ]
     }
 
     #[test]
-    fn test_people_delete() {
-        let route = "/people/12345678901234567890123456789012";
-        match routes::match_route(&route, wayfinder::Method::Delete) {
-            Ok(Match::Route(routes::Route::People(routes::people::Route::Destroy(_)))) => {}
-            _ => assert!(false),
+    fn test_routes() {
+        for (route, method, expected) in test_cases() {
+            let actual = match routes::match_route(&route, method) {
+                Ok(m) => m,
+                Err(e) => return assert!(false, "Unexpected error: {}", e),
+            };
+            assert_eq!(actual, expected);
         }
     }
 

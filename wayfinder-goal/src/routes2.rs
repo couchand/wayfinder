@@ -250,54 +250,71 @@ pub fn match_route<P: AsRef<[u8]>>(
     method: wayfinder::Method,
 ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
     use wayfinder::{Error, Method, Match};
-
-    let path = path.as_ref();
-    let len = path.len();
-    let mut i = if &path[0..1] == b"/" { 1 } else { 0 };
-
-    match &path[i..i+1] {
-        b"b" => {
-            i += 1;
-            match &path[i..i+4] {
-                b"ooks" => {
-                    i += 4;
-                },
+    let mut path = std::str::from_utf8(path.as_ref()).unwrap().chars().fuse().peekable();
+    if path.peek() == Some(&'/') {
+        path.next();
+    }
+    match path.next() {
+        Some('b') => {
+            match path.next() {
+                Some('o') => {},
                 _ => return Ok(Match::NotFound),
             }
-            if i == len {
-                match method {
+            match path.next() {
+                Some('o') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('k') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('s') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
                 },
+                Some('/') => {}
                 _ => return Ok(Match::NotFound),
             }
-            if i == len {
-                match method {
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
+                },
+                _ => return Ok(Match::NotFound),
             }
-            return Ok(Match::NotFound);
         },
-        b"p" => {
-            i += 1;
-            match &path[i..i+5] {
-                b"eople" => {
-                    i += 5;
-                },
+        Some('p') => {
+            match path.next() {
+                Some('e') => {},
                 _ => return Ok(Match::NotFound),
             }
-            if i == len {
-                match method {
+            match path.next() {
+                Some('o') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('p') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('l') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('e') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
                         lang: None,
                     })))),
@@ -305,16 +322,15 @@ pub fn match_route<P: AsRef<[u8]>>(
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
                 },
+                Some('/') => {}
                 _ => return Ok(Match::NotFound),
             }
-            if i == len {
-                match method {
+
+            let mut text = String::new();
+
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
                         lang: None,
                     })))),
@@ -322,55 +338,58 @@ pub fn match_route<P: AsRef<[u8]>>(
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
-            }
-
-            let start = i;
-
-            match &path[i..i+3] {
-                b"new" => {
-                    i += 3;
-                    if i == len {
-                        match method {
+                },
+                Some('n') => {
+                    match path.next() {
+                        Some('e') => {},
+                        _ => return Ok(Match::NotFound),
+                    }
+                    match path.next() {
+                        Some('w') => {},
+                        _ => return Ok(Match::NotFound),
+                    }
+                    match path.next() {
+                        None => match method {
                             Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
                                 lang: None,
                             })))),
                             _ => return Ok(Match::NotAllowed),
-                        }
+                        },
+                        Some('/') => {}
+                        _ => return Ok(Match::NotFound),
                     }
-                    match &path[i..i+1] {
-                        b"/" => {
-                            i += 1;
+                    match path.next() {
+                        None => match method {
+                            Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
+                                lang: None,
+                            })))),
+                            _ => return Ok(Match::NotAllowed),
                         },
                         _ => return Ok(Match::NotFound),
                     }
-                    if i == len {
-                        match method {
-                            Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
-                                lang: None,
-                            })))),
-                            _ => return Ok(Match::NotAllowed),
-                        }
-                    }
-                }
-                _ => {},
+                },
+                Some(c) => text.push(c),
             }
 
             loop {
-                if i == len { break }
-                match &path[i..i+1] {
-                    b"/" => break,
-                    _ => i += 1,
+                match path.peek().cloned() {
+                    None => break,
+                    Some(c) => {
+                        path.next();
+                        if c == '/' {
+                            break;
+                        } else {
+                            text.push(c);
+                        }
+                    },
                 }
-            }
-
-            let text = std::str::from_utf8(&path[start..i]).unwrap();
+            };
 
             let id = text.parse()
                 .map_err(|e| Error::fail("id", e))?;
 
-            if i == len {
-                match method {
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
                         id,
                         lang: None,
@@ -385,73 +404,82 @@ pub fn match_route<P: AsRef<[u8]>>(
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
-            }
-            i += 1;
-            match &path[i..i+4] {
-                b"edit" => {
-                    i += 4;
-                }
+                },
+                Some('e') => {},
                 _ => return Ok(Match::NotFound),
             }
-            if i == len {
-                match method {
+            match path.next() {
+                Some('d') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('i') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('t') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
                         id,
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
                 },
+                Some('/') => {}
                 _ => return Ok(Match::NotFound),
             }
-            if i == len {
-                match method {
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
                         id,
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
-            }
-            Ok(Match::NotFound)
-        },
-        b"u" => {
-            match &path[i..i+4] {
-                b"sers" => {
-                    i += 4;
                 },
                 _ => return Ok(Match::NotFound),
             }
-            if i == len {
-                match method {
+        },
+        Some('u') => {
+            match path.next() {
+                Some('s') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('e') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('r') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                Some('s') => {},
+                _ => return Ok(Match::NotFound),
+            }
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
                 },
+                Some('/') => {}
                 _ => return Ok(Match::NotFound),
             }
-            if i == len {
-                match method {
+            match path.next() {
+                None => match method {
                     Method::Get => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
-                }
+                },
+                _ => return Ok(Match::NotFound),
             }
-            Ok(Match::NotFound)
         },
-        _ => Ok(Match::NotFound),
+        _ => return Ok(Match::NotFound),
     }
 }
 
