@@ -24,7 +24,7 @@ use uuid::Uuid;
 
   books
     GET Books::Index
-    POST Books:Create
+    POST Books::Create
 
     new
       GET Books::New

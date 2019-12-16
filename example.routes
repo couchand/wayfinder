@@ -24,14 +24,14 @@ use uuid::Uuid;
 
   books
     GET Books::Index
-    POST Books:Create
+    POST Books::Create
 
     new
       GET Books::New
 
     {id: Uuid}
       GET Books::Show
-      PUT Books::update
+      PUT Books::Update
       DELETE Books::Destroy
 
       edit
