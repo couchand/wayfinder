@@ -1,15 +1,15 @@
 pub mod routes {
 
-//! Application route configuration.
-//!
-//! Of note is the function [`match_route`] as well as request structs
-//! specific to each named resource.
-//!
-//! Route configuration:
-//!
-//! ```ignore
-//! /
-//!   [lang: String]
+    //! Application route configuration.
+    //!
+    //! Of note is the function [`match_route`] as well as request structs
+    //! specific to each named resource.
+    //!
+    //! Route configuration:
+    //!
+    //! ```ignore
+    //! /
+    //!   [lang: String]
 //!   users
 //!     GET -> People::Index
 //!   people
@@ -35,14 +35,14 @@ pub mod routes {
 //!       DELETE Books::Destroy
 //!       edit
 //!         GET Books::Edit
-//! ```
-//!
-//! [`match_route`]: fn.match_route.html
+    //! ```
+    //!
+    //! [`match_route`]: fn.match_route.html
 
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_mut)]
-#![allow(unused_variables)]
+    #![allow(dead_code)]
+    #![allow(unused_imports)]
+    #![allow(unused_mut)]
+    #![allow(unused_variables)]
 
 use uuid::Uuid;
 
@@ -330,383 +330,383 @@ impl Route {
     }
 }
 
-/// Match a path and method against this router.
-///
-/// Accepts an iterator for the characters of the request path,
-/// as well as a [`wayfinder::Method`] for the HTTP verb.
-/// Returns a `Result`, usually `Ok` with the result of the
-/// [`wayfinder::Match`].
-///
-/// If the match was successful, it will be a `Match::Route` or
-/// `Match::Redirect` with the parameters enclosed.  You can then
-/// match on the [`Route`] to pass control of the request along to
-/// a specific handler.
-///
-/// If there is no match, this will return `Match::NotFound`
-/// if no path matches (which you could return as `404 Not Found`),
-/// or `Match::NotAllowed` if no method matches (in which case a
-/// `405 Not Allowed` would be appropriate).
-///
-/// If a route parameter fails to parse correctly, this will return
-/// `Err` with the underlying parsing error.  Usually you'll want
-/// to send back a `400 Bad Request` for that.
-///
-/// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
-/// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
-/// [`Route`]: enum.Route.html
-pub fn match_route<P: AsRef<[u8]>>(
-    path: P,
-    method: wayfinder::Method,
-) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
-    use wayfinder::{Error, Method, Match};
+    /// Match a path and method against this router.
+    ///
+    /// Accepts an iterator for the characters of the request path,
+    /// as well as a [`wayfinder::Method`] for the HTTP verb.
+    /// Returns a `Result`, usually `Ok` with the result of the
+    /// [`wayfinder::Match`].
+    ///
+    /// If the match was successful, it will be a `Match::Route` or
+    /// `Match::Redirect` with the parameters enclosed.  You can then
+    /// match on the [`Route`] to pass control of the request along to
+    /// a specific handler.
+    ///
+    /// If there is no match, this will return `Match::NotFound`
+    /// if no path matches (which you could return as `404 Not Found`),
+    /// or `Match::NotAllowed` if no method matches (in which case a
+    /// `405 Not Allowed` would be appropriate).
+    ///
+    /// If a route parameter fails to parse correctly, this will return
+    /// `Err` with the underlying parsing error.  Usually you'll want
+    /// to send back a `400 Bad Request` for that.
+    ///
+    /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
+    /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
+    /// [`Route`]: enum.Route.html
+    pub fn match_route<P: AsRef<[u8]>>(
+        path: P,
+        method: wayfinder::Method,
+    ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
+        use wayfinder::{Error, Method, Match};
 
-    let path = path.as_ref();
-    let len = path.len();
-    let mut i = if &path[0..1] == b"/" { 1 } else { 0 };
+        let path = path.as_ref();
+        let len = path.len();
+        let mut i = if &path[0..1] == b"/" { 1 } else { 0 };
 
-    match &path[i..i+1] {
-        b"b" => {
-            i += 1;
-            match &path[i..i+4] {
-                b"ooks" => {
-                    i += 4;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
-                        lang: None,
-                    })))),
-                    Method::Post => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
+        match &path[i..i+1] {
+            b"b" => {
+                i += 1;
+                match &path[i..i+4] {
+                    b"ooks" => {
+                        i += 4;
+                    },
+                    _ => return Ok(Match::NotFound),
                 }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
-                        lang: None,
-                    })))),
-                    Method::Post => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
+                            lang: None,
+                        })))),
+                        Method::Post => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
                 }
-            }
-
-            let start = i;
-
-            match &path[i..i+3] {
-                b"new" => {
-                    i += 3;
-                    if i == len {
-                        match method {
-                            Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
-                                lang: None,
-                            })))),
-                            _ => return Ok(Match::NotAllowed),
-                        }
-                    }
-                    match &path[i..i+1] {
-                        b"/" => {
-                            i += 1;
-                        },
-                        _ => return Ok(Match::NotFound),
-                    }
-                    if i == len {
-                        match method {
-                            Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
-                                lang: None,
-                            })))),
-                            _ => return Ok(Match::NotAllowed),
-                        }
-                    }
-                    return Ok(Match::NotFound);
-                },
-                _ => {},
-            }
-
-            loop {
-                if i == len { break }
                 match &path[i..i+1] {
-                    b"/" => break,
-                    _ => i += 1,
+                    b"/" => {
+                        i += 1;
+                    },
+                    _ => return Ok(Match::NotFound),
                 }
-            }
-
-            let text = std::str::from_utf8(&path[start..i]).unwrap();
-            let id = text.parse()
-                .map_err(|e| Error::fail("id", e))?;
-
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
-                        id,
-                        lang: None,
-                    })))),
-                    Method::Put => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
-                        id,
-                        lang: None,
-                    })))),
-                    Method::Delete => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
-                        id,
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
-                }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
-                        id,
-                        lang: None,
-                    })))),
-                    Method::Put => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
-                        id,
-                        lang: None,
-                    })))),
-                    Method::Delete => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
-                        id,
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
-                }
-            }
-            match &path[i..i+4] {
-                b"edit" => {
-                    i += 4;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
-                        id,
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
-                }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
-                        id,
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
-                }
-            }
-            return Ok(Match::NotFound);
-        },
-        b"p" => {
-            i += 1;
-            match &path[i..i+5] {
-                b"eople" => {
-                    i += 5;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
-                        lang: None,
-                    })))),
-                    Method::Post => return Ok(Match::Route(Route::People(people::Route::Create(people::Create {
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
-                }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
-                        lang: None,
-                    })))),
-                    Method::Post => return Ok(Match::Route(Route::People(people::Route::Create(people::Create {
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
-                }
-            }
-
-            let start = i;
-
-            match &path[i..i+3] {
-                b"new" => {
-                    i += 3;
-                    if i == len {
-                        match method {
-                            Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
-                                lang: None,
-                            })))),
-                            _ => return Ok(Match::NotAllowed),
-                        }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
+                            lang: None,
+                        })))),
+                        Method::Post => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
                     }
+                }
+
+                let start = i;
+
+                match &path[i..i+3] {
+                    b"new" => {
+                        i += 3;
+                        if i == len {
+                            match method {
+                                Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
+                                    lang: None,
+                                })))),
+                                _ => return Ok(Match::NotAllowed),
+                            }
+                        }
+                        match &path[i..i+1] {
+                            b"/" => {
+                                i += 1;
+                            },
+                            _ => return Ok(Match::NotFound),
+                        }
+                        if i == len {
+                            match method {
+                                Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
+                                    lang: None,
+                                })))),
+                                _ => return Ok(Match::NotAllowed),
+                            }
+                        }
+                        return Ok(Match::NotFound);
+                    },
+                    _ => {},
+                }
+
+                loop {
+                    if i == len { break }
                     match &path[i..i+1] {
-                        b"/" => {
-                            i += 1;
-                        },
-                        _ => return Ok(Match::NotFound),
+                        b"/" => break,
+                        _ => i += 1,
                     }
-                    if i == len {
-                        match method {
-                            Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
-                                lang: None,
-                            })))),
-                            _ => return Ok(Match::NotAllowed),
-                        }
-                    }
-                    return Ok(Match::NotFound);
-                },
-                _ => {},
-            }
+                }
 
-            loop {
-                if i == len { break }
+                let text = std::str::from_utf8(&path[start..i]).unwrap();
+                let id = text.parse()
+                    .map_err(|e| Error::fail("id", e))?;
+
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
+                            id,
+                            lang: None,
+                        })))),
+                        Method::Put => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
+                            id,
+                            lang: None,
+                        })))),
+                        Method::Delete => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
+                            id,
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
                 match &path[i..i+1] {
-                    b"/" => break,
-                    _ => i += 1,
+                    b"/" => {
+                        i += 1;
+                    },
+                    _ => return Ok(Match::NotFound),
                 }
-            }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
+                            id,
+                            lang: None,
+                        })))),
+                        Method::Put => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
+                            id,
+                            lang: None,
+                        })))),
+                        Method::Delete => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
+                            id,
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
+                match &path[i..i+4] {
+                    b"edit" => {
+                        i += 4;
+                    },
+                    _ => return Ok(Match::NotFound),
+                }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
+                            id,
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
+                match &path[i..i+1] {
+                    b"/" => {
+                        i += 1;
+                    },
+                    _ => return Ok(Match::NotFound),
+                }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
+                            id,
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
+                return Ok(Match::NotFound);
+            },
+            b"p" => {
+                i += 1;
+                match &path[i..i+5] {
+                    b"eople" => {
+                        i += 5;
+                    },
+                    _ => return Ok(Match::NotFound),
+                }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
+                            lang: None,
+                        })))),
+                        Method::Post => return Ok(Match::Route(Route::People(people::Route::Create(people::Create {
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
+                match &path[i..i+1] {
+                    b"/" => {
+                        i += 1;
+                    },
+                    _ => return Ok(Match::NotFound),
+                }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
+                            lang: None,
+                        })))),
+                        Method::Post => return Ok(Match::Route(Route::People(people::Route::Create(people::Create {
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
 
-            let text = std::str::from_utf8(&path[start..i]).unwrap();
-            let id = text.parse()
-                .map_err(|e| Error::fail("id", e))?;
+                let start = i;
 
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
-                        id,
-                        lang: None,
-                    })))),
-                    Method::Put => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
-                        id,
-                        lang: None,
-                        name: None,
-                    })))),
-                    Method::Delete => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
-                        id,
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
+                match &path[i..i+3] {
+                    b"new" => {
+                        i += 3;
+                        if i == len {
+                            match method {
+                                Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
+                                    lang: None,
+                                })))),
+                                _ => return Ok(Match::NotAllowed),
+                            }
+                        }
+                        match &path[i..i+1] {
+                            b"/" => {
+                                i += 1;
+                            },
+                            _ => return Ok(Match::NotFound),
+                        }
+                        if i == len {
+                            match method {
+                                Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
+                                    lang: None,
+                                })))),
+                                _ => return Ok(Match::NotAllowed),
+                            }
+                        }
+                        return Ok(Match::NotFound);
+                    },
+                    _ => {},
                 }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
-                        id,
-                        lang: None,
-                    })))),
-                    Method::Put => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
-                        id,
-                        lang: None,
-                        name: None,
-                    })))),
-                    Method::Delete => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
-                        id,
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
+
+                loop {
+                    if i == len { break }
+                    match &path[i..i+1] {
+                        b"/" => break,
+                        _ => i += 1,
+                    }
                 }
-            }
-            match &path[i..i+4] {
-                b"edit" => {
-                    i += 4;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
-                        id,
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
+
+                let text = std::str::from_utf8(&path[start..i]).unwrap();
+                let id = text.parse()
+                    .map_err(|e| Error::fail("id", e))?;
+
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
+                            id,
+                            lang: None,
+                        })))),
+                        Method::Put => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
+                            id,
+                            lang: None,
+                            name: None,
+                        })))),
+                        Method::Delete => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
+                            id,
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
                 }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
-                        id,
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
+                match &path[i..i+1] {
+                    b"/" => {
+                        i += 1;
+                    },
+                    _ => return Ok(Match::NotFound),
                 }
-            }
-            return Ok(Match::NotFound);
-        },
-        b"u" => {
-            i += 1;
-            match &path[i..i+4] {
-                b"sers" => {
-                    i += 4;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
+                            id,
+                            lang: None,
+                        })))),
+                        Method::Put => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
+                            id,
+                            lang: None,
+                            name: None,
+                        })))),
+                        Method::Delete => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
+                            id,
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
                 }
-            }
-            match &path[i..i+1] {
-                b"/" => {
-                    i += 1;
-                },
-                _ => return Ok(Match::NotFound),
-            }
-            if i == len {
-                match method {
-                    Method::Get => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
-                        lang: None,
-                    })))),
-                    _ => return Ok(Match::NotAllowed),
+                match &path[i..i+4] {
+                    b"edit" => {
+                        i += 4;
+                    },
+                    _ => return Ok(Match::NotFound),
                 }
-            }
-            return Ok(Match::NotFound);
-        },
-        _ => return Ok(Match::NotFound),
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
+                            id,
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
+                match &path[i..i+1] {
+                    b"/" => {
+                        i += 1;
+                    },
+                    _ => return Ok(Match::NotFound),
+                }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
+                            id,
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
+                return Ok(Match::NotFound);
+            },
+            b"u" => {
+                i += 1;
+                match &path[i..i+4] {
+                    b"sers" => {
+                        i += 4;
+                    },
+                    _ => return Ok(Match::NotFound),
+                }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
+                match &path[i..i+1] {
+                    b"/" => {
+                        i += 1;
+                    },
+                    _ => return Ok(Match::NotFound),
+                }
+                if i == len {
+                    match method {
+                        Method::Get => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
+                            lang: None,
+                        })))),
+                        _ => return Ok(Match::NotAllowed),
+                    }
+                }
+                return Ok(Match::NotFound);
+            },
+            _ => return Ok(Match::NotFound),
+        }
     }
-}
 
 } // mod routes

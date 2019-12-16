@@ -282,31 +282,31 @@ where
 
     writeln!(w, "pub mod routes {{")?;
     writeln!(w)?;
-    writeln!(w, "//! Application route configuration.")?;
-    writeln!(w, "//!")?;
+    writeln!(w, "    //! Application route configuration.")?;
+    writeln!(w, "    //!")?;
     writeln!(
         w,
-        "//! Of note is the function [`match_route`] as well as request structs"
+        "    //! Of note is the function [`match_route`] as well as request structs"
     )?;
-    writeln!(w, "//! specific to each named resource.")?;
-    writeln!(w, "//!")?;
-    writeln!(w, "//! Route configuration:")?;
-    writeln!(w, "//!")?;
-    writeln!(w, "//! ```ignore")?;
-    writeln!(w, "//! /")?;
+    writeln!(w, "    //! specific to each named resource.")?;
+    writeln!(w, "    //!")?;
+    writeln!(w, "    //! Route configuration:")?;
+    writeln!(w, "    //!")?;
+    writeln!(w, "    //! ```ignore")?;
+    writeln!(w, "    //! /")?;
 
     let stringified_config = str::replace(&route_config.routes.stringify(1), "\n", "\n//! ");
     let stringified_config = &stringified_config[..stringified_config.len() - 4];
-    write!(w, "//! {}", stringified_config)?;
-    writeln!(w, "//! ```")?;
-    writeln!(w, "//!")?;
+    write!(w, "    //! {}", stringified_config)?;
+    writeln!(w, "    //! ```")?;
+    writeln!(w, "    //!")?;
 
-    writeln!(w, "//! [`match_route`]: fn.match_route.html")?;
+    writeln!(w, "    //! [`match_route`]: fn.match_route.html")?;
     writeln!(w)?;
-    writeln!(w, "#![allow(dead_code)]")?;
-    writeln!(w, "#![allow(unused_imports)]")?;
-    writeln!(w, "#![allow(unused_mut)]")?;
-    writeln!(w, "#![allow(unused_variables)]")?;
+    writeln!(w, "    #![allow(dead_code)]")?;
+    writeln!(w, "    #![allow(unused_imports)]")?;
+    writeln!(w, "    #![allow(unused_mut)]")?;
+    writeln!(w, "    #![allow(unused_variables)]")?;
     writeln!(w)?;
 
     codegen_module(w, &modules.root, &route_config.headers, "")?;
@@ -314,108 +314,108 @@ where
 
     #[cfg(feature = "http")]
     {
-        writeln!(w, "/// Match an incoming request against this router.")?;
-        writeln!(w, "///")?;
+        writeln!(w, "    /// Match an incoming request against this router.")?;
+        writeln!(w, "    ///")?;
         writeln!(
             w,
-            "/// For more details, see the documentation for [`match_route`]"
+            "    /// For more details, see the documentation for [`match_route`]"
         )?;
-        writeln!(w, "/// [`match_route`]: #match_route")?;
-        writeln!(w, "pub fn match_req<B>(req: &http::Request<B>) ->")?;
-        writeln!(w, "    Result<wayfinder::Match<Route>, wayfinder::Error>")?;
-        writeln!(w, "{{")?;
-        writeln!(w, "    let mut path = req.uri().path().chars();")?;
-        writeln!(w, "    match_route(&mut path, req.method().into())")?;
-        writeln!(w, "}}")?;
+        writeln!(w, "    /// [`match_route`]: #match_route")?;
+        writeln!(w, "    pub fn match_req<B>(req: &http::Request<B>) ->")?;
+        writeln!(w, "        Result<wayfinder::Match<Route>, wayfinder::Error>")?;
+        writeln!(w, "    {{")?;
+        writeln!(w, "        let mut path = req.uri().path().chars();")?;
+        writeln!(w, "        match_route(&mut path, req.method().into())")?;
+        writeln!(w, "    }}")?;
     }
 
-    writeln!(w, "/// Match a path and method against this router.")?;
-    writeln!(w, "///")?;
+    writeln!(w, "    /// Match a path and method against this router.")?;
+    writeln!(w, "    ///")?;
     writeln!(
         w,
-        "/// Accepts an iterator for the characters of the request path,"
+        "    /// Accepts an iterator for the characters of the request path,"
     )?;
     writeln!(
         w,
-        "/// as well as a [`wayfinder::Method`] for the HTTP verb."
+        "    /// as well as a [`wayfinder::Method`] for the HTTP verb."
     )?;
     writeln!(
         w,
-        "/// Returns a `Result`, usually `Ok` with the result of the"
+        "    /// Returns a `Result`, usually `Ok` with the result of the"
     )?;
-    writeln!(w, "/// [`wayfinder::Match`].")?;
-    writeln!(w, "///")?;
+    writeln!(w, "    /// [`wayfinder::Match`].")?;
+    writeln!(w, "    ///")?;
     writeln!(
         w,
-        "/// If the match was successful, it will be a `Match::Route` or"
-    )?;
-    writeln!(
-        w,
-        "/// `Match::Redirect` with the parameters enclosed.  You can then"
+        "    /// If the match was successful, it will be a `Match::Route` or"
     )?;
     writeln!(
         w,
-        "/// match on the [`Route`] to pass control of the request along to"
-    )?;
-    writeln!(w, "/// a specific handler.")?;
-    writeln!(w, "///")?;
-    writeln!(
-        w,
-        "/// If there is no match, this will return `Match::NotFound`"
+        "    /// `Match::Redirect` with the parameters enclosed.  You can then"
     )?;
     writeln!(
         w,
-        "/// if no path matches (which you could return as `404 Not Found`),"
+        "    /// match on the [`Route`] to pass control of the request along to"
+    )?;
+    writeln!(w, "    /// a specific handler.")?;
+    writeln!(w, "    ///")?;
+    writeln!(
+        w,
+        "    /// If there is no match, this will return `Match::NotFound`"
     )?;
     writeln!(
         w,
-        "/// or `Match::NotAllowed` if no method matches (in which case a"
-    )?;
-    writeln!(w, "/// `405 Not Allowed` would be appropriate).")?;
-    writeln!(w, "///")?;
-    writeln!(
-        w,
-        "/// If a route parameter fails to parse correctly, this will return"
+        "    /// if no path matches (which you could return as `404 Not Found`),"
     )?;
     writeln!(
         w,
-        "/// `Err` with the underlying parsing error.  Usually you'll want"
+        "    /// or `Match::NotAllowed` if no method matches (in which case a"
     )?;
-    writeln!(w, "/// to send back a `400 Bad Request` for that.")?;
-    writeln!(w, "///")?;
+    writeln!(w, "    /// `405 Not Allowed` would be appropriate).")?;
+    writeln!(w, "    ///")?;
+    writeln!(
+        w,
+        "    /// If a route parameter fails to parse correctly, this will return"
+    )?;
+    writeln!(
+        w,
+        "    /// `Err` with the underlying parsing error.  Usually you'll want"
+    )?;
+    writeln!(w, "    /// to send back a `400 Bad Request` for that.")?;
+    writeln!(w, "    ///")?;
     // TODO: these relative paths assume way too much
     // TODO: make these point to the specific version on docs.rs
     writeln!(
         w,
-        "/// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html"
+        "    /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html"
     )?;
     writeln!(
         w,
-        "/// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html"
+        "    /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html"
     )?;
-    writeln!(w, "/// [`Route`]: enum.Route.html")?;
+    writeln!(w, "    /// [`Route`]: enum.Route.html")?;
 
-    writeln!(w, "pub fn match_route<P: AsRef<[u8]>>(")?;
-    writeln!(w, "    path: P,")?;
-    writeln!(w, "    method: wayfinder::Method,")?;
+    writeln!(w, "    pub fn match_route<P: AsRef<[u8]>>(")?;
+    writeln!(w, "        path: P,")?;
+    writeln!(w, "        method: wayfinder::Method,")?;
     writeln!(
         w,
-        ") -> Result<wayfinder::Match<Route>, wayfinder::Error> {{"
+        "    ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {{"
     )?;
-    writeln!(w, "    use wayfinder::{{Error, Method, Match}};")?;
+    writeln!(w, "        use wayfinder::{{Error, Method, Match}};")?;
     writeln!(w)?;
-    writeln!(w, "    let path = path.as_ref();")?;
-    writeln!(w, "    let len = path.len();")?;
+    writeln!(w, "        let path = path.as_ref();")?;
+    writeln!(w, "        let len = path.len();")?;
     writeln!(
         w,
-        "    let mut i = if &path[0..1] == b\"/\" {{ 1 }} else {{ 0 }};"
+        "        let mut i = if &path[0..1] == b\"/\" {{ 1 }} else {{ 0 }};"
     )?;
 
     writeln!(w)?;
 
-    codegen_trie(w, &flattened.to_trie(), 1)?;
+    codegen_trie(w, &flattened.to_trie(), 2)?;
 
-    writeln!(w, "}}")?;
+    writeln!(w, "    }}")?;
     writeln!(w)?;
     writeln!(w, "}} // mod routes")?;
 
@@ -794,26 +794,26 @@ mod tests {
 
         let expected = "pub mod routes {
 
-//! Application route configuration.
-//!
-//! Of note is the function [`match_route`] as well as request structs
-//! specific to each named resource.
-//!
-//! Route configuration:
-//!
-//! ```ignore
-//! /
-//!   GET people::Index
+    //! Application route configuration.
+    //!
+    //! Of note is the function [`match_route`] as well as request structs
+    //! specific to each named resource.
+    //!
+    //! Route configuration:
+    //!
+    //! ```ignore
+    //! /
+    //!   GET people::Index
 //!   {id: Uuid}
 //!     GET people::Show
-//! ```
-//!
-//! [`match_route`]: fn.match_route.html
+    //! ```
+    //!
+    //! [`match_route`]: fn.match_route.html
 
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_mut)]
-#![allow(unused_variables)]
+    #![allow(dead_code)]
+    #![allow(unused_imports)]
+    #![allow(unused_mut)]
+    #![allow(unused_variables)]
 
 use uuid::Uuid;
 
@@ -878,56 +878,56 @@ impl Route {
     }
 }
 
-/// Match a path and method against this router.
-///
-/// Accepts an iterator for the characters of the request path,
-/// as well as a [`wayfinder::Method`] for the HTTP verb.
-/// Returns a `Result`, usually `Ok` with the result of the
-/// [`wayfinder::Match`].
-///
-/// If the match was successful, it will be a `Match::Route` or
-/// `Match::Redirect` with the parameters enclosed.  You can then
-/// match on the [`Route`] to pass control of the request along to
-/// a specific handler.
-///
-/// If there is no match, this will return `Match::NotFound`
-/// if no path matches (which you could return as `404 Not Found`),
-/// or `Match::NotAllowed` if no method matches (in which case a
-/// `405 Not Allowed` would be appropriate).
-///
-/// If a route parameter fails to parse correctly, this will return
-/// `Err` with the underlying parsing error.  Usually you'll want
-/// to send back a `400 Bad Request` for that.
-///
-/// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
-/// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
-/// [`Route`]: enum.Route.html
-pub fn match_route<P: AsRef<[u8]>>(
-    path: P,
-    method: wayfinder::Method,
-) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
-    use wayfinder::{Error, Method, Match};
+    /// Match a path and method against this router.
+    ///
+    /// Accepts an iterator for the characters of the request path,
+    /// as well as a [`wayfinder::Method`] for the HTTP verb.
+    /// Returns a `Result`, usually `Ok` with the result of the
+    /// [`wayfinder::Match`].
+    ///
+    /// If the match was successful, it will be a `Match::Route` or
+    /// `Match::Redirect` with the parameters enclosed.  You can then
+    /// match on the [`Route`] to pass control of the request along to
+    /// a specific handler.
+    ///
+    /// If there is no match, this will return `Match::NotFound`
+    /// if no path matches (which you could return as `404 Not Found`),
+    /// or `Match::NotAllowed` if no method matches (in which case a
+    /// `405 Not Allowed` would be appropriate).
+    ///
+    /// If a route parameter fails to parse correctly, this will return
+    /// `Err` with the underlying parsing error.  Usually you\'ll want
+    /// to send back a `400 Bad Request` for that.
+    ///
+    /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
+    /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
+    /// [`Route`]: enum.Route.html
+    pub fn match_route<P: AsRef<[u8]>>(
+        path: P,
+        method: wayfinder::Method,
+    ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
+        use wayfinder::{Error, Method, Match};
 
-    let path = path.as_ref();
-    let len = path.len();
-    let mut i = if &path[0..1] == b\"/\" { 1 } else { 0 };
+        let path = path.as_ref();
+        let len = path.len();
+        let mut i = if &path[0..1] == b\"/\" { 1 } else { 0 };
 
-    if i == len {
-        match method {
-            Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
-            })))),
-            _ => return Ok(Match::NotAllowed),
+        if i == len {
+            match method {
+                Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
+                })))),
+                _ => return Ok(Match::NotAllowed),
+            }
         }
-    }
-    let start = i;
-    while i < len && path[i..i+1] != b\"/\" {
-        i += 1;
-    }
+        let start = i;
+        while i < len && path[i..i+1] != b\"/\" {
+            i += 1;
+        }
 
-    let id = path[start..i].parse()
-        .map_err(|e| Error::fail(\"id\", e))?;
+        let id = path[start..i].parse()
+            .map_err(|e| Error::fail(\"id\", e))?;
 
-}
+    }
 
 } // mod routes
 ";
@@ -970,26 +970,26 @@ pub fn match_route<P: AsRef<[u8]>>(
 
         let expected = "pub mod routes {
 
-//! Application route configuration.
-//!
-//! Of note is the function [`match_route`] as well as request structs
-//! specific to each named resource.
-//!
-//! Route configuration:
-//!
-//! ```ignore
-//! /
-//!   GET Index
+    //! Application route configuration.
+    //!
+    //! Of note is the function [`match_route`] as well as request structs
+    //! specific to each named resource.
+    //!
+    //! Route configuration:
+    //!
+    //! ```ignore
+    //! /
+    //!   GET Index
 //!   {id: Uuid}
 //!     GET Admin::People::Show
-//! ```
-//!
-//! [`match_route`]: fn.match_route.html
+    //! ```
+    //!
+    //! [`match_route`]: fn.match_route.html
 
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_mut)]
-#![allow(unused_variables)]
+    #![allow(dead_code)]
+    #![allow(unused_imports)]
+    #![allow(unused_mut)]
+    #![allow(unused_variables)]
 
 use uuid::Uuid;
 
@@ -1073,56 +1073,56 @@ impl Route {
     }
 }
 
-/// Match a path and method against this router.
-///
-/// Accepts an iterator for the characters of the request path,
-/// as well as a [`wayfinder::Method`] for the HTTP verb.
-/// Returns a `Result`, usually `Ok` with the result of the
-/// [`wayfinder::Match`].
-///
-/// If the match was successful, it will be a `Match::Route` or
-/// `Match::Redirect` with the parameters enclosed.  You can then
-/// match on the [`Route`] to pass control of the request along to
-/// a specific handler.
-///
-/// If there is no match, this will return `Match::NotFound`
-/// if no path matches (which you could return as `404 Not Found`),
-/// or `Match::NotAllowed` if no method matches (in which case a
-/// `405 Not Allowed` would be appropriate).
-///
-/// If a route parameter fails to parse correctly, this will return
-/// `Err` with the underlying parsing error.  Usually you'll want
-/// to send back a `400 Bad Request` for that.
-///
-/// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
-/// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
-/// [`Route`]: enum.Route.html
-pub fn match_route<P: AsRef<[u8]>>(
-    path: P,
-    method: wayfinder::Method,
-) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
-    use wayfinder::{Error, Method, Match};
+    /// Match a path and method against this router.
+    ///
+    /// Accepts an iterator for the characters of the request path,
+    /// as well as a [`wayfinder::Method`] for the HTTP verb.
+    /// Returns a `Result`, usually `Ok` with the result of the
+    /// [`wayfinder::Match`].
+    ///
+    /// If the match was successful, it will be a `Match::Route` or
+    /// `Match::Redirect` with the parameters enclosed.  You can then
+    /// match on the [`Route`] to pass control of the request along to
+    /// a specific handler.
+    ///
+    /// If there is no match, this will return `Match::NotFound`
+    /// if no path matches (which you could return as `404 Not Found`),
+    /// or `Match::NotAllowed` if no method matches (in which case a
+    /// `405 Not Allowed` would be appropriate).
+    ///
+    /// If a route parameter fails to parse correctly, this will return
+    /// `Err` with the underlying parsing error.  Usually you\'ll want
+    /// to send back a `400 Bad Request` for that.
+    ///
+    /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
+    /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
+    /// [`Route`]: enum.Route.html
+    pub fn match_route<P: AsRef<[u8]>>(
+        path: P,
+        method: wayfinder::Method,
+    ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
+        use wayfinder::{Error, Method, Match};
 
-    let path = path.as_ref();
-    let len = path.len();
-    let mut i = if &path[0..1] == b\"/\" { 1 } else { 0 };
+        let path = path.as_ref();
+        let len = path.len();
+        let mut i = if &path[0..1] == b\"/\" { 1 } else { 0 };
 
-    if i == len {
-        match method {
-            Method::Get => return Ok(Match::Route(Route::Index(Index {
-            }))),
-            _ => return Ok(Match::NotAllowed),
+        if i == len {
+            match method {
+                Method::Get => return Ok(Match::Route(Route::Index(Index {
+                }))),
+                _ => return Ok(Match::NotAllowed),
+            }
         }
-    }
-    let start = i;
-    while i < len && path[i..i+1] != b\"/\" {
-        i += 1;
-    }
+        let start = i;
+        while i < len && path[i..i+1] != b\"/\" {
+            i += 1;
+        }
 
-    let id = path[start..i].parse()
-        .map_err(|e| Error::fail(\"id\", e))?;
+        let id = path[start..i].parse()
+            .map_err(|e| Error::fail(\"id\", e))?;
 
-}
+    }
 
 } // mod routes
 ";
