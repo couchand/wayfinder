@@ -576,19 +576,6 @@ where
 
     let match_len = if l == 0 { 1 } else { l };
 
-/*
-    match trie.data {
-        Some(ref route) if route.resources.len() != 0 => {
-            write_methods(w, route, indent + 1)?;
-        }
-        _ => {
-            writeln!(w, "{}if i == len {{", indent1)?;
-            writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
-            writeln!(w, "{}}}", indent1)?;
-        }
-    }
-*/
-
     if unambiguous != "" {
         writeln!(w, "{}match &path[i..i+{}] {{", indent1, match_len)?;
         writeln!(w, "{}    b\"{}\" => {{", indent1, unambiguous)?; // TODO: quotes in paths??
@@ -712,7 +699,7 @@ where
 // assumes that a None case has already been written
 fn write_dynamic<W>(
     w: &mut W,
-    mut trie: &Trie<Charlike, FlattenedRoute>,
+    trie: &Trie<Charlike, FlattenedRoute>,
     indent: usize,
     name: &str,
 ) -> io::Result<()>
@@ -753,22 +740,6 @@ where
     if trie.children[0].0 != Charlike::Separator {
         return Err(io::ErrorKind::InvalidInput.into());
     }
-
-/*
-    // we already checked for the separator above
-    trie = &trie.children[0].1;
-
-    match trie.data {
-        Some(ref route) if route.resources.len() != 0 => {
-            write_methods(w, route, indent)?;
-        }
-        _ => {
-            writeln!(w, "{}if i == len {{", indent1)?;
-            writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
-            writeln!(w, "{}}}", indent1)?;
-        }
-    }
-*/
 
     codegen_trie(w, trie, indent)?;
 
