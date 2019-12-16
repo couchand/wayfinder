@@ -322,7 +322,10 @@ where
         )?;
         writeln!(w, "    /// [`match_route`]: #match_route")?;
         writeln!(w, "    pub fn match_req<B>(req: &http::Request<B>) ->")?;
-        writeln!(w, "        Result<wayfinder::Match<Route>, wayfinder::Error>")?;
+        writeln!(
+            w,
+            "        Result<wayfinder::Match<Route>, wayfinder::Error>"
+        )?;
         writeln!(w, "    {{")?;
         writeln!(w, "        let mut path = req.uri().path().chars();")?;
         writeln!(w, "        match_route(&mut path, req.method().into())")?;
