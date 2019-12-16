@@ -26,6 +26,15 @@ pub mod routes {
 //!         GET People::Edit
 //!   books
 //!     GET Books::Index
+//!     POST Books::Create
+//!     new
+//!       GET Books::New
+//!     {id: Uuid}
+//!       GET Books::Show
+//!       PUT Books::update
+//!       DELETE Books::Destroy
+//!       edit
+//!         GET Books::Edit
 //! ```
 //!
 //! [`match_route`]: fn.match_route.html
@@ -40,8 +49,52 @@ use uuid::Uuid;
 pub mod books {
     use uuid::Uuid;
 
+    /// Renders for `POST /books`.
+    #[derive(Debug, PartialEq, Eq)]
+    pub struct Create {
+        pub lang: Option<String>,
+    }
+
+    impl Create {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            let Create { ref lang, } = self;
+            format!("/books")
+        }
+    }
+
+    /// Renders for `DELETE /books/{id}`.
+    #[derive(Debug, PartialEq, Eq)]
+    pub struct Destroy {
+        pub id: Uuid,
+        pub lang: Option<String>,
+    }
+
+    impl Destroy {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            let Destroy { ref id, ref lang, } = self;
+            format!("/books/{}", id)
+        }
+    }
+
+    /// Renders for `GET /books/{id}/edit`.
+    #[derive(Debug, PartialEq, Eq)]
+    pub struct Edit {
+        pub id: Uuid,
+        pub lang: Option<String>,
+    }
+
+    impl Edit {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            let Edit { ref id, ref lang, } = self;
+            format!("/books/{}/edit", id)
+        }
+    }
+
     /// Renders for `GET /books`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Index {
         pub lang: Option<String>,
     }
@@ -54,17 +107,73 @@ pub mod books {
         }
     }
 
+    /// Renders for `GET /books/new`.
+    #[derive(Debug, PartialEq, Eq)]
+    pub struct New {
+        pub lang: Option<String>,
+    }
+
+    impl New {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            let New { ref lang, } = self;
+            format!("/books/new")
+        }
+    }
+
+    /// Renders for `GET /books/{id}`.
+    #[derive(Debug, PartialEq, Eq)]
+    pub struct Show {
+        pub id: Uuid,
+        pub lang: Option<String>,
+    }
+
+    impl Show {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            let Show { ref id, ref lang, } = self;
+            format!("/books/{}", id)
+        }
+    }
+
+    /// Renders for `PUT /books/{id}`.
+    #[derive(Debug, PartialEq, Eq)]
+    pub struct Update {
+        pub id: Uuid,
+        pub lang: Option<String>,
+    }
+
+    impl Update {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            let Update { ref id, ref lang, } = self;
+            format!("/books/{}", id)
+        }
+    }
+
     /// Parameters for requests to the books controller.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
+        Create(Create),
+        Destroy(Destroy),
+        Edit(Edit),
         Index(Index),
+        New(New),
+        Show(Show),
+        Update(Update),
     }
 
     impl Route {
         /// Make a path to this route with the given parameters.
         pub fn to_path(&self) -> String {
             match self {
+                Route::Create(ref route) => route.to_path(),
+                Route::Destroy(ref route) => route.to_path(),
+                Route::Edit(ref route) => route.to_path(),
                 Route::Index(ref route) => route.to_path(),
+                Route::New(ref route) => route.to_path(),
+                Route::Show(ref route) => route.to_path(),
+                Route::Update(ref route) => route.to_path(),
             }
         }
     }
@@ -74,7 +183,7 @@ pub mod people {
     use uuid::Uuid;
 
     /// Renders for `POST /people`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Create {
         pub lang: Option<String>,
     }
@@ -88,7 +197,7 @@ pub mod people {
     }
 
     /// Renders for `DELETE /people/{id}`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Destroy {
         pub id: Uuid,
         pub lang: Option<String>,
@@ -103,7 +212,7 @@ pub mod people {
     }
 
     /// Renders for `GET /people/{id}/edit`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Edit {
         pub id: Uuid,
         pub lang: Option<String>,
@@ -118,7 +227,7 @@ pub mod people {
     }
 
     /// Renders for `GET /people`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Index {
         pub lang: Option<String>,
     }
@@ -132,7 +241,7 @@ pub mod people {
     }
 
     /// Renders for `GET /people/new`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct New {
         pub lang: Option<String>,
     }
@@ -146,7 +255,7 @@ pub mod people {
     }
 
     /// Renders for `GET /people/{id}`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Show {
         pub id: Uuid,
         pub lang: Option<String>,
@@ -161,7 +270,7 @@ pub mod people {
     }
 
     /// Renders for `PUT /people/{id}`.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct Update {
         pub id: Uuid,
         pub lang: Option<String>,
@@ -177,7 +286,7 @@ pub mod people {
     }
 
     /// Parameters for requests to the people controller.
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         Create(Create),
         Destroy(Destroy),
@@ -205,7 +314,7 @@ pub mod people {
 }
 
 /// An active route in the application -- match against this.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Route {
     Books(books::Route),
     People(people::Route),
@@ -269,6 +378,9 @@ pub fn match_route<P: AsRef<[u8]>>(
                     Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
                         lang: None,
                     })))),
+                    Method::Post => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
+                        lang: None,
+                    })))),
                     _ => return Ok(Match::NotAllowed),
                 }
             }
@@ -281,6 +393,124 @@ pub fn match_route<P: AsRef<[u8]>>(
             if i == len {
                 match method {
                     Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
+                        lang: None,
+                    })))),
+                    Method::Post => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
+                        lang: None,
+                    })))),
+                    _ => return Ok(Match::NotAllowed),
+                }
+            }
+
+            let start = i;
+
+            match &path[i..i+3] {
+                b"new" => {
+                    i += 3;
+                    if i == len {
+                        match method {
+                            Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
+                                lang: None,
+                            })))),
+                            _ => return Ok(Match::NotAllowed),
+                        }
+                    }
+                    match &path[i..i+1] {
+                        b"/" => {
+                            i += 1;
+                        },
+                        _ => return Ok(Match::NotFound),
+                    }
+                    if i == len {
+                        match method {
+                            Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
+                                lang: None,
+                            })))),
+                            _ => return Ok(Match::NotAllowed),
+                        }
+                    }
+                    return Ok(Match::NotFound);
+                },
+                _ => {},
+            }
+
+            loop {
+                if i == len { break }
+                match &path[i..i+1] {
+                    b"/" => break,
+                    _ => i += 1,
+                }
+            }
+
+            let text = std::str::from_utf8(&path[start..i]).unwrap();
+            let id = text.parse()
+                .map_err(|e| Error::fail("id", e))?;
+
+            if i == len {
+                match method {
+                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
+                        id,
+                        lang: None,
+                    })))),
+                    Method::Put => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
+                        id,
+                        lang: None,
+                    })))),
+                    Method::Delete => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
+                        id,
+                        lang: None,
+                    })))),
+                    _ => return Ok(Match::NotAllowed),
+                }
+            }
+            match &path[i..i+1] {
+                b"/" => {
+                    i += 1;
+                },
+                _ => return Ok(Match::NotFound),
+            }
+            if i == len {
+                match method {
+                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
+                        id,
+                        lang: None,
+                    })))),
+                    Method::Put => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
+                        id,
+                        lang: None,
+                    })))),
+                    Method::Delete => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
+                        id,
+                        lang: None,
+                    })))),
+                    _ => return Ok(Match::NotAllowed),
+                }
+            }
+            match &path[i..i+4] {
+                b"edit" => {
+                    i += 4;
+                },
+                _ => return Ok(Match::NotFound),
+            }
+            if i == len {
+                match method {
+                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
+                        id,
+                        lang: None,
+                    })))),
+                    _ => return Ok(Match::NotAllowed),
+                }
+            }
+            match &path[i..i+1] {
+                b"/" => {
+                    i += 1;
+                },
+                _ => return Ok(Match::NotFound),
+            }
+            if i == len {
+                match method {
+                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
+                        id,
                         lang: None,
                     })))),
                     _ => return Ok(Match::NotAllowed),
@@ -352,7 +582,8 @@ pub fn match_route<P: AsRef<[u8]>>(
                             _ => return Ok(Match::NotAllowed),
                         }
                     }
-                }
+                    return Ok(Match::NotFound);
+                },
                 _ => {},
             }
 
@@ -365,7 +596,6 @@ pub fn match_route<P: AsRef<[u8]>>(
             }
 
             let text = std::str::from_utf8(&path[start..i]).unwrap();
-
             let id = text.parse()
                 .map_err(|e| Error::fail("id", e))?;
 
@@ -387,11 +617,34 @@ pub fn match_route<P: AsRef<[u8]>>(
                     _ => return Ok(Match::NotAllowed),
                 }
             }
-            i += 1;
+            match &path[i..i+1] {
+                b"/" => {
+                    i += 1;
+                },
+                _ => return Ok(Match::NotFound),
+            }
+            if i == len {
+                match method {
+                    Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
+                        id,
+                        lang: None,
+                    })))),
+                    Method::Put => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
+                        id,
+                        lang: None,
+                        name: None,
+                    })))),
+                    Method::Delete => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
+                        id,
+                        lang: None,
+                    })))),
+                    _ => return Ok(Match::NotAllowed),
+                }
+            }
             match &path[i..i+4] {
                 b"edit" => {
                     i += 4;
-                }
+                },
                 _ => return Ok(Match::NotFound),
             }
             if i == len {
@@ -418,9 +671,10 @@ pub fn match_route<P: AsRef<[u8]>>(
                     _ => return Ok(Match::NotAllowed),
                 }
             }
-            Ok(Match::NotFound)
+            return Ok(Match::NotFound);
         },
         b"u" => {
+            i += 1;
             match &path[i..i+4] {
                 b"sers" => {
                     i += 4;
@@ -449,9 +703,9 @@ pub fn match_route<P: AsRef<[u8]>>(
                     _ => return Ok(Match::NotAllowed),
                 }
             }
-            Ok(Match::NotFound)
+            return Ok(Match::NotFound);
         },
-        _ => Ok(Match::NotFound),
+        _ => return Ok(Match::NotFound),
     }
 }
 
