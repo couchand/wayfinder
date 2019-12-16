@@ -10,31 +10,31 @@ pub mod routes {
     //! ```ignore
     //! /
     //!   [lang: String]
-//!   users
-//!     GET -> People::Index
-//!   people
-//!     GET People::Index
-//!     POST People::Create
-//!     new
-//!       GET People::New
-//!     {id: Uuid}
-//!       GET People::Show
-//!       PUT People::Update
-//!         [name: String]
-//!       DELETE People::Destroy
-//!       edit
-//!         GET People::Edit
-//!   books
-//!     GET Books::Index
-//!     POST Books::Create
-//!     new
-//!       GET Books::New
-//!     {id: Uuid}
-//!       GET Books::Show
-//!       PUT Books::update
-//!       DELETE Books::Destroy
-//!       edit
-//!         GET Books::Edit
+    //!   users
+    //!     GET -> People::Index
+    //!   people
+    //!     GET People::Index
+    //!     POST People::Create
+    //!     new
+    //!       GET People::New
+    //!     {id: Uuid}
+    //!       GET People::Show
+    //!       PUT People::Update
+    //!         [name: String]
+    //!       DELETE People::Destroy
+    //!       edit
+    //!         GET People::Edit
+    //!   books
+    //!     GET Books::Index
+    //!     POST Books::Create
+    //!     new
+    //!       GET Books::New
+    //!     {id: Uuid}
+    //!       GET Books::Show
+    //!       PUT Books::update
+    //!       DELETE Books::Destroy
+    //!       edit
+    //!         GET Books::Edit
     //! ```
     //!
     //! [`match_route`]: fn.match_route.html
@@ -44,291 +44,291 @@ pub mod routes {
     #![allow(unused_mut)]
     #![allow(unused_variables)]
 
-use uuid::Uuid;
-
-pub mod books {
     use uuid::Uuid;
 
-    /// Renders for `POST /books`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Create {
-        pub lang: Option<String>,
-    }
+    pub mod books {
+        use uuid::Uuid;
 
-    impl Create {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Create { ref lang, } = self;
-            format!("/books")
+        /// Renders for `POST /books`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Create {
+            pub lang: Option<String>,
+        }
+
+        impl Create {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Create { ref lang, } = self;
+                format!("/books")
+            }
+        }
+
+        /// Renders for `DELETE /books/{id}`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Destroy {
+            pub id: Uuid,
+            pub lang: Option<String>,
+        }
+
+        impl Destroy {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Destroy { ref id, ref lang, } = self;
+                format!("/books/{}", id)
+            }
+        }
+
+        /// Renders for `GET /books/{id}/edit`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Edit {
+            pub id: Uuid,
+            pub lang: Option<String>,
+        }
+
+        impl Edit {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Edit { ref id, ref lang, } = self;
+                format!("/books/{}/edit", id)
+            }
+        }
+
+        /// Renders for `GET /books`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Index {
+            pub lang: Option<String>,
+        }
+
+        impl Index {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Index { ref lang, } = self;
+                format!("/books")
+            }
+        }
+
+        /// Renders for `GET /books/new`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct New {
+            pub lang: Option<String>,
+        }
+
+        impl New {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let New { ref lang, } = self;
+                format!("/books/new")
+            }
+        }
+
+        /// Renders for `GET /books/{id}`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Show {
+            pub id: Uuid,
+            pub lang: Option<String>,
+        }
+
+        impl Show {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Show { ref id, ref lang, } = self;
+                format!("/books/{}", id)
+            }
+        }
+
+        /// Renders for `PUT /books/{id}`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Update {
+            pub id: Uuid,
+            pub lang: Option<String>,
+        }
+
+        impl Update {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Update { ref id, ref lang, } = self;
+                format!("/books/{}", id)
+            }
+        }
+
+        /// Parameters for requests to the books controller.
+        #[derive(Debug, PartialEq, Eq)]
+        pub enum Route {
+            Create(Create),
+            Destroy(Destroy),
+            Edit(Edit),
+            Index(Index),
+            New(New),
+            Show(Show),
+            Update(Update),
+        }
+
+        impl Route {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                match self {
+                    Route::Create(ref route) => route.to_path(),
+                    Route::Destroy(ref route) => route.to_path(),
+                    Route::Edit(ref route) => route.to_path(),
+                    Route::Index(ref route) => route.to_path(),
+                    Route::New(ref route) => route.to_path(),
+                    Route::Show(ref route) => route.to_path(),
+                    Route::Update(ref route) => route.to_path(),
+                }
+            }
         }
     }
 
-    /// Renders for `DELETE /books/{id}`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Destroy {
-        pub id: Uuid,
-        pub lang: Option<String>,
-    }
+    pub mod people {
+        use uuid::Uuid;
 
-    impl Destroy {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Destroy { ref id, ref lang, } = self;
-            format!("/books/{}", id)
+        /// Renders for `POST /people`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Create {
+            pub lang: Option<String>,
+        }
+
+        impl Create {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Create { ref lang, } = self;
+                format!("/people")
+            }
+        }
+
+        /// Renders for `DELETE /people/{id}`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Destroy {
+            pub id: Uuid,
+            pub lang: Option<String>,
+        }
+
+        impl Destroy {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Destroy { ref id, ref lang, } = self;
+                format!("/people/{}", id)
+            }
+        }
+
+        /// Renders for `GET /people/{id}/edit`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Edit {
+            pub id: Uuid,
+            pub lang: Option<String>,
+        }
+
+        impl Edit {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Edit { ref id, ref lang, } = self;
+                format!("/people/{}/edit", id)
+            }
+        }
+
+        /// Renders for `GET /people`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Index {
+            pub lang: Option<String>,
+        }
+
+        impl Index {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Index { ref lang, } = self;
+                format!("/people")
+            }
+        }
+
+        /// Renders for `GET /people/new`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct New {
+            pub lang: Option<String>,
+        }
+
+        impl New {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let New { ref lang, } = self;
+                format!("/people/new")
+            }
+        }
+
+        /// Renders for `GET /people/{id}`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Show {
+            pub id: Uuid,
+            pub lang: Option<String>,
+        }
+
+        impl Show {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Show { ref id, ref lang, } = self;
+                format!("/people/{}", id)
+            }
+        }
+
+        /// Renders for `PUT /people/{id}`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Update {
+            pub id: Uuid,
+            pub lang: Option<String>,
+            pub name: Option<String>,
+        }
+
+        impl Update {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Update { ref id, ref lang, ref name, } = self;
+                format!("/people/{}", id)
+            }
+        }
+
+        /// Parameters for requests to the people controller.
+        #[derive(Debug, PartialEq, Eq)]
+        pub enum Route {
+            Create(Create),
+            Destroy(Destroy),
+            Edit(Edit),
+            Index(Index),
+            New(New),
+            Show(Show),
+            Update(Update),
+        }
+
+        impl Route {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                match self {
+                    Route::Create(ref route) => route.to_path(),
+                    Route::Destroy(ref route) => route.to_path(),
+                    Route::Edit(ref route) => route.to_path(),
+                    Route::Index(ref route) => route.to_path(),
+                    Route::New(ref route) => route.to_path(),
+                    Route::Show(ref route) => route.to_path(),
+                    Route::Update(ref route) => route.to_path(),
+                }
+            }
         }
     }
 
-    /// Renders for `GET /books/{id}/edit`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Edit {
-        pub id: Uuid,
-        pub lang: Option<String>,
-    }
-
-    impl Edit {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Edit { ref id, ref lang, } = self;
-            format!("/books/{}/edit", id)
-        }
-    }
-
-    /// Renders for `GET /books`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Index {
-        pub lang: Option<String>,
-    }
-
-    impl Index {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Index { ref lang, } = self;
-            format!("/books")
-        }
-    }
-
-    /// Renders for `GET /books/new`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct New {
-        pub lang: Option<String>,
-    }
-
-    impl New {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let New { ref lang, } = self;
-            format!("/books/new")
-        }
-    }
-
-    /// Renders for `GET /books/{id}`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Show {
-        pub id: Uuid,
-        pub lang: Option<String>,
-    }
-
-    impl Show {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Show { ref id, ref lang, } = self;
-            format!("/books/{}", id)
-        }
-    }
-
-    /// Renders for `PUT /books/{id}`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Update {
-        pub id: Uuid,
-        pub lang: Option<String>,
-    }
-
-    impl Update {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Update { ref id, ref lang, } = self;
-            format!("/books/{}", id)
-        }
-    }
-
-    /// Parameters for requests to the books controller.
+    /// Parameters for requests to the routes controller.
     #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
-        Create(Create),
-        Destroy(Destroy),
-        Edit(Edit),
-        Index(Index),
-        New(New),
-        Show(Show),
-        Update(Update),
+        Books(books::Route),
+        People(people::Route),
     }
 
     impl Route {
         /// Make a path to this route with the given parameters.
         pub fn to_path(&self) -> String {
             match self {
-                Route::Create(ref route) => route.to_path(),
-                Route::Destroy(ref route) => route.to_path(),
-                Route::Edit(ref route) => route.to_path(),
-                Route::Index(ref route) => route.to_path(),
-                Route::New(ref route) => route.to_path(),
-                Route::Show(ref route) => route.to_path(),
-                Route::Update(ref route) => route.to_path(),
+                Route::Books(ref route) => route.to_path(),
+                Route::People(ref route) => route.to_path(),
             }
         }
     }
-}
-
-pub mod people {
-    use uuid::Uuid;
-
-    /// Renders for `POST /people`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Create {
-        pub lang: Option<String>,
-    }
-
-    impl Create {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Create { ref lang, } = self;
-            format!("/people")
-        }
-    }
-
-    /// Renders for `DELETE /people/{id}`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Destroy {
-        pub id: Uuid,
-        pub lang: Option<String>,
-    }
-
-    impl Destroy {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Destroy { ref id, ref lang, } = self;
-            format!("/people/{}", id)
-        }
-    }
-
-    /// Renders for `GET /people/{id}/edit`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Edit {
-        pub id: Uuid,
-        pub lang: Option<String>,
-    }
-
-    impl Edit {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Edit { ref id, ref lang, } = self;
-            format!("/people/{}/edit", id)
-        }
-    }
-
-    /// Renders for `GET /people`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Index {
-        pub lang: Option<String>,
-    }
-
-    impl Index {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Index { ref lang, } = self;
-            format!("/people")
-        }
-    }
-
-    /// Renders for `GET /people/new`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct New {
-        pub lang: Option<String>,
-    }
-
-    impl New {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let New { ref lang, } = self;
-            format!("/people/new")
-        }
-    }
-
-    /// Renders for `GET /people/{id}`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Show {
-        pub id: Uuid,
-        pub lang: Option<String>,
-    }
-
-    impl Show {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Show { ref id, ref lang, } = self;
-            format!("/people/{}", id)
-        }
-    }
-
-    /// Renders for `PUT /people/{id}`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Update {
-        pub id: Uuid,
-        pub lang: Option<String>,
-        pub name: Option<String>,
-    }
-
-    impl Update {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Update { ref id, ref lang, ref name, } = self;
-            format!("/people/{}", id)
-        }
-    }
-
-    /// Parameters for requests to the people controller.
-    #[derive(Debug, PartialEq, Eq)]
-    pub enum Route {
-        Create(Create),
-        Destroy(Destroy),
-        Edit(Edit),
-        Index(Index),
-        New(New),
-        Show(Show),
-        Update(Update),
-    }
-
-    impl Route {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            match self {
-                Route::Create(ref route) => route.to_path(),
-                Route::Destroy(ref route) => route.to_path(),
-                Route::Edit(ref route) => route.to_path(),
-                Route::Index(ref route) => route.to_path(),
-                Route::New(ref route) => route.to_path(),
-                Route::Show(ref route) => route.to_path(),
-                Route::Update(ref route) => route.to_path(),
-            }
-        }
-    }
-}
-
-/// An active route in the application -- match against this.
-#[derive(Debug, PartialEq, Eq)]
-pub enum Route {
-    Books(books::Route),
-    People(people::Route),
-}
-
-impl Route {
-    /// Make a path to this route with the given parameters.
-    pub fn to_path(&self) -> String {
-        match self {
-            Route::Books(ref route) => route.to_path(),
-            Route::People(ref route) => route.to_path(),
-        }
-    }
-}
 
     /// Match a path and method against this router.
     ///

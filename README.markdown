@@ -158,6 +158,7 @@ the current status compared to planned/potential updates:
 - Meta-concerns
   - [ ] Better test coverage
   - [ ] Make codegen not so painful
+  - [ ] Migrate last codegen unit tests to functional tests
   - [ ] Security review
   - [ ] Micro benchmarking to eke out the most perf
   - [ ] Macro benchmarking against other routers

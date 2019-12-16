@@ -295,8 +295,8 @@ where
     writeln!(w, "    //! ```ignore")?;
     writeln!(w, "    //! /")?;
 
-    let stringified_config = str::replace(&route_config.routes.stringify(1), "\n", "\n//! ");
-    let stringified_config = &stringified_config[..stringified_config.len() - 4];
+    let stringified_config = str::replace(&route_config.routes.stringify(1), "\n", "\n    //! ");
+    let stringified_config = &stringified_config[..stringified_config.len() - 8];
     write!(w, "    //! {}", stringified_config)?;
     writeln!(w, "    //! ```")?;
     writeln!(w, "    //!")?;
@@ -309,7 +309,7 @@ where
     writeln!(w, "    #![allow(unused_variables)]")?;
     writeln!(w)?;
 
-    codegen_module(w, &modules.root, &route_config.headers, "")?;
+    codegen_module(w, &modules.root, &route_config.headers, "    ")?;
     writeln!(w)?;
 
     #[cfg(feature = "http")]
@@ -807,8 +807,8 @@ mod tests {
     //! ```ignore
     //! /
     //!   GET people::Index
-//!   {id: Uuid}
-//!     GET people::Show
+    //!   {id: Uuid}
+    //!     GET people::Show
     //! ```
     //!
     //! [`match_route`]: fn.match_route.html
@@ -818,68 +818,68 @@ mod tests {
     #![allow(unused_mut)]
     #![allow(unused_variables)]
 
-use uuid::Uuid;
-
-pub mod people {
     use uuid::Uuid;
 
-    /// Renders for `GET /`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Index;
+    pub mod people {
+        use uuid::Uuid;
 
-    impl Index {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            format!(\"/\")
+        /// Renders for `GET /`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Index;
+
+        impl Index {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                format!(\"/\")
+            }
+        }
+
+        /// Renders for `GET /{id}`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Show {
+            pub id: Uuid,
+        }
+
+        impl Show {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Show { ref id, } = self;
+                format!(\"/{}\", id)
+            }
+        }
+
+        /// Parameters for requests to the people controller.
+        #[derive(Debug, PartialEq, Eq)]
+        pub enum Route {
+            Index(Index),
+            Show(Show),
+        }
+
+        impl Route {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                match self {
+                    Route::Index(ref route) => route.to_path(),
+                    Route::Show(ref route) => route.to_path(),
+                }
+            }
         }
     }
 
-    /// Renders for `GET /{id}`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Show {
-        pub id: Uuid,
-    }
-
-    impl Show {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Show { ref id, } = self;
-            format!(\"/{}\", id)
-        }
-    }
-
-    /// Parameters for requests to the people controller.
+    /// Parameters for requests to the routes controller.
     #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
-        Index(Index),
-        Show(Show),
+        People(people::Route),
     }
 
     impl Route {
         /// Make a path to this route with the given parameters.
         pub fn to_path(&self) -> String {
             match self {
-                Route::Index(ref route) => route.to_path(),
-                Route::Show(ref route) => route.to_path(),
+                Route::People(ref route) => route.to_path(),
             }
         }
     }
-}
-
-/// An active route in the application -- match against this.
-#[derive(Debug, PartialEq, Eq)]
-pub enum Route {
-    People(people::Route),
-}
-
-impl Route {
-    /// Make a path to this route with the given parameters.
-    pub fn to_path(&self) -> String {
-        match self {
-            Route::People(ref route) => route.to_path(),
-        }
-    }
-}
 
     /// Match a path and method against this router.
     ///
@@ -983,8 +983,8 @@ impl Route {
     //! ```ignore
     //! /
     //!   GET Index
-//!   {id: Uuid}
-//!     GET Admin::People::Show
+    //!   {id: Uuid}
+    //!     GET Admin::People::Show
     //! ```
     //!
     //! [`match_route`]: fn.match_route.html
@@ -994,87 +994,87 @@ impl Route {
     #![allow(unused_mut)]
     #![allow(unused_variables)]
 
-use uuid::Uuid;
-
-/// Renders for `GET /`.
-#[derive(Debug, PartialEq, Eq)]
-pub struct Index;
-
-impl Index {
-    /// Make a path to this route with the given parameters.
-    pub fn to_path(&self) -> String {
-        format!(\"/\")
-    }
-}
-
-pub mod admin {
     use uuid::Uuid;
 
-    pub mod people {
+    /// Renders for `GET /`.
+    #[derive(Debug, PartialEq, Eq)]
+    pub struct Index;
+
+    impl Index {
+        /// Make a path to this route with the given parameters.
+        pub fn to_path(&self) -> String {
+            format!(\"/\")
+        }
+    }
+
+    pub mod admin {
         use uuid::Uuid;
 
-        /// Renders for `GET /{id}`.
-        #[derive(Debug, PartialEq, Eq)]
-        pub struct Show {
-            pub id: Uuid,
-        }
+        pub mod people {
+            use uuid::Uuid;
 
-        impl Show {
-            /// Make a path to this route with the given parameters.
-            pub fn to_path(&self) -> String {
-                let Show { ref id, } = self;
-                format!(\"/{}\", id)
+            /// Renders for `GET /{id}`.
+            #[derive(Debug, PartialEq, Eq)]
+            pub struct Show {
+                pub id: Uuid,
+            }
+
+            impl Show {
+                /// Make a path to this route with the given parameters.
+                pub fn to_path(&self) -> String {
+                    let Show { ref id, } = self;
+                    format!(\"/{}\", id)
+                }
+            }
+
+            /// Parameters for requests to the people controller.
+            #[derive(Debug, PartialEq, Eq)]
+            pub enum Route {
+                Show(Show),
+            }
+
+            impl Route {
+                /// Make a path to this route with the given parameters.
+                pub fn to_path(&self) -> String {
+                    match self {
+                        Route::Show(ref route) => route.to_path(),
+                    }
+                }
             }
         }
 
-        /// Parameters for requests to the people controller.
+        /// Parameters for requests to the admin controller.
         #[derive(Debug, PartialEq, Eq)]
         pub enum Route {
-            Show(Show),
+            People(people::Route),
         }
 
         impl Route {
             /// Make a path to this route with the given parameters.
             pub fn to_path(&self) -> String {
                 match self {
-                    Route::Show(ref route) => route.to_path(),
+                    Route::People(ref route) => route.to_path(),
                 }
             }
         }
     }
 
-    /// Parameters for requests to the admin controller.
+    /// Parameters for requests to the routes controller.
     #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
-        People(people::Route),
+        Index(Index),
+        Admin(admin::Route),
     }
 
     impl Route {
         /// Make a path to this route with the given parameters.
         pub fn to_path(&self) -> String {
             match self {
-                Route::People(ref route) => route.to_path(),
+                Route::Index(ref route) => route.to_path(),
+                Route::Admin(ref route) => route.to_path(),
             }
         }
     }
-}
-
-/// An active route in the application -- match against this.
-#[derive(Debug, PartialEq, Eq)]
-pub enum Route {
-    Index(Index),
-    Admin(admin::Route),
-}
-
-impl Route {
-    /// Make a path to this route with the given parameters.
-    pub fn to_path(&self) -> String {
-        match self {
-            Route::Index(ref route) => route.to_path(),
-            Route::Admin(ref route) => route.to_path(),
-        }
-    }
-}
 
     /// Match a path and method against this router.
     ///

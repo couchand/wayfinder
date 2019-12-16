@@ -10,13 +10,13 @@ pub mod routes {
     //! ```ignore
     //! /
     //!   foobar
-//!     GET Foo::Bar
-//!   fomo
-//!     GET Fomo::AsUsual
-//!   foosh
-//!     GET Foosh::Ball
-//!   {a: String}
-//!     GET Bar::Dyn
+    //!     GET Foo::Bar
+    //!   fomo
+    //!     GET Fomo::AsUsual
+    //!   foosh
+    //!     GET Foosh::Ball
+    //!   {a: String}
+    //!     GET Bar::Dyn
     //! ```
     //!
     //! [`match_route`]: fn.match_route.html
@@ -26,81 +26,128 @@ pub mod routes {
     #![allow(unused_mut)]
     #![allow(unused_variables)]
 
-pub mod bar {
-    /// Renders for `GET /{a}`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Dyn {
-        pub a: String,
-    }
-
-    impl Dyn {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            let Dyn { ref a, } = self;
-            format!("/{}", a)
+    pub mod bar {
+        /// Renders for `GET /{a}`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Dyn {
+            pub a: String,
         }
-    }
 
-    /// Parameters for requests to the bar controller.
-    #[derive(Debug, PartialEq, Eq)]
-    pub enum Route {
-        Dyn(Dyn),
-    }
+        impl Dyn {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                let Dyn { ref a, } = self;
+                format!("/{}", a)
+            }
+        }
 
-    impl Route {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            match self {
-                Route::Dyn(ref route) => route.to_path(),
+        /// Parameters for requests to the bar controller.
+        #[derive(Debug, PartialEq, Eq)]
+        pub enum Route {
+            Dyn(Dyn),
+        }
+
+        impl Route {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                match self {
+                    Route::Dyn(ref route) => route.to_path(),
+                }
             }
         }
     }
-}
 
-pub mod fomo {
-    /// Renders for `GET /fomo`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct AsUsual;
+    pub mod fomo {
+        /// Renders for `GET /fomo`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct AsUsual;
 
-    impl AsUsual {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            format!("/fomo")
+        impl AsUsual {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                format!("/fomo")
+            }
         }
-    }
 
-    /// Parameters for requests to the fomo controller.
-    #[derive(Debug, PartialEq, Eq)]
-    pub enum Route {
-        AsUsual(AsUsual),
-    }
+        /// Parameters for requests to the fomo controller.
+        #[derive(Debug, PartialEq, Eq)]
+        pub enum Route {
+            AsUsual(AsUsual),
+        }
 
-    impl Route {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            match self {
-                Route::AsUsual(ref route) => route.to_path(),
+        impl Route {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                match self {
+                    Route::AsUsual(ref route) => route.to_path(),
+                }
             }
         }
     }
-}
 
-pub mod foo {
-    /// Renders for `GET /foobar`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Bar;
+    pub mod foo {
+        /// Renders for `GET /foobar`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Bar;
 
-    impl Bar {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            format!("/foobar")
+        impl Bar {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                format!("/foobar")
+            }
+        }
+
+        /// Parameters for requests to the foo controller.
+        #[derive(Debug, PartialEq, Eq)]
+        pub enum Route {
+            Bar(Bar),
+        }
+
+        impl Route {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                match self {
+                    Route::Bar(ref route) => route.to_path(),
+                }
+            }
         }
     }
 
-    /// Parameters for requests to the foo controller.
+    pub mod foosh {
+        /// Renders for `GET /foosh`.
+        #[derive(Debug, PartialEq, Eq)]
+        pub struct Ball;
+
+        impl Ball {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                format!("/foosh")
+            }
+        }
+
+        /// Parameters for requests to the foosh controller.
+        #[derive(Debug, PartialEq, Eq)]
+        pub enum Route {
+            Ball(Ball),
+        }
+
+        impl Route {
+            /// Make a path to this route with the given parameters.
+            pub fn to_path(&self) -> String {
+                match self {
+                    Route::Ball(ref route) => route.to_path(),
+                }
+            }
+        }
+    }
+
+    /// Parameters for requests to the routes controller.
     #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
-        Bar(Bar),
+        Bar(bar::Route),
+        Fomo(fomo::Route),
+        Foo(foo::Route),
+        Foosh(foosh::Route),
     }
 
     impl Route {
@@ -108,59 +155,12 @@ pub mod foo {
         pub fn to_path(&self) -> String {
             match self {
                 Route::Bar(ref route) => route.to_path(),
+                Route::Fomo(ref route) => route.to_path(),
+                Route::Foo(ref route) => route.to_path(),
+                Route::Foosh(ref route) => route.to_path(),
             }
         }
     }
-}
-
-pub mod foosh {
-    /// Renders for `GET /foosh`.
-    #[derive(Debug, PartialEq, Eq)]
-    pub struct Ball;
-
-    impl Ball {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            format!("/foosh")
-        }
-    }
-
-    /// Parameters for requests to the foosh controller.
-    #[derive(Debug, PartialEq, Eq)]
-    pub enum Route {
-        Ball(Ball),
-    }
-
-    impl Route {
-        /// Make a path to this route with the given parameters.
-        pub fn to_path(&self) -> String {
-            match self {
-                Route::Ball(ref route) => route.to_path(),
-            }
-        }
-    }
-}
-
-/// An active route in the application -- match against this.
-#[derive(Debug, PartialEq, Eq)]
-pub enum Route {
-    Bar(bar::Route),
-    Fomo(fomo::Route),
-    Foo(foo::Route),
-    Foosh(foosh::Route),
-}
-
-impl Route {
-    /// Make a path to this route with the given parameters.
-    pub fn to_path(&self) -> String {
-        match self {
-            Route::Bar(ref route) => route.to_path(),
-            Route::Fomo(ref route) => route.to_path(),
-            Route::Foo(ref route) => route.to_path(),
-            Route::Foosh(ref route) => route.to_path(),
-        }
-    }
-}
 
     /// Match a path and method against this router.
     ///
