@@ -1,6 +1,3 @@
-extern crate uuid;
-extern crate wayfinder;
-
 use routes::Match;
 
 include!(concat!(env!("OUT_DIR"), "/routes.rs"));
