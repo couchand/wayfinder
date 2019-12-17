@@ -1,6 +1,4 @@
-extern crate wayfinder_build;
-
-use wayfinder_build::build_from_config;
+use wayfinder::build::build_from_config;
 
 mod routes;
 

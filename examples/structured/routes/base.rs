@@ -1,4 +1,4 @@
-use wayfinder_core::{get, param, NestedRoutes, RouteConfig, Routes};
+use wayfinder::{get, param, NestedRoutes, RouteConfig, Routes};
 
 pub fn routes() -> RouteConfig {
     RouteConfig {

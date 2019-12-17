@@ -9,7 +9,7 @@ use nom::{
     take_while1, terminated, value, ws, IResult,
 };
 
-use wayfinder_core::*;
+use crate::core::*;
 
 #[macro_use]
 pub mod errors;

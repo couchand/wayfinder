@@ -6,8 +6,7 @@ mod macros;
 
 use nom::types::CompleteStr;
 
-use wayfinder_core::*;
-use wayfinder_parse as parse;
+use wayfinder::*;
 
 include!(concat!(env!("OUT_DIR"), "/cases.rs"));
 

@@ -3,7 +3,7 @@ macro_rules! header {
     (
         $($tokens:item)*
     ) => {
-        ::wayfinder_core::Header::new(stringify!($($tokens)*))
+        ::wayfinder::Header::new(stringify!($($tokens)*))
     }
 }
 
@@ -12,8 +12,8 @@ macro_rules! get {
     (
         @get ($($modules:ident)+) $is_redirect:expr $(, $param:expr)*
     ) => {
-        ::wayfinder_core::Resource::make(
-            ::wayfinder_core::Method::Get,
+        ::wayfinder::Resource::make(
+            ::wayfinder::Method::Get,
             vec![$(stringify!($modules).to_string()),*],
             $is_redirect,
             vec![$($param),*],
@@ -36,8 +36,8 @@ macro_rules! post {
     (
         @post ($($modules:ident)+) $is_redirect:expr $(, $param:expr)*
     ) => {
-        ::wayfinder_core::Resource::make(
-            ::wayfinder_core::Method::Post,
+        ::wayfinder::Resource::make(
+            ::wayfinder::Method::Post,
             vec![$(stringify!($modules).to_string()),*],
             $is_redirect,
             vec![$($param),*],
@@ -60,8 +60,8 @@ macro_rules! put {
     (
         @put ($($modules:ident)+) $is_redirect:expr $(, $param:expr)*
     ) => {
-        ::wayfinder_core::Resource::make(
-            ::wayfinder_core::Method::Put,
+        ::wayfinder::Resource::make(
+            ::wayfinder::Method::Put,
             vec![$(stringify!($modules).to_string()),*],
             $is_redirect,
             vec![$($param),*],
@@ -84,8 +84,8 @@ macro_rules! delete {
     (
         @delete ($($modules:ident)+) $is_redirect:expr $(, $param:expr)*
     ) => {
-        ::wayfinder_core::Resource::make(
-            ::wayfinder_core::Method::Delete,
+        ::wayfinder::Resource::make(
+            ::wayfinder::Method::Delete,
             vec![$(stringify!($modules).to_string()),*],
             $is_redirect,
             vec![$($param),*],
@@ -108,6 +108,6 @@ macro_rules! param {
     (
         $name:ident : $type:ty
     ) => {
-        ::wayfinder_core::Param::new(stringify!($name), stringify!($type))
+        ::wayfinder::Param::new(stringify!($name), stringify!($type))
     };
 }

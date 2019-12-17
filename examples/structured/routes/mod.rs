@@ -1,4 +1,4 @@
-use wayfinder_core::RouteConfig;
+use wayfinder::RouteConfig;
 
 mod base;
 mod books;

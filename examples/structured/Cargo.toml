@@ -13,5 +13,4 @@ uuid = { version = "0.7", features = ["serde"] }
 wayfinder = { path = "../../wayfinder" }
 
 [build-dependencies]
-wayfinder-core = { path = "../../wayfinder-core" }
-wayfinder-build = { path = "../../wayfinder-build" }
+wayfinder = { path = "../../wayfinder" }

@@ -1,9 +1,11 @@
 use std::io;
 use std::io::Write;
 
-use crate::flat::{Charlike, FlattenedModule, FlattenedModules, FlattenedRoute, FlattenedRoutes};
-use crate::trie::Trie;
-use wayfinder_core::{Header, RouteConfig};
+use crate::core::{Header, RouteConfig};
+use crate::gen::flat::{
+    Charlike, FlattenedModule, FlattenedModules, FlattenedRoute, FlattenedRoutes,
+};
+use crate::gen::trie::Trie;
 
 pub fn to_caps_case(s: &str) -> String {
     let mut chars = s.chars();
@@ -357,7 +359,7 @@ where
         w,
         "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{"
     )?;
-    writeln!(w, "            f.debug_struct(\"wayfinder::Error\")")?;
+    writeln!(w, "            f.debug_struct(\"wayfinder::Error\")")?; // TODO: what here?
     writeln!(w, "                .field(\"param\", &self.param)")?;
     writeln!(w, "                .field(\"what\", &self.what)")?;
     writeln!(w, "                .finish()")?;

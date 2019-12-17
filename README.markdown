@@ -109,7 +109,7 @@ the current status compared to planned/potential updates:
 - Required before publishing 0.1
   - [x] Drop or fix `http` feature
   - [x] Rewrite generated docs so they're accurate
-  - [ ] De-crateify
+  - [x] De-crateify
   - [x] Triage inline TODO items
 
 - Route file syntax

@@ -5,4 +5,6 @@ authors = ["Andrew Dona-Couch <hi@andrewcou.ch>"]
 edition = "2018"
 
 [dependencies]
-wayfinder-core = { path = "../wayfinder-core" }
+itertools = "0.8"
+lazy_static = "1.0"
+nom = { version = "4.1.1", features = ["verbose-errors"] }

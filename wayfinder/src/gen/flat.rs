@@ -1,7 +1,7 @@
 use itertools::Either;
 
-use crate::trie::*;
-use wayfinder_core::*;
+use crate::core::*;
+use crate::gen::trie::*;
 
 #[derive(Debug, Clone, PartialOrd, Ord, PartialEq, Eq)]
 pub enum Charlike {

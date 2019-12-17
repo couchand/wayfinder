@@ -317,7 +317,7 @@ pub mod routes {
         }
     }
 
-    /// Parameters for requests to the routes controller.
+    /// An active route in the application -- match against this.
     #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         Books(books::Route),
@@ -334,12 +334,65 @@ pub mod routes {
         }
     }
 
+    #[derive(PartialEq, Eq)]
+    pub enum Match<T> {
+        NotFound,
+        NotAllowed,
+        Route(T),
+        Redirect(T),
+    }
+
+    use std::fmt;
+    impl<T: fmt::Debug> fmt::Debug for Match<T> {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match self {
+                Match::NotFound => write!(f, "Match::NotFound"),
+                Match::NotAllowed => write!(f, "Match::NotAllowed"),
+                Match::Route(t) => write!(f, "Match::Route({:?})", t),
+                Match::Redirect(t) => write!(f, "Match::Redirect({:?})", t),
+            }
+        }
+    }
+
+    pub struct Error {
+        param: String,
+        what: Box<dyn fmt::Debug>,
+    }
+
+    impl fmt::Debug for Error {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            f.debug_struct("wayfinder::Error")
+                .field("param", &self.param)
+                .field("what", &self.what)
+                .finish()
+        }
+    }
+
+    impl fmt::Display for Error {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(
+                f,
+                "Error parsing '{}' parameter {:?}",
+                self.param, self.what
+            )
+        }
+    }
+
+    impl std::error::Error for Error {}
+
+    impl Error {
+        pub fn fail<S: AsRef<str>, T: fmt::Debug + 'static>(param: S, what: T) -> Error {
+            Error {
+                param: param.as_ref().to_string(),
+                what: Box::new(what),
+            }
+        }
+    }
     /// Match a path and method against this router.
     ///
-    /// Accepts an iterator for the characters of the request path,
-    /// as well as a [`wayfinder::Method`] for the HTTP verb.
+    /// Accepts a byte slice for the request path and HTTP verb.
     /// Returns a `Result`, usually `Ok` with the result of the
-    /// [`wayfinder::Match`].
+    /// [`Match`].
     ///
     /// If the match was successful, it will be a `Match::Route` or
     /// `Match::Redirect` with the parameters enclosed.  You can then
@@ -355,15 +408,12 @@ pub mod routes {
     /// `Err` with the underlying parsing error.  Usually you'll want
     /// to send back a `400 Bad Request` for that.
     ///
-    /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
-    /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
+    /// [`Match`]: enum.Match.html
     /// [`Route`]: enum.Route.html
     pub fn match_route<P: AsRef<[u8]>, M: AsRef<[u8]>>(
         path: P,
         method: M,
-    ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
-        use wayfinder::{Error, Match};
-
+    ) -> Result<Match<Route>, Error> {
         let method = method.as_ref();
         let path = path.as_ref();
         let len = path.len();

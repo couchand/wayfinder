@@ -1,4 +1,4 @@
-use wayfinder_core::{delete, get, header, param, post, put, NestedRoutes, RouteConfig, Routes};
+use wayfinder::{delete, get, header, param, post, put, NestedRoutes, RouteConfig, Routes};
 
 pub fn routes() -> RouteConfig {
     RouteConfig {

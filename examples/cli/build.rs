@@ -1,10 +1,8 @@
-extern crate wayfinder_build;
-
 use std::env;
 use std::fs::File;
 use std::path::PathBuf;
 
-use wayfinder_build::build;
+use wayfinder::build::build;
 
 fn main() {
     let in_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());

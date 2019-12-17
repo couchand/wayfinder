@@ -13,7 +13,7 @@ mod tests {
         let path = "/people";
 
         match routes::match_route(&path, b"GET") {
-            Ok(wayfinder::Match::Route(routes::Route::People(routes::people::Route::Index(
+            Ok(routes::Match::Route(routes::Route::People(routes::people::Route::Index(
                 routes::people::Index { lang: None },
             )))) => {}
             _ => assert!(false, "route match error"),
@@ -25,7 +25,7 @@ mod tests {
         let path = "/people/";
 
         match routes::match_route(&path, b"GET") {
-            Ok(wayfinder::Match::Route(routes::Route::People(routes::people::Route::Index(
+            Ok(routes::Match::Route(routes::Route::People(routes::people::Route::Index(
                 routes::people::Index { lang: None },
             )))) => {}
             _ => assert!(false, "route match error"),

@@ -1,4 +1,4 @@
-use wayfinder_core::{delete, get, header, param, post, put, Header, Method, Param, Resource};
+use wayfinder::{delete, get, header, param, post, put, Header, Method, Param, Resource};
 
 #[test]
 fn test_header_macro() {

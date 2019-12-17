@@ -1,4 +1,4 @@
-use wayfinder_build::build;
+use wayfinder::build::build;
 
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();

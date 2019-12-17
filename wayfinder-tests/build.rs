@@ -48,14 +48,17 @@ fn write_cases<W: std::io::Write>(w: &mut W, cases: &[DirEntry]) -> std::io::Res
 
         writeln!(w, "        let mut dest = vec![];")?;
 
-        writeln!(w, "        match wayfinder_parse::route_config(&routes) {{")?;
+        writeln!(
+            w,
+            "        match wayfinder::parse::route_config(&routes) {{"
+        )?;
 
         writeln!(
             w,
-            "            Ok(config) => wayfinder_gen::codegen(&mut dest, &config.1).unwrap(),"
+            "            Ok(config) => wayfinder::gen::codegen(&mut dest, &config.1).unwrap(),"
         )?;
         writeln!(w, "            result => {{")?;
-        writeln!(w, "                wayfinder_parse::errors::show_errors(&mut std::io::stderr(), &routes, result, \"\");")?;
+        writeln!(w, "                wayfinder::parse::errors::show_errors(&mut std::io::stderr(), &routes, result, \"\");")?;
         writeln!(w, "                assert!(false);")?;
 
         writeln!(w, "            }}")?;
