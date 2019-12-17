@@ -63,7 +63,7 @@ pub fn codegen_module<W>(
 where
     W: Write,
 {
-    let is_root = indent == "";
+    let is_root = indent == "    ";
 
     // TODO: can we do something smarter than repeating these everywhere?
     for header in headers.iter() {

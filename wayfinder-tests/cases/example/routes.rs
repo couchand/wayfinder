@@ -313,7 +313,7 @@ pub mod routes {
         }
     }
 
-    /// Parameters for requests to the routes controller.
+    /// An active route in the application -- match against this.
     #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         Books(books::Route),
