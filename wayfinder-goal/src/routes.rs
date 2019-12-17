@@ -317,7 +317,7 @@ pub mod routes {
         }
     }
 
-    /// An active route in the application -- match against this.
+    /// Parameters for requests to the routes controller.
     #[derive(Debug, PartialEq, Eq)]
     pub enum Route {
         Books(books::Route),
@@ -366,11 +366,17 @@ pub mod routes {
 
         let path = path.as_ref();
         let len = path.len();
-        let mut i = if &path[0..1] == b"/" { 1 } else { 0 };
+        let mut i = if len > 0 && &path[0..1] == b"/" { 1 } else { 0 };
 
+        if i == len {
+            return Ok(Match::NotFound);
+        }
         match &path[i..i + 1] {
             b"b" => {
                 i += 1;
+                if i + 4 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i + 4] {
                     b"ooks" => {
                         i += 4;
@@ -416,48 +422,44 @@ pub mod routes {
 
                 let start = i;
 
-                match &path[i..i + 3] {
-                    b"new" => {
-                        i += 3;
-                        if i == len {
-                            match method {
-                                Method::Get => {
-                                    return Ok(Match::Route(Route::Books(books::Route::New(
-                                        books::New { lang: None },
-                                    ))))
+                if i + 3 <= len {
+                    match &path[i..i + 3] {
+                        b"new" => {
+                            i += 3;
+                            if i == len {
+                                match method {
+                                    Method::Get => {
+                                        return Ok(Match::Route(Route::Books(books::Route::New(
+                                            books::New { lang: None },
+                                        ))))
+                                    }
+                                    _ => return Ok(Match::NotAllowed),
                                 }
-                                _ => return Ok(Match::NotAllowed),
                             }
-                        }
-                        match &path[i..i + 1] {
-                            b"/" => {
-                                i += 1;
-                            }
-                            _ => return Ok(Match::NotFound),
-                        }
-                        if i == len {
-                            match method {
-                                Method::Get => {
-                                    return Ok(Match::Route(Route::Books(books::Route::New(
-                                        books::New { lang: None },
-                                    ))))
+                            match &path[i..i + 1] {
+                                b"/" => {
+                                    i += 1;
                                 }
-                                _ => return Ok(Match::NotAllowed),
+                                _ => return Ok(Match::NotFound),
                             }
+                            if i == len {
+                                match method {
+                                    Method::Get => {
+                                        return Ok(Match::Route(Route::Books(books::Route::New(
+                                            books::New { lang: None },
+                                        ))))
+                                    }
+                                    _ => return Ok(Match::NotAllowed),
+                                }
+                            }
+                            return Ok(Match::NotFound);
                         }
-                        return Ok(Match::NotFound);
+                        _ => {}
                     }
-                    _ => {}
                 }
 
-                loop {
-                    if i == len {
-                        break;
-                    }
-                    match &path[i..i + 1] {
-                        b"/" => break,
-                        _ => i += 1,
-                    }
+                while i < len && &path[i..i + 1] != b"/" {
+                    i += 1;
                 }
 
                 let text = std::str::from_utf8(&path[start..i]).unwrap();
@@ -509,6 +511,9 @@ pub mod routes {
                         _ => return Ok(Match::NotAllowed),
                     }
                 }
+                if i + 4 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i + 4] {
                     b"edit" => {
                         i += 4;
@@ -545,6 +550,9 @@ pub mod routes {
             }
             b"p" => {
                 i += 1;
+                if i + 5 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i + 5] {
                     b"eople" => {
                         i += 5;
@@ -590,48 +598,44 @@ pub mod routes {
 
                 let start = i;
 
-                match &path[i..i + 3] {
-                    b"new" => {
-                        i += 3;
-                        if i == len {
-                            match method {
-                                Method::Get => {
-                                    return Ok(Match::Route(Route::People(people::Route::New(
-                                        people::New { lang: None },
-                                    ))))
+                if i + 3 <= len {
+                    match &path[i..i + 3] {
+                        b"new" => {
+                            i += 3;
+                            if i == len {
+                                match method {
+                                    Method::Get => {
+                                        return Ok(Match::Route(Route::People(people::Route::New(
+                                            people::New { lang: None },
+                                        ))))
+                                    }
+                                    _ => return Ok(Match::NotAllowed),
                                 }
-                                _ => return Ok(Match::NotAllowed),
                             }
-                        }
-                        match &path[i..i + 1] {
-                            b"/" => {
-                                i += 1;
-                            }
-                            _ => return Ok(Match::NotFound),
-                        }
-                        if i == len {
-                            match method {
-                                Method::Get => {
-                                    return Ok(Match::Route(Route::People(people::Route::New(
-                                        people::New { lang: None },
-                                    ))))
+                            match &path[i..i + 1] {
+                                b"/" => {
+                                    i += 1;
                                 }
-                                _ => return Ok(Match::NotAllowed),
+                                _ => return Ok(Match::NotFound),
                             }
+                            if i == len {
+                                match method {
+                                    Method::Get => {
+                                        return Ok(Match::Route(Route::People(people::Route::New(
+                                            people::New { lang: None },
+                                        ))))
+                                    }
+                                    _ => return Ok(Match::NotAllowed),
+                                }
+                            }
+                            return Ok(Match::NotFound);
                         }
-                        return Ok(Match::NotFound);
+                        _ => {}
                     }
-                    _ => {}
                 }
 
-                loop {
-                    if i == len {
-                        break;
-                    }
-                    match &path[i..i + 1] {
-                        b"/" => break,
-                        _ => i += 1,
-                    }
+                while i < len && &path[i..i + 1] != b"/" {
+                    i += 1;
                 }
 
                 let text = std::str::from_utf8(&path[start..i]).unwrap();
@@ -691,6 +695,9 @@ pub mod routes {
                         _ => return Ok(Match::NotAllowed),
                     }
                 }
+                if i + 4 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i + 4] {
                     b"edit" => {
                         i += 4;
@@ -727,6 +734,9 @@ pub mod routes {
             }
             b"u" => {
                 i += 1;
+                if i + 4 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i + 4] {
                     b"sers" => {
                         i += 4;
