@@ -156,6 +156,7 @@ the current status compared to planned/potential updates:
   - [ ] CLI args??
 
 - Meta-concerns
+  - [ ] Address all inline TODO items
   - [ ] Better test coverage
   - [ ] Make codegen not so painful
   - [x] Migrate last codegen unit tests to functional tests

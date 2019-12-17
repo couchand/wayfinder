@@ -152,6 +152,7 @@ pub mod routes {
         let id = path[start..i].parse()
             .map_err(|e| Error::fail("id", e))?;
 
+        // TODO: there's a bug here, obviously!
     }
 
 } // mod routes
