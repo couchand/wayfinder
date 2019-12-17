@@ -1,0 +1,7 @@
+use uuid::Uuid;
+
+/
+  GET Index
+
+  {id: Uuid}
+    GET Admin::People::Show
