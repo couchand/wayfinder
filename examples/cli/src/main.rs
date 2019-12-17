@@ -35,6 +35,21 @@ mod tests {
         let id: Uuid = "12345678901234567890123456789012".parse().unwrap();
         vec![
             (
+                "",
+                wayfinder::Method::Get,
+                Match::NotFound,
+            ),
+            (
+                "/",
+                wayfinder::Method::Get,
+                Match::NotFound,
+            ),
+            (
+                "/user",
+                wayfinder::Method::Get,
+                Match::NotFound,
+            ),
+            (
                 "/users",
                 wayfinder::Method::Get,
                 Match::Redirect(routes::Route::People(routes::people::Route::Index(

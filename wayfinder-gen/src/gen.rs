@@ -411,7 +411,7 @@ where
     writeln!(w, "        let len = path.len();")?;
     writeln!(
         w,
-        "        let mut i = if &path[0..1] == b\"/\" {{ 1 }} else {{ 0 }};"
+        "        let mut i = if len > 0 && &path[0..1] == b\"/\" {{ 1 }} else {{ 0 }};"
     )?;
 
     writeln!(w)?;
@@ -497,10 +497,19 @@ where
                     break;
                 }
 
+                let match_len = unambiguous.len();
+                if match_len == 1 {
+                    writeln!(w, "{}if i == len {{", indent1)?;
+                } else {
+                    writeln!(w, "{}if i + {} > len {{", indent1, match_len)?;
+                }
+                writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
+                writeln!(w, "{}}}", indent1)?;
+
                 // check it
-                writeln!(w, "{}match &path[i..i+{}] {{", indent1, unambiguous.len())?;
+                writeln!(w, "{}match &path[i..i+{}] {{", indent1, match_len)?;
                 writeln!(w, "{}    b\"{}\" => {{", indent1, unambiguous)?; // TODO quotes in paths????
-                writeln!(w, "{}        i += {};", indent1, unambiguous.len())?;
+                writeln!(w, "{}        i += {};", indent1, match_len)?;
                 writeln!(w, "{}    }},", indent1)?;
                 writeln!(w, "{}    _ => return Ok(Match::NotFound),", indent1)?;
                 writeln!(w, "{}}}", indent1)?;
@@ -587,6 +596,14 @@ where
     let match_len = if l == 0 { 1 } else { l };
 
     if unambiguous != "" {
+        if match_len == 1 {
+            writeln!(w, "{}if i == len {{", indent1)?;
+        } else {
+            writeln!(w, "{}if i + {} > len {{", indent1, match_len)?;
+        }
+        writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
+        writeln!(w, "{}}}", indent1)?;
+
         writeln!(w, "{}match &path[i..i+{}] {{", indent1, match_len)?;
         writeln!(w, "{}    b\"{}\" => {{", indent1, unambiguous)?; // TODO: quotes in paths??
         writeln!(w, "{}        i += {};", indent1, match_len)?;
@@ -613,6 +630,9 @@ where
     }
 
     // n.b. if we got here, the next character is ambiguous
+    writeln!(w, "{}if i == len {{", indent1)?;
+    writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
+    writeln!(w, "{}}}", indent1)?;
 
     writeln!(w, "{}match &path[i..i+1] {{", indent1)?;
 

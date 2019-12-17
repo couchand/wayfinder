@@ -362,11 +362,17 @@ pub mod routes {
 
         let path = path.as_ref();
         let len = path.len();
-        let mut i = if &path[0..1] == b"/" { 1 } else { 0 };
+        let mut i = if len > 0 && &path[0..1] == b"/" { 1 } else { 0 };
 
+        if i == len {
+            return Ok(Match::NotFound);
+        }
         match &path[i..i+1] {
             b"b" => {
                 i += 1;
+                if i + 4 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i+4] {
                     b"ooks" => {
                         i += 4;
@@ -404,6 +410,10 @@ pub mod routes {
 
                 let start = i;
 
+                if i + 3 > len {
+                    return Ok(Match::NotFound);
+                    // TODO: there's a bug here, obviously
+                }
                 match &path[i..i+3] {
                     b"new" => {
                         i += 3;
@@ -486,6 +496,9 @@ pub mod routes {
                         _ => return Ok(Match::NotAllowed),
                     }
                 }
+                if i + 4 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i+4] {
                     b"edit" => {
                         i += 4;
@@ -520,6 +533,9 @@ pub mod routes {
             },
             b"p" => {
                 i += 1;
+                if i + 5 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i+5] {
                     b"eople" => {
                         i += 5;
@@ -557,6 +573,10 @@ pub mod routes {
 
                 let start = i;
 
+                if i + 3 > len {
+                    return Ok(Match::NotFound);
+                    // TODO: another instance of the bug
+                }
                 match &path[i..i+3] {
                     b"new" => {
                         i += 3;
@@ -641,6 +661,9 @@ pub mod routes {
                         _ => return Ok(Match::NotAllowed),
                     }
                 }
+                if i + 4 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i+4] {
                     b"edit" => {
                         i += 4;
@@ -675,6 +698,9 @@ pub mod routes {
             },
             b"u" => {
                 i += 1;
+                if i + 4 > len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i+4] {
                     b"sers" => {
                         i += 4;

@@ -135,7 +135,7 @@ pub mod routes {
 
         let path = path.as_ref();
         let len = path.len();
-        let mut i = if &path[0..1] == b"/" { 1 } else { 0 };
+        let mut i = if len > 0 && &path[0..1] == b"/" { 1 } else { 0 };
 
         if i == len {
             match method {

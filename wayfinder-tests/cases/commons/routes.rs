@@ -194,17 +194,26 @@ pub mod routes {
 
         let path = path.as_ref();
         let len = path.len();
-        let mut i = if &path[0..1] == b"/" { 1 } else { 0 };
+        let mut i = if len > 0 && &path[0..1] == b"/" { 1 } else { 0 };
 
 
         let start = i;
 
+        if i + 3 > len {
+            return Ok(Match::NotFound);
+        }
         match &path[i..i+3] {
             b"fo" => {
                 i += 3;
+                if i == len {
+                    return Ok(Match::NotFound);
+                }
                 match &path[i..i+1] {
                     b"m" => {
                         i += 1;
+                        if i == len {
+                            return Ok(Match::NotFound);
+                        }
                         match &path[i..i+1] {
                             b"o" => {
                                 i += 1;
@@ -235,9 +244,15 @@ pub mod routes {
                     },
                     b"o" => {
                         i += 1;
+                        if i == len {
+                            return Ok(Match::NotFound);
+                        }
                         match &path[i..i+1] {
                             b"b" => {
                                 i += 1;
+                                if i + 2 > len {
+                                    return Ok(Match::NotFound);
+                                }
                                 match &path[i..i+2] {
                                     b"ar" => {
                                         i += 2;
@@ -268,6 +283,9 @@ pub mod routes {
                             },
                             b"s" => {
                                 i += 1;
+                                if i == len {
+                                    return Ok(Match::NotFound);
+                                }
                                 match &path[i..i+1] {
                                     b"h" => {
                                         i += 1;
