@@ -8,6 +8,8 @@ edition = "2018"
 
 [dependencies]
 uuid = { version = "0.7", features = ["serde"] }
+
+[dev-dependencies]
 wayfinder = { path = "../../wayfinder" }
 
 [build-dependencies]

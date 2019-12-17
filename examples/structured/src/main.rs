@@ -1,7 +1,7 @@
 extern crate uuid;
 extern crate wayfinder;
 
-use wayfinder::Match;
+use routes::Match;
 
 include!(concat!(env!("OUT_DIR"), "/routes.rs"));
 
@@ -28,7 +28,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::routes;
-    use wayfinder::Match;
+    use routes::Match;
 
     #[test]
     fn test_people_index() {

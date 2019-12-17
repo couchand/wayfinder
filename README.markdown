@@ -140,7 +140,7 @@ the current status compared to planned/potential updates:
   - [ ] Redirect should provide the code?
 
 - Refactorings and cleanups
-  - [ ] Get rid of any runtime dep on this lib
+  - [x] Get rid of any runtime dep on this lib
   - [x] Accept `AsRef<str>` instead of `Iterator<Item=char>`
   - [x] Actually `AsRef<[u8]>` since it must be ASCII
   - [ ] Accept `Read`?

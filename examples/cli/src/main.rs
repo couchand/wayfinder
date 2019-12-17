@@ -1,7 +1,7 @@
 extern crate uuid;
 extern crate wayfinder;
 
-use wayfinder::Match;
+use routes::Match;
 
 include!(concat!(env!("OUT_DIR"), "/routes.rs"));
 
@@ -29,7 +29,7 @@ fn main() {
 mod tests {
     use super::routes;
     use uuid::Uuid;
-    use wayfinder::Match;
+    use routes::Match;
 
     fn test_cases() -> Vec<(&'static str, wayfinder::Method, Match<routes::Route>)> {
         let id: Uuid = "12345678901234567890123456789012".parse().unwrap();

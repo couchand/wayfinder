@@ -312,6 +312,61 @@ where
     codegen_module(w, &modules.root, &route_config.headers, "    ")?;
     writeln!(w)?;
 
+    writeln!(w, "    #[derive(PartialEq, Eq)]")?;
+    writeln!(w, "    pub enum Match<T> {{")?;
+    writeln!(w, "        NotFound,")?;
+    writeln!(w, "        NotAllowed,")?;
+    writeln!(w, "        Route(T),")?;
+    writeln!(w, "        Redirect(T),")?;
+    writeln!(w, "    }}")?;
+    writeln!(w)?;
+    writeln!(w, "    use std::fmt;")?;
+    writeln!(w, "    impl<T: fmt::Debug> fmt::Debug for Match<T> {{")?;
+    writeln!(w, "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{")?;
+    writeln!(w, "            match self {{")?;
+    writeln!(w, "                Match::NotFound => write!(f, \"Match::NotFound\"),")?;
+    writeln!(w, "                Match::NotAllowed => write!(f, \"Match::NotAllowed\"),")?;
+    writeln!(w, "                Match::Route(t) => write!(f, \"Match::Route({{:?}})\", t),")?;
+    writeln!(w, "                Match::Redirect(t) => write!(f, \"Match::Redirect({{:?}})\", t),")?;
+    writeln!(w, "            }}")?;
+    writeln!(w, "        }}")?;
+    writeln!(w, "    }}")?;
+    writeln!(w)?;
+    writeln!(w, "    pub struct Error {{")?;
+    writeln!(w, "        param: String,")?;
+    writeln!(w, "        what: Box<dyn fmt::Debug>,")?;
+    writeln!(w, "    }}")?;
+    writeln!(w)?;
+    writeln!(w, "    impl fmt::Debug for Error {{")?;
+    writeln!(w, "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{")?;
+    writeln!(w, "            f.debug_struct(\"wayfinder::Error\")")?;
+    writeln!(w, "                .field(\"param\", &self.param)")?;
+    writeln!(w, "                .field(\"what\", &self.what)")?;
+    writeln!(w, "                .finish()")?;
+    writeln!(w, "        }}")?;
+    writeln!(w, "    }}")?;
+    writeln!(w)?;
+    writeln!(w, "    impl fmt::Display for Error {{")?;
+    writeln!(w, "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{")?;
+    writeln!(w, "            write!(")?;
+    writeln!(w, "                f,")?;
+    writeln!(w, "                \"Error parsing '{{}}' parameter {{:?}}\",")?;
+    writeln!(w, "                self.param, self.what")?;
+    writeln!(w, "            )")?;
+    writeln!(w, "        }}")?;
+    writeln!(w, "    }}")?;
+    writeln!(w)?;
+    writeln!(w, "    impl std::error::Error for Error {{}}")?;
+    writeln!(w)?;
+    writeln!(w, "    impl Error {{")?;
+    writeln!(w, "        pub fn fail<S: AsRef<str>, T: fmt::Debug + 'static>(param: S, what: T) -> Error {{")?;
+    writeln!(w, "            Error {{")?;
+    writeln!(w, "                param: param.as_ref().to_string(),")?;
+    writeln!(w, "                what: Box::new(what),")?;
+    writeln!(w, "            }}")?;
+    writeln!(w, "        }}")?;
+    writeln!(w, "    }}")?;
+
     #[cfg(feature = "http")]
     {
         writeln!(w, "    /// Match an incoming request against this router.")?;
@@ -403,10 +458,8 @@ where
     writeln!(w, "        method: M,")?;
     writeln!(
         w,
-        "    ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {{"
+        "    ) -> Result<Match<Route>, Error> {{"
     )?;
-    writeln!(w, "        use wayfinder::{{Error, Match}};")?;
-    writeln!(w)?;
     writeln!(w, "        let method = method.as_ref();")?;
     writeln!(w, "        let path = path.as_ref();")?;
     writeln!(w, "        let len = path.len();")?;
