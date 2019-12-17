@@ -586,7 +586,10 @@ where
         // n.b. if we got here, the next bit is unambiguous save a dynamic
 
         // TODO: refactor code to make this clearer!
-        assert!(has_dynamic, "there must be a dynamic or we did something wrong");
+        assert!(
+            has_dynamic,
+            "there must be a dynamic or we did something wrong"
+        );
 
         if match_len == 1 {
             writeln!(w, "{}if i <= len {{", indent1)?;

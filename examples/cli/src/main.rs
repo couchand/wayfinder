@@ -34,21 +34,9 @@ mod tests {
     fn test_cases() -> Vec<(&'static str, wayfinder::Method, Match<routes::Route>)> {
         let id: Uuid = "12345678901234567890123456789012".parse().unwrap();
         vec![
-            (
-                "",
-                wayfinder::Method::Get,
-                Match::NotFound,
-            ),
-            (
-                "/",
-                wayfinder::Method::Get,
-                Match::NotFound,
-            ),
-            (
-                "/user",
-                wayfinder::Method::Get,
-                Match::NotFound,
-            ),
+            ("", wayfinder::Method::Get, Match::NotFound),
+            ("/", wayfinder::Method::Get, Match::NotFound),
+            ("/user", wayfinder::Method::Get, Match::NotFound),
             (
                 "/users",
                 wayfinder::Method::Get,
