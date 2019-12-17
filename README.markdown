@@ -128,6 +128,7 @@ the current status compared to planned/potential updates:
   - [x] Any level (module*-route) route types
   - [ ] Documentation on using the `config` types directly from `build.rs`
   - [ ] Some simple static checks (uniqueness of params, existence of redirect)
+  - [ ] Cargo rerun-if-changed output for build
 
 - Runtime functionality
   - [x] Match static routes
