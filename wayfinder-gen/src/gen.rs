@@ -371,17 +371,13 @@ where
     writeln!(w, "    ///")?;
     writeln!(
         w,
-        "    /// Accepts an iterator for the characters of the request path,"
-    )?;
-    writeln!(
-        w,
-        "    /// as well as a [`wayfinder::Method`] for the HTTP verb."
+        "    /// Accepts a byte slice for the request path and HTTP verb."
     )?;
     writeln!(
         w,
         "    /// Returns a `Result`, usually `Ok` with the result of the"
     )?;
-    writeln!(w, "    /// [`wayfinder::Match`].")?;
+    writeln!(w, "    /// [`Match`].")?;
     writeln!(w, "    ///")?;
     writeln!(
         w,
@@ -421,16 +417,7 @@ where
     )?;
     writeln!(w, "    /// to send back a `400 Bad Request` for that.")?;
     writeln!(w, "    ///")?;
-    // TODO: these relative paths assume way too much
-    // TODO: make these point to the specific version on docs.rs
-    writeln!(
-        w,
-        "    /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html"
-    )?;
-    writeln!(
-        w,
-        "    /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html"
-    )?;
+    writeln!(w, "    /// [`Match`]: enum.Match.html")?;
     writeln!(w, "    /// [`Route`]: enum.Route.html")?;
 
     writeln!(w, "    pub fn match_route<P: AsRef<[u8]>, M: AsRef<[u8]>>(")?;

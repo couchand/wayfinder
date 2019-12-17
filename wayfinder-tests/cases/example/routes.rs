@@ -386,10 +386,9 @@ pub mod routes {
     }
     /// Match a path and method against this router.
     ///
-    /// Accepts an iterator for the characters of the request path,
-    /// as well as a [`wayfinder::Method`] for the HTTP verb.
+    /// Accepts a byte slice for the request path and HTTP verb.
     /// Returns a `Result`, usually `Ok` with the result of the
-    /// [`wayfinder::Match`].
+    /// [`Match`].
     ///
     /// If the match was successful, it will be a `Match::Route` or
     /// `Match::Redirect` with the parameters enclosed.  You can then
@@ -405,8 +404,7 @@ pub mod routes {
     /// `Err` with the underlying parsing error.  Usually you'll want
     /// to send back a `400 Bad Request` for that.
     ///
-    /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
-    /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
+    /// [`Match`]: enum.Match.html
     /// [`Route`]: enum.Route.html
     pub fn match_route<P: AsRef<[u8]>, M: AsRef<[u8]>>(
         path: P,

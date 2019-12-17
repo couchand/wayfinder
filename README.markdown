@@ -108,7 +108,7 @@ the current status compared to planned/potential updates:
 
 - Required before publishing 0.1
   - [x] Drop or fix `http` feature
-  - [ ] Rewrite generated docs so they're accurate
+  - [x] Rewrite generated docs so they're accurate
   - [ ] De-crateify
   - [ ] Triage inline TODO items
 
