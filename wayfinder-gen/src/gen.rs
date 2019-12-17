@@ -583,34 +583,33 @@ where
     let match_len = if l == 0 { 1 } else { l };
 
     if unambiguous != "" {
+        // n.b. if we got here, the next bit is unambiguous save a dynamic
+
+        // TODO: refactor code to make this clearer!
+        assert!(has_dynamic, "there must be a dynamic or we did something wrong");
+
         if match_len == 1 {
-            writeln!(w, "{}if i == len {{", indent1)?;
+            writeln!(w, "{}if i <= len {{", indent1)?;
         } else {
-            writeln!(w, "{}if i + {} > len {{", indent1, match_len)?;
+            writeln!(w, "{}if i + {} <= len {{", indent1, match_len)?;
         }
-        writeln!(w, "{}    return Ok(Match::NotFound);", indent1)?;
+
+        writeln!(w, "{}match &path[i..i+{}] {{", indent2, match_len)?;
+        writeln!(w, "{}    b\"{}\" => {{", indent2, unambiguous)?; // TODO: quotes in paths??
+        writeln!(w, "{}        i += {};", indent2, match_len)?;
+
+        codegen_trie(w, next, indent + 3)?;
+
+        writeln!(w, "{}    }},", indent2)?;
+
+        writeln!(w, "{}    _ => {{}},", indent2)?;
+        writeln!(w, "{}}}", indent2)?;
         writeln!(w, "{}}}", indent1)?;
 
-        writeln!(w, "{}match &path[i..i+{}] {{", indent1, match_len)?;
-        writeln!(w, "{}    b\"{}\" => {{", indent1, unambiguous)?; // TODO: quotes in paths??
-        writeln!(w, "{}        i += {};", indent1, match_len)?;
-
-        codegen_trie(w, next, indent + 2)?;
-
-        writeln!(w, "{}    }},", indent1)?;
-
-        if !has_dynamic {
-            writeln!(w, "{}    _ => return Ok(Match::NotFound),", indent1)?;
-            writeln!(w, "{}}}", indent1)?;
+        if let Charlike::Dynamic(ref name) = dynamic.unwrap().0 {
+            write_dynamic(w, &dynamic.unwrap().1, indent, name)?;
         } else {
-            writeln!(w, "{}    _ => {{}},", indent1)?;
-            writeln!(w, "{}}}", indent1)?;
-
-            if let Charlike::Dynamic(ref name) = dynamic.unwrap().0 {
-                write_dynamic(w, &dynamic.unwrap().1, indent, name)?;
-            } else {
-                unreachable!();
-            }
+            unreachable!();
         }
 
         return Ok(());

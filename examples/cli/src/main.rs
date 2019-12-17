@@ -156,6 +156,11 @@ mod tests {
                 ))),
             ),
             (
+                "/people/12345678901234567890123456789012/edi",
+                wayfinder::Method::Get,
+                Match::NotFound,
+            ),
+            (
                 "/people/12345678901234567890123456789012/edit",
                 wayfinder::Method::Get,
                 Match::Route(routes::Route::People(routes::people::Route::Edit(

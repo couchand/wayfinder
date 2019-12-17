@@ -128,7 +128,7 @@ the current status compared to planned/potential updates:
   - [ ] More complicated parameter matching (e.g. regex)
   - [ ] Match const query params and route on them
   - [ ] Actually handle query string parameters
-  - [ ] Correctly handle bad routes
+  - [x] Correctly handle bad routes
   - [ ] Method parser & HTTP first-line parser
   - [x] `http` lib support instead of or in addition to the above
   - [ ] `Into` impls flow upward

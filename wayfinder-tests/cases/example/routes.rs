@@ -410,38 +410,36 @@ pub mod routes {
 
                 let start = i;
 
-                if i + 3 > len {
-                    return Ok(Match::NotFound);
-                    // TODO: there's a bug here, obviously
-                }
-                match &path[i..i+3] {
-                    b"new" => {
-                        i += 3;
-                        if i == len {
-                            match method {
-                                Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
-                                    lang: None,
-                                })))),
-                                _ => return Ok(Match::NotAllowed),
+                if i + 3 <= len {
+                    match &path[i..i+3] {
+                        b"new" => {
+                            i += 3;
+                            if i == len {
+                                match method {
+                                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
+                                        lang: None,
+                                    })))),
+                                    _ => return Ok(Match::NotAllowed),
+                                }
                             }
-                        }
-                        match &path[i..i+1] {
-                            b"/" => {
-                                i += 1;
-                            },
-                            _ => return Ok(Match::NotFound),
-                        }
-                        if i == len {
-                            match method {
-                                Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
-                                    lang: None,
-                                })))),
-                                _ => return Ok(Match::NotAllowed),
+                            match &path[i..i+1] {
+                                b"/" => {
+                                    i += 1;
+                                },
+                                _ => return Ok(Match::NotFound),
                             }
-                        }
-                        return Ok(Match::NotFound);
-                    },
-                    _ => {},
+                            if i == len {
+                                match method {
+                                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
+                                        lang: None,
+                                    })))),
+                                    _ => return Ok(Match::NotAllowed),
+                                }
+                            }
+                            return Ok(Match::NotFound);
+                        },
+                        _ => {},
+                    }
                 }
 
                 while i < len && &path[i..i+1] != b"/" {
@@ -569,38 +567,36 @@ pub mod routes {
 
                 let start = i;
 
-                if i + 3 > len {
-                    return Ok(Match::NotFound);
-                    // TODO: another instance of the bug
-                }
-                match &path[i..i+3] {
-                    b"new" => {
-                        i += 3;
-                        if i == len {
-                            match method {
-                                Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
-                                    lang: None,
-                                })))),
-                                _ => return Ok(Match::NotAllowed),
+                if i + 3 <= len {
+                    match &path[i..i+3] {
+                        b"new" => {
+                            i += 3;
+                            if i == len {
+                                match method {
+                                    Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
+                                        lang: None,
+                                    })))),
+                                    _ => return Ok(Match::NotAllowed),
+                                }
                             }
-                        }
-                        match &path[i..i+1] {
-                            b"/" => {
-                                i += 1;
-                            },
-                            _ => return Ok(Match::NotFound),
-                        }
-                        if i == len {
-                            match method {
-                                Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
-                                    lang: None,
-                                })))),
-                                _ => return Ok(Match::NotAllowed),
+                            match &path[i..i+1] {
+                                b"/" => {
+                                    i += 1;
+                                },
+                                _ => return Ok(Match::NotFound),
                             }
-                        }
-                        return Ok(Match::NotFound);
-                    },
-                    _ => {},
+                            if i == len {
+                                match method {
+                                    Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
+                                        lang: None,
+                                    })))),
+                                    _ => return Ok(Match::NotAllowed),
+                                }
+                            }
+                            return Ok(Match::NotFound);
+                        },
+                        _ => {},
+                    }
                 }
 
                 while i < len && &path[i..i+1] != b"/" {
