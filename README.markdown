@@ -111,7 +111,7 @@ the current status compared to planned/potential updates:
   - [x] Rewrite generated docs so they're accurate
   - [x] De-crateify
   - [x] Triage inline TODO items
-  - [ ] Smoke test app
+  - [x] Smoke test app
 
 - Route file syntax
   - [x] Parse & stringify route files
