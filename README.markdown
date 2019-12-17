@@ -106,6 +106,12 @@ status
 `wayfinder` is currently a work-in-progress.  Here is a summary of
 the current status compared to planned/potential updates:
 
+- Required before publishing 0.1
+  - [ ] Drop or fix `http` feature
+  - [ ] Rewrite generated docs so they're accurate
+  - [ ] De-crateify
+  - [ ] Triage inline TODO items
+
 - Route file syntax
   - [x] Parse & stringify route files
   - [ ] More robust parsing error reporting
@@ -148,7 +154,6 @@ the current status compared to planned/potential updates:
   - [ ] Accept `AsyncRead`?
   - [x] Match chunk-wise, not char-wise
   - [ ] Only try parsing if route actually matches otherwise
-  - [ ] Rewrite generated docs so they're accurate
 
 - Other use-cases
   - [ ] JS router for SPA
@@ -158,7 +163,6 @@ the current status compared to planned/potential updates:
   - [ ] CLI args??
 
 - Meta-concerns
-  - [ ] De-crateify
   - [ ] Address all inline TODO items
   - [ ] Better test coverage
   - [ ] Make codegen not so painful
