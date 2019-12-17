@@ -3,6 +3,11 @@ name = "wayfinder"
 version = "0.1.0"
 authors = ["Andrew Dona-Couch <hi@andrewcou.ch>"]
 edition = "2018"
+license = "MIT"
+description = "A little HTTP router generator"
+repository = "https://github.com/couchand/wayfinder"
+categories = ["web-programming"]
+keywords = ["url", "http", "router"]
 
 [dependencies]
 itertools = "0.8"
