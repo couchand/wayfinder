@@ -110,7 +110,7 @@ the current status compared to planned/potential updates:
   - [x] Drop or fix `http` feature
   - [x] Rewrite generated docs so they're accurate
   - [ ] De-crateify
-  - [ ] Triage inline TODO items
+  - [x] Triage inline TODO items
 
 - Route file syntax
   - [x] Parse & stringify route files

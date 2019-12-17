@@ -550,7 +550,7 @@ where
 
                 // check it
                 writeln!(w, "{}match &path[i..i+{}] {{", indent1, match_len)?;
-                writeln!(w, "{}    b\"{}\" => {{", indent1, unambiguous)?; // TODO quotes in paths????
+                writeln!(w, "{}    b\"{}\" => {{", indent1, unambiguous)?; // TODO quotes in paths - invalid, but??
                 writeln!(w, "{}        i += {};", indent1, match_len)?;
                 writeln!(w, "{}    }},", indent1)?;
                 writeln!(w, "{}    _ => return Ok(Match::NotFound),", indent1)?;
@@ -640,7 +640,7 @@ where
         }
 
         writeln!(w, "{}match &path[i..i+{}] {{", indent2, match_len)?;
-        writeln!(w, "{}    b\"{}\" => {{", indent2, unambiguous)?; // TODO: quotes in paths??
+        writeln!(w, "{}    b\"{}\" => {{", indent2, unambiguous)?; // TODO: quotes in paths - invalid, but??
         writeln!(w, "{}        i += {};", indent2, match_len)?;
 
         codegen_trie(w, next, indent + 3)?;
@@ -680,8 +680,8 @@ where
             Charlike::Dynamic(ref p) => {
                 write_dynamic(w, &child.1, indent, p)?;
 
-                // TODO: is this true still?
                 // No further routes will possibly match.
+                // TODO: is this true still?
                 break;
             }
             Charlike::Separator => {
