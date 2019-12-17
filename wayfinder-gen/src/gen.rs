@@ -322,12 +322,27 @@ where
     writeln!(w)?;
     writeln!(w, "    use std::fmt;")?;
     writeln!(w, "    impl<T: fmt::Debug> fmt::Debug for Match<T> {{")?;
-    writeln!(w, "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{")?;
+    writeln!(
+        w,
+        "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{"
+    )?;
     writeln!(w, "            match self {{")?;
-    writeln!(w, "                Match::NotFound => write!(f, \"Match::NotFound\"),")?;
-    writeln!(w, "                Match::NotAllowed => write!(f, \"Match::NotAllowed\"),")?;
-    writeln!(w, "                Match::Route(t) => write!(f, \"Match::Route({{:?}})\", t),")?;
-    writeln!(w, "                Match::Redirect(t) => write!(f, \"Match::Redirect({{:?}})\", t),")?;
+    writeln!(
+        w,
+        "                Match::NotFound => write!(f, \"Match::NotFound\"),"
+    )?;
+    writeln!(
+        w,
+        "                Match::NotAllowed => write!(f, \"Match::NotAllowed\"),"
+    )?;
+    writeln!(
+        w,
+        "                Match::Route(t) => write!(f, \"Match::Route({{:?}})\", t),"
+    )?;
+    writeln!(
+        w,
+        "                Match::Redirect(t) => write!(f, \"Match::Redirect({{:?}})\", t),"
+    )?;
     writeln!(w, "            }}")?;
     writeln!(w, "        }}")?;
     writeln!(w, "    }}")?;
@@ -338,7 +353,10 @@ where
     writeln!(w, "    }}")?;
     writeln!(w)?;
     writeln!(w, "    impl fmt::Debug for Error {{")?;
-    writeln!(w, "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{")?;
+    writeln!(
+        w,
+        "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{"
+    )?;
     writeln!(w, "            f.debug_struct(\"wayfinder::Error\")")?;
     writeln!(w, "                .field(\"param\", &self.param)")?;
     writeln!(w, "                .field(\"what\", &self.what)")?;
@@ -347,10 +365,16 @@ where
     writeln!(w, "    }}")?;
     writeln!(w)?;
     writeln!(w, "    impl fmt::Display for Error {{")?;
-    writeln!(w, "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{")?;
+    writeln!(
+        w,
+        "        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{"
+    )?;
     writeln!(w, "            write!(")?;
     writeln!(w, "                f,")?;
-    writeln!(w, "                \"Error parsing '{{}}' parameter {{:?}}\",")?;
+    writeln!(
+        w,
+        "                \"Error parsing '{{}}' parameter {{:?}}\","
+    )?;
     writeln!(w, "                self.param, self.what")?;
     writeln!(w, "            )")?;
     writeln!(w, "        }}")?;
@@ -423,10 +447,7 @@ where
     writeln!(w, "    pub fn match_route<P: AsRef<[u8]>, M: AsRef<[u8]>>(")?;
     writeln!(w, "        path: P,")?;
     writeln!(w, "        method: M,")?;
-    writeln!(
-        w,
-        "    ) -> Result<Match<Route>, Error> {{"
-    )?;
+    writeln!(w, "    ) -> Result<Match<Route>, Error> {{")?;
     writeln!(w, "        let method = method.as_ref();")?;
     writeln!(w, "        let path = path.as_ref();")?;
     writeln!(w, "        let len = path.len();")?;
