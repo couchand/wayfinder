@@ -80,21 +80,24 @@ indented!(
     )
 );
 
-// TODO: make this parse multi-level routes!
-named!(target<CompleteStr, (bool, String, String)>,
+named!(target<CompleteStr, (bool, Vec<String>, String)>,
     alt_complete!(
         do_parse!(
             ws!(tag!("->")) >>
-            controller: take_while1!(is_identifier_char) >>
-            ws!(tag!("::")) >>
+            modules: many0!(terminated!(
+                take_while1!(is_identifier_char),
+                ws!(tag!("::"))
+            )) >>
             action: take_while1!(is_identifier_char) >>
-            ((true, controller.to_string(), action.to_string()))
+            ((true, modules.iter().map(|m| m.to_string()).collect(), action.to_string()))
         ) |
         do_parse!(
-            controller: take_while1!(is_identifier_char) >>
-            ws!(tag!("::")) >>
+            modules: many0!(terminated!(
+                take_while1!(is_identifier_char),
+                ws!(tag!("::"))
+            )) >>
             action: take_while1!(is_identifier_char) >>
-            ((false, controller.to_string(), action.to_string()))
+            ((false, modules.iter().map(|m| m.to_string()).collect(), action.to_string()))
         )
     )
 );
@@ -122,7 +125,7 @@ pub fn resource(input: CompleteStr, level: usize) -> IResult<CompleteStr, Resour
                     ))
                 >> (Resource {
                     method,
-                    modules: vec![target.1],
+                    modules: target.1,
                     name: target.2,
                     is_redirect: target.0,
                     query_parameters,

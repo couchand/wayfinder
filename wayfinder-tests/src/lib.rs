@@ -155,6 +155,26 @@ fn get_resource_cases() -> Vec<(Resource, &'static str)> {
             },
             "GET person::show\n  [id: usize]\n",
         ),
+        (
+            Resource {
+                method: Method::Get,
+                modules: vec![],
+                name: "index".to_string(),
+                is_redirect: false,
+                query_parameters: vec![],
+            },
+            "GET index\n",
+        ),
+        (
+            Resource {
+                method: Method::Get,
+                modules: vec!["admin".to_string(), "person".to_string()],
+                name: "show".to_string(),
+                is_redirect: false,
+                query_parameters: vec![],
+            },
+            "GET admin::person::show\n",
+        ),
     ]
 }
 
