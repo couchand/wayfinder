@@ -107,7 +107,7 @@ status
 the current status compared to planned/potential updates:
 
 - Required before publishing 0.1
-  - [ ] Drop or fix `http` feature
+  - [x] Drop or fix `http` feature
   - [ ] Rewrite generated docs so they're accurate
   - [ ] De-crateify
   - [ ] Triage inline TODO items
@@ -136,7 +136,7 @@ the current status compared to planned/potential updates:
   - [ ] Actually handle query string parameters
   - [x] Correctly handle bad routes
   - [ ] Method parser & HTTP first-line parser
-  - [x] `http` lib support instead of or in addition to the above
+  - [ ] `http` lib support instead of or in addition to the above
   - [ ] Fix `http` support & add tests
   - [ ] `Into` impls flow upward
   - [ ] `ToPath` or something trait
