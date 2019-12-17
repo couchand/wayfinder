@@ -166,6 +166,7 @@ the current status compared to planned/potential updates:
 - Meta-concerns
   - [ ] Address all inline TODO items
   - [ ] Better test coverage
+  - [ ] Add lints - require docs, idioms, etc
   - [ ] Make codegen not so painful
   - [x] Migrate last codegen unit tests to functional tests
   - [ ] Security review
