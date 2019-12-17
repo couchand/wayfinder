@@ -145,14 +145,38 @@ pub mod routes {
             }
         }
         let start = i;
-        while i < len && path[i..i+1] != b"/" {
+
+        while i < len && &path[i..i+1] != b"/" {
             i += 1;
         }
 
-        let id = path[start..i].parse()
+        let text = std::str::from_utf8(&path[start..i]).unwrap();
+        let id = text.parse()
             .map_err(|e| Error::fail("id", e))?;
 
-        // TODO: there's a bug here, obviously!
+        if i == len {
+            match method {
+                Method::Get => return Ok(Match::Route(Route::Admin(admin::Route::People(admin::people::Route::Show(admin::people::Show {
+                    id,
+                }))))),
+                _ => return Ok(Match::NotAllowed),
+            }
+        }
+        match &path[i..i+1] {
+            b"/" => {
+                i += 1;
+            },
+            _ => return Ok(Match::NotFound),
+        }
+        if i == len {
+            match method {
+                Method::Get => return Ok(Match::Route(Route::Admin(admin::Route::People(admin::people::Route::Show(admin::people::Show {
+                    id,
+                }))))),
+                _ => return Ok(Match::NotAllowed),
+            }
+        }
+        return Ok(Match::NotFound);
     }
 
 } // mod routes

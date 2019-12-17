@@ -323,12 +323,8 @@ pub mod routes {
             _ => {},
         }
 
-        loop {
-            if i == len { break }
-            match &path[i..i+1] {
-                b"/" => break,
-                _ => i += 1,
-            }
+        while i < len && &path[i..i+1] != b"/" {
+            i += 1;
         }
 
         let text = std::str::from_utf8(&path[start..i]).unwrap();

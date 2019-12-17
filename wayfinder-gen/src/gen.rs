@@ -518,21 +518,8 @@ where
                 codegen_trie(w, child, indent)?;
             }
             Charlike::Dynamic(ref name) => {
-                // collect chars to next separator
                 writeln!(w, "{}let start = i;", indent1)?;
-                writeln!(w, "{}while i < len && path[i..i+1] != b\"/\" {{", indent1)?;
-                writeln!(w, "{}    i += 1;", indent1)?;
-                writeln!(w, "{}}}", indent1)?;
-
-                // try parse
-                writeln!(w)?;
-                writeln!(w, "{}let {} = path[start..i].parse()", indent1, name)?;
-                writeln!(
-                    w,
-                    "{}    .map_err(|e| Error::fail(\"{}\", e))?;",
-                    indent1, name
-                )?;
-                writeln!(w)?;
+                write_dynamic(w, &child, indent, name)?;
             }
         }
 
@@ -744,14 +731,8 @@ where
     indent2.push_str("    ");
 
     writeln!(w)?;
-    writeln!(w, "{}loop {{", indent1)?;
-
-    writeln!(w, "{}if i == len {{ break }}", indent2)?;
-    writeln!(w, "{}match &path[i..i+1] {{", indent2)?;
-    writeln!(w, "{}    b\"/\" => break,", indent2)?;
-    writeln!(w, "{}    _ => i += 1,", indent2)?;
-    writeln!(w, "{}}}", indent2)?;
-
+    writeln!(w, "{}while i < len && &path[i..i+1] != b\"/\" {{", indent1)?;
+    writeln!(w, "{}    i += 1;", indent1)?;
     writeln!(w, "{}}}", indent1)?;
     writeln!(w)?;
     writeln!(
