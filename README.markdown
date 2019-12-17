@@ -131,6 +131,7 @@ the current status compared to planned/potential updates:
   - [x] Correctly handle bad routes
   - [ ] Method parser & HTTP first-line parser
   - [x] `http` lib support instead of or in addition to the above
+  - [ ] Fix `http` support & add tests
   - [ ] `Into` impls flow upward
   - [ ] `ToPath` or something trait
   - [ ] `link_to` helper leveraging the above
@@ -147,6 +148,7 @@ the current status compared to planned/potential updates:
   - [ ] Accept `AsyncRead`?
   - [x] Match chunk-wise, not char-wise
   - [ ] Only try parsing if route actually matches otherwise
+  - [ ] Rewrite generated docs so they're accurate
 
 - Other use-cases
   - [ ] JS router for SPA
@@ -156,6 +158,7 @@ the current status compared to planned/potential updates:
   - [ ] CLI args??
 
 - Meta-concerns
+  - [ ] De-crateify
   - [ ] Address all inline TODO items
   - [ ] Better test coverage
   - [ ] Make codegen not so painful
