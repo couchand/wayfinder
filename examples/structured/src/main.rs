@@ -13,7 +13,7 @@ fn main() {
         return;
     }
 
-    let result = routes::match_route(&args[1], wayfinder::Method::Get);
+    let result = routes::match_route(&args[1], b"GET");
     println!("Parsed: {:?}", result);
 
     match result {
@@ -33,7 +33,7 @@ mod tests {
     #[test]
     fn test_people_index() {
         let route = "/people";
-        match routes::match_route(&route, wayfinder::Method::Get) {
+        match routes::match_route(&route, b"GET") {
             Ok(Match::Route(routes::Route::People(routes::people::Route::Index(_)))) => {}
             _ => assert!(false),
         }
@@ -42,7 +42,7 @@ mod tests {
     #[test]
     fn test_people_delete() {
         let route = "/people/12345678901234567890123456789012";
-        match routes::match_route(&route, wayfinder::Method::Delete) {
+        match routes::match_route(&route, b"DELETE") {
             Ok(Match::Route(routes::Route::People(routes::people::Route::Destroy(_)))) => {}
             _ => assert!(false),
         }
@@ -51,7 +51,7 @@ mod tests {
     #[test]
     fn test_not_allowed() {
         let route = "/people/12345678901234567890123456789012";
-        match routes::match_route(&route, wayfinder::Method::Post) {
+        match routes::match_route(&route, b"POST") {
             Ok(Match::NotAllowed) => {}
             _ => assert!(false),
         }

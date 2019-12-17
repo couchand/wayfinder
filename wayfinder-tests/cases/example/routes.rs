@@ -354,12 +354,13 @@ pub mod routes {
     /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
     /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
     /// [`Route`]: enum.Route.html
-    pub fn match_route<P: AsRef<[u8]>>(
+    pub fn match_route<P: AsRef<[u8]>, M: AsRef<[u8]>>(
         path: P,
-        method: wayfinder::Method,
+        method: M,
     ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
-        use wayfinder::{Error, Method, Match};
+        use wayfinder::{Error, Match};
 
+        let method = method.as_ref();
         let path = path.as_ref();
         let len = path.len();
         let mut i = if len > 0 && &path[0..1] == b"/" { 1 } else { 0 };
@@ -381,10 +382,10 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
+                        b"GET" => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
                             lang: None,
                         })))),
-                        Method::Post => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
+                        b"POST" => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
                             lang: None,
                         })))),
                         _ => return Ok(Match::NotAllowed),
@@ -398,10 +399,10 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
+                        b"GET" => return Ok(Match::Route(Route::Books(books::Route::Index(books::Index {
                             lang: None,
                         })))),
-                        Method::Post => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
+                        b"POST" => return Ok(Match::Route(Route::Books(books::Route::Create(books::Create {
                             lang: None,
                         })))),
                         _ => return Ok(Match::NotAllowed),
@@ -416,7 +417,7 @@ pub mod routes {
                             i += 3;
                             if i == len {
                                 match method {
-                                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
+                                    b"GET" => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
                                         lang: None,
                                     })))),
                                     _ => return Ok(Match::NotAllowed),
@@ -430,7 +431,7 @@ pub mod routes {
                             }
                             if i == len {
                                 match method {
-                                    Method::Get => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
+                                    b"GET" => return Ok(Match::Route(Route::Books(books::Route::New(books::New {
                                         lang: None,
                                     })))),
                                     _ => return Ok(Match::NotAllowed),
@@ -452,15 +453,15 @@ pub mod routes {
 
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
+                        b"GET" => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
                             id,
                             lang: None,
                         })))),
-                        Method::Put => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
+                        b"PUT" => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
                             id,
                             lang: None,
                         })))),
-                        Method::Delete => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
+                        b"DELETE" => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
                             id,
                             lang: None,
                         })))),
@@ -475,15 +476,15 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
+                        b"GET" => return Ok(Match::Route(Route::Books(books::Route::Show(books::Show {
                             id,
                             lang: None,
                         })))),
-                        Method::Put => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
+                        b"PUT" => return Ok(Match::Route(Route::Books(books::Route::Update(books::Update {
                             id,
                             lang: None,
                         })))),
-                        Method::Delete => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
+                        b"DELETE" => return Ok(Match::Route(Route::Books(books::Route::Destroy(books::Destroy {
                             id,
                             lang: None,
                         })))),
@@ -501,7 +502,7 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
+                        b"GET" => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
                             id,
                             lang: None,
                         })))),
@@ -516,7 +517,7 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
+                        b"GET" => return Ok(Match::Route(Route::Books(books::Route::Edit(books::Edit {
                             id,
                             lang: None,
                         })))),
@@ -538,10 +539,10 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
+                        b"GET" => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
                             lang: None,
                         })))),
-                        Method::Post => return Ok(Match::Route(Route::People(people::Route::Create(people::Create {
+                        b"POST" => return Ok(Match::Route(Route::People(people::Route::Create(people::Create {
                             lang: None,
                         })))),
                         _ => return Ok(Match::NotAllowed),
@@ -555,10 +556,10 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
+                        b"GET" => return Ok(Match::Route(Route::People(people::Route::Index(people::Index {
                             lang: None,
                         })))),
-                        Method::Post => return Ok(Match::Route(Route::People(people::Route::Create(people::Create {
+                        b"POST" => return Ok(Match::Route(Route::People(people::Route::Create(people::Create {
                             lang: None,
                         })))),
                         _ => return Ok(Match::NotAllowed),
@@ -573,7 +574,7 @@ pub mod routes {
                             i += 3;
                             if i == len {
                                 match method {
-                                    Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
+                                    b"GET" => return Ok(Match::Route(Route::People(people::Route::New(people::New {
                                         lang: None,
                                     })))),
                                     _ => return Ok(Match::NotAllowed),
@@ -587,7 +588,7 @@ pub mod routes {
                             }
                             if i == len {
                                 match method {
-                                    Method::Get => return Ok(Match::Route(Route::People(people::Route::New(people::New {
+                                    b"GET" => return Ok(Match::Route(Route::People(people::Route::New(people::New {
                                         lang: None,
                                     })))),
                                     _ => return Ok(Match::NotAllowed),
@@ -609,16 +610,16 @@ pub mod routes {
 
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
+                        b"GET" => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
                             id,
                             lang: None,
                         })))),
-                        Method::Put => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
+                        b"PUT" => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
                             id,
                             lang: None,
                             name: None,
                         })))),
-                        Method::Delete => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
+                        b"DELETE" => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
                             id,
                             lang: None,
                         })))),
@@ -633,16 +634,16 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
+                        b"GET" => return Ok(Match::Route(Route::People(people::Route::Show(people::Show {
                             id,
                             lang: None,
                         })))),
-                        Method::Put => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
+                        b"PUT" => return Ok(Match::Route(Route::People(people::Route::Update(people::Update {
                             id,
                             lang: None,
                             name: None,
                         })))),
-                        Method::Delete => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
+                        b"DELETE" => return Ok(Match::Route(Route::People(people::Route::Destroy(people::Destroy {
                             id,
                             lang: None,
                         })))),
@@ -660,7 +661,7 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
+                        b"GET" => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
                             id,
                             lang: None,
                         })))),
@@ -675,7 +676,7 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
+                        b"GET" => return Ok(Match::Route(Route::People(people::Route::Edit(people::Edit {
                             id,
                             lang: None,
                         })))),
@@ -697,7 +698,7 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
+                        b"GET" => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
                             lang: None,
                         })))),
                         _ => return Ok(Match::NotAllowed),
@@ -711,7 +712,7 @@ pub mod routes {
                 }
                 if i == len {
                     match method {
-                        Method::Get => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
+                        b"GET" => return Ok(Match::Redirect(Route::People(people::Route::Index(people::Index {
                             lang: None,
                         })))),
                         _ => return Ok(Match::NotAllowed),

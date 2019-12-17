@@ -252,6 +252,12 @@ pub enum Method {
     // TODO: more?
 }
 
+impl Method {
+    pub fn byte_str(&self) -> String {
+        format!("b\"{}\"", self)
+    }
+}
+
 impl fmt::Display for Method {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str(match self {

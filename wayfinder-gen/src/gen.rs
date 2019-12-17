@@ -398,15 +398,16 @@ where
     )?;
     writeln!(w, "    /// [`Route`]: enum.Route.html")?;
 
-    writeln!(w, "    pub fn match_route<P: AsRef<[u8]>>(")?;
+    writeln!(w, "    pub fn match_route<P: AsRef<[u8]>, M: AsRef<[u8]>>(")?;
     writeln!(w, "        path: P,")?;
-    writeln!(w, "        method: wayfinder::Method,")?;
+    writeln!(w, "        method: M,")?;
     writeln!(
         w,
         "    ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {{"
     )?;
-    writeln!(w, "        use wayfinder::{{Error, Method, Match}};")?;
+    writeln!(w, "        use wayfinder::{{Error, Match}};")?;
     writeln!(w)?;
+    writeln!(w, "        let method = method.as_ref();")?;
     writeln!(w, "        let path = path.as_ref();")?;
     writeln!(w, "        let len = path.len();")?;
     writeln!(
@@ -682,9 +683,9 @@ where
 
         writeln!(
             w,
-            "{0}        Method::{1:?} => return Ok(Match::{2}({3}{4}Route::{5}({4}{5} {{",
+            "{0}        {1} => return Ok(Match::{2}({3}{4}Route::{5}({4}{5} {{",
             indent1,
-            resource.method,
+            resource.method.byte_str(),
             if resource.is_redirect {
                 "Redirect"
             } else {

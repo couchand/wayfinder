@@ -186,12 +186,13 @@ pub mod routes {
     /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
     /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
     /// [`Route`]: enum.Route.html
-    pub fn match_route<P: AsRef<[u8]>>(
+    pub fn match_route<P: AsRef<[u8]>, M: AsRef<[u8]>>(
         path: P,
-        method: wayfinder::Method,
+        method: M,
     ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
-        use wayfinder::{Error, Method, Match};
+        use wayfinder::{Error, Match};
 
+        let method = method.as_ref();
         let path = path.as_ref();
         let len = path.len();
         let mut i = if len > 0 && &path[0..1] == b"/" { 1 } else { 0 };
@@ -220,7 +221,7 @@ pub mod routes {
                             }
                             if i == len {
                                 match method {
-                                    Method::Get => return Ok(Match::Route(Route::Fomo(fomo::Route::AsUsual(fomo::AsUsual {
+                                    b"GET" => return Ok(Match::Route(Route::Fomo(fomo::Route::AsUsual(fomo::AsUsual {
                                     })))),
                                     _ => return Ok(Match::NotAllowed),
                                 }
@@ -233,7 +234,7 @@ pub mod routes {
                             }
                             if i == len {
                                 match method {
-                                    Method::Get => return Ok(Match::Route(Route::Fomo(fomo::Route::AsUsual(fomo::AsUsual {
+                                    b"GET" => return Ok(Match::Route(Route::Fomo(fomo::Route::AsUsual(fomo::AsUsual {
                                     })))),
                                     _ => return Ok(Match::NotAllowed),
                                 }
@@ -259,7 +260,7 @@ pub mod routes {
                                     }
                                     if i == len {
                                         match method {
-                                            Method::Get => return Ok(Match::Route(Route::Foo(foo::Route::Bar(foo::Bar {
+                                            b"GET" => return Ok(Match::Route(Route::Foo(foo::Route::Bar(foo::Bar {
                                             })))),
                                             _ => return Ok(Match::NotAllowed),
                                         }
@@ -272,7 +273,7 @@ pub mod routes {
                                     }
                                     if i == len {
                                         match method {
-                                            Method::Get => return Ok(Match::Route(Route::Foo(foo::Route::Bar(foo::Bar {
+                                            b"GET" => return Ok(Match::Route(Route::Foo(foo::Route::Bar(foo::Bar {
                                             })))),
                                             _ => return Ok(Match::NotAllowed),
                                         }
@@ -292,7 +293,7 @@ pub mod routes {
                                     }
                                     if i == len {
                                         match method {
-                                            Method::Get => return Ok(Match::Route(Route::Foosh(foosh::Route::Ball(foosh::Ball {
+                                            b"GET" => return Ok(Match::Route(Route::Foosh(foosh::Route::Ball(foosh::Ball {
                                             })))),
                                             _ => return Ok(Match::NotAllowed),
                                         }
@@ -305,7 +306,7 @@ pub mod routes {
                                     }
                                     if i == len {
                                         match method {
-                                            Method::Get => return Ok(Match::Route(Route::Foosh(foosh::Route::Ball(foosh::Ball {
+                                            b"GET" => return Ok(Match::Route(Route::Foosh(foosh::Route::Ball(foosh::Ball {
                                             })))),
                                             _ => return Ok(Match::NotAllowed),
                                         }
@@ -332,7 +333,7 @@ pub mod routes {
 
         if i == len {
             match method {
-                Method::Get => return Ok(Match::Route(Route::Bar(bar::Route::Dyn(bar::Dyn {
+                b"GET" => return Ok(Match::Route(Route::Bar(bar::Route::Dyn(bar::Dyn {
                     a,
                 })))),
                 _ => return Ok(Match::NotAllowed),
@@ -346,7 +347,7 @@ pub mod routes {
         }
         if i == len {
             match method {
-                Method::Get => return Ok(Match::Route(Route::Bar(bar::Route::Dyn(bar::Dyn {
+                b"GET" => return Ok(Match::Route(Route::Bar(bar::Route::Dyn(bar::Dyn {
                     a,
                 })))),
                 _ => return Ok(Match::NotAllowed),

@@ -13,7 +13,7 @@ fn main() {
         return;
     }
 
-    let result = routes::match_route(&args[1], wayfinder::Method::Get);
+    let result = routes::match_route(&args[1], b"GET");
     println!("Parsed: {:?}", result);
 
     match result {
@@ -260,26 +260,23 @@ mod tests {
                     routes::books::Edit { id, lang: None },
                 ))),
             ),
+            (
+                "/people/12345678901234567890123456789012",
+                wayfinder::Method::Post,
+                Match::NotAllowed,
+            ),
         ]
     }
 
     #[test]
     fn test_routes() {
         for (route, method, expected) in test_cases() {
+            let method = format!("{}", method).into_bytes();
             let actual = match routes::match_route(&route, method) {
                 Ok(m) => m,
                 Err(e) => return assert!(false, "Unexpected error: {}", e),
             };
             assert_eq!(actual, expected);
-        }
-    }
-
-    #[test]
-    fn test_not_allowed() {
-        let route = "/people/12345678901234567890123456789012";
-        match routes::match_route(&route, wayfinder::Method::Post) {
-            Ok(Match::NotAllowed) => {}
-            _ => assert!(false),
         }
     }
 }

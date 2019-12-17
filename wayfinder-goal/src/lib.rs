@@ -12,7 +12,7 @@ mod tests {
     fn test_people() {
         let path = "/people";
 
-        match routes::match_route(&path, wayfinder::Method::Get) {
+        match routes::match_route(&path, b"GET") {
             Ok(wayfinder::Match::Route(routes::Route::People(routes::people::Route::Index(
                 routes::people::Index { lang: None },
             )))) => {}
@@ -24,7 +24,7 @@ mod tests {
     fn test_people2() {
         let path = "/people/";
 
-        match routes::match_route(&path, wayfinder::Method::Get) {
+        match routes::match_route(&path, b"GET") {
             Ok(wayfinder::Match::Route(routes::Route::People(routes::people::Route::Index(
                 routes::people::Index { lang: None },
             )))) => {}

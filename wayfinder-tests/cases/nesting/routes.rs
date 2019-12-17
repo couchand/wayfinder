@@ -127,19 +127,20 @@ pub mod routes {
     /// [`wayfinder::Method`]: ../../wayfinder/enum.Method.html
     /// [`wayfinder::Match`]: ../../wayfinder/enum.Match.html
     /// [`Route`]: enum.Route.html
-    pub fn match_route<P: AsRef<[u8]>>(
+    pub fn match_route<P: AsRef<[u8]>, M: AsRef<[u8]>>(
         path: P,
-        method: wayfinder::Method,
+        method: M,
     ) -> Result<wayfinder::Match<Route>, wayfinder::Error> {
-        use wayfinder::{Error, Method, Match};
+        use wayfinder::{Error, Match};
 
+        let method = method.as_ref();
         let path = path.as_ref();
         let len = path.len();
         let mut i = if len > 0 && &path[0..1] == b"/" { 1 } else { 0 };
 
         if i == len {
             match method {
-                Method::Get => return Ok(Match::Route(Route::Index(Index {
+                b"GET" => return Ok(Match::Route(Route::Index(Index {
                 }))),
                 _ => return Ok(Match::NotAllowed),
             }
@@ -156,7 +157,7 @@ pub mod routes {
 
         if i == len {
             match method {
-                Method::Get => return Ok(Match::Route(Route::Admin(admin::Route::People(admin::people::Route::Show(admin::people::Show {
+                b"GET" => return Ok(Match::Route(Route::Admin(admin::Route::People(admin::people::Route::Show(admin::people::Show {
                     id,
                 }))))),
                 _ => return Ok(Match::NotAllowed),
@@ -170,7 +171,7 @@ pub mod routes {
         }
         if i == len {
             match method {
-                Method::Get => return Ok(Match::Route(Route::Admin(admin::Route::People(admin::people::Route::Show(admin::people::Show {
+                b"GET" => return Ok(Match::Route(Route::Admin(admin::Route::People(admin::people::Route::Show(admin::people::Show {
                     id,
                 }))))),
                 _ => return Ok(Match::NotAllowed),
