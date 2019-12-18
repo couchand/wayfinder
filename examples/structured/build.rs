@@ -1,7 +1,10 @@
-use wayfinder::build::build_from_config;
+use wayfinder::build::Builder;
 
 mod routes;
 
 fn main() {
-    build_from_config(routes::routes())
+    Builder::from_env()
+        .input_config(routes::routes())
+        .output_file("routes.rs")
+        .build();
 }

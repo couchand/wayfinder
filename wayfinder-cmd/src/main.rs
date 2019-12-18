@@ -1,4 +1,4 @@
-use wayfinder::build::build;
+use wayfinder::build::Builder;
 
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
@@ -9,5 +9,8 @@ fn main() {
 
     let path = &args[1];
 
-    build(&path, &mut std::io::stdout());
+    Builder::new()
+        .input_file(path)
+        .output_stdout()
+        .build();
 }
