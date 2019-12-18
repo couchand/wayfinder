@@ -1,3 +1,8 @@
+//! Build helpers for using Wayfinder route matchers.
+//!
+//! See the documentation for [`Builder`](struct.Builder.html) for
+//! more details and examples.
+
 use std::env;
 use std::fs::File;
 use std::io::Write;
@@ -51,6 +56,16 @@ enum Target {
     Stdout,
 }
 
+/// Helper for building a server-side route matcher.
+///
+/// Basic usage in a build script looks like:
+///
+/// ```ignore
+/// Builder::from_env()
+///     .input_file("app.routes")
+///     .output_file("routes.rs")
+///     .build();
+/// ```
 pub struct Builder {
     use_cargo: bool,
     source_dir: Option<PathBuf>,
@@ -60,6 +75,7 @@ pub struct Builder {
 }
 
 impl Builder {
+    /// Create a new builder without loading Cargo environment variables.
     pub fn new() -> Builder {
         Builder {
             use_cargo: false,
@@ -70,6 +86,7 @@ impl Builder {
         }
     }
 
+    /// Create a new builder for use from a Cargo build script.
     pub fn from_env() -> Builder {
         let source_dir = match env::var("CARGO_MANIFEST_DIR") {
             Err(env::VarError::NotPresent) => fail!("Env var CARGO_MANIFEST_DIR not found."),
@@ -91,26 +108,38 @@ impl Builder {
         }
     }
 
+    /// Set the route config input to come from the specified file.
+    ///
+    /// The file is relative to the crate's Cargo manifest.
     pub fn input_file<P: Into<PathBuf>>(mut self, path: P) -> Builder {
         self.source = Some(Source::File(path.into()));
         self
     }
 
+    /// Set the route config directly.
     pub fn input_config(mut self, routes: RouteConfig) -> Builder {
         self.source = Some(Source::Config(routes));
         self
     }
 
+    /// Set the name of the output file to use.
     pub fn output_file<P: Into<PathBuf>>(mut self, path: P) -> Builder {
         self.target = Some(Target::File(path.into()));
         self
     }
 
+    /// Write the output to standard out.
     pub fn output_stdout(mut self) -> Builder {
         self.target = Some(Target::Stdout);
         self
     }
 
+    /// Execute the route matcher build.
+    ///
+    /// # Process termination
+    ///
+    /// This method exits the process if an error is encountered.
+    // TODO: should it return a result instead?
     pub fn build(self) {
         let source = match self.source {
             None => fail!("Source not configured.  Try builder.input_file(\"app.routes\")."),
