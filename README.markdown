@@ -168,7 +168,7 @@ the current status compared to planned/potential updates:
   - [ ] Address all inline TODO items
   - [ ] Better test coverage
   - [ ] Add lints - require docs, idioms, etc
-  - [ ] More complete inline docs
+  - [x] More complete inline docs
   - [ ] README for the wayfinder crate
   - [ ] More complete metadata for the crate
   - [ ] Make codegen not so painful
