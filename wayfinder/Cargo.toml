@@ -5,7 +5,9 @@ authors = ["Andrew Dona-Couch <hi@andrewcou.ch>"]
 edition = "2018"
 license = "MIT"
 description = "A little HTTP router generator"
+documentation = "https://docs.rs/wayfinder"
 repository = "https://github.com/couchand/wayfinder"
+readme = "README.markdown"
 categories = ["web-programming"]
 keywords = ["url", "http", "router"]
 
