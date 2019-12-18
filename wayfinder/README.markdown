@@ -6,7 +6,6 @@ a little http router generator
 - what is it?
 - getting started
 - language reference
-- status
 - more information
 
 what is it?
