@@ -275,6 +275,8 @@ where
     Ok(())
 }
 
+/// Generate a server-side route matching module for the given
+/// [`RouteConfig`](../struct.RouteConfig.html).
 pub fn codegen<W>(w: &mut W, route_config: &RouteConfig) -> io::Result<()>
 where
     W: Write,

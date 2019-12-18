@@ -1,3 +1,5 @@
+//! Parsing utilities for route config files.
+
 // TODO: this parser is functional, but there's a lot more that can
 // be done to improve robustness and error reporting.
 
