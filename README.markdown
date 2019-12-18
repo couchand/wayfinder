@@ -171,6 +171,7 @@ the current status compared to planned/potential updates:
   - [x] More complete inline docs
   - [x] README for the wayfinder crate
   - [x] More complete metadata for the crate
+  - [ ] Upgrade nom (and other deps)
   - [ ] Make codegen not so painful
   - [x] Migrate last codegen unit tests to functional tests
   - [ ] Security review
